@@ -10,7 +10,8 @@ import { db } from './firebase.js';
 import { doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { ORDER, CHAPTER_DATA, SESSIONS } from './data.js';
 import { idFor, totalForChapter, computeTotalAll, totalTheory, totalPyq } from './metrics.js';
-import { computeRankings, findRank, medal } from './leaderboard.js';
+import { computeRankings, mountLeaderboard } from './leaderboard.js';
+import { recommendQotd } from './qotdRecommend.js';
 
 let currentUser = null;
 let myUsername = null;
@@ -179,24 +180,31 @@ function updateStatStrip(){
   document.getElementById('overallBar').style.width = pct + '%';
 }
 
-async function updateRankWidget(){
-  const el = document.getElementById('rankStrip');
-  if (!el) return;
-  el.innerHTML = '<div class="loading" style="padding:10px;">Loading your rank…</div>';
-  try {
-    const rankings = await computeRankings();
-    const oRank = findRank(rankings.byOverall, currentUser.uid);
-    const tRank = findRank(rankings.byTheory, currentUser.uid);
-    const pRank = findRank(rankings.byPyq, currentUser.uid);
-    const n = rankings.byOverall.length;
-    const fmt = (r) => r ? `#${r}${medal(r) ? ' ' + medal(r) : ''} <span class="lbl">of ${n}</span>` : 'Unranked';
-    el.innerHTML = `
-      <div class="rank-item"><div class="rank-num">${fmt(oRank)}</div><div class="rank-lbl">Overall rank</div></div>
-      <div class="rank-item"><div class="rank-num">${fmt(tRank)}</div><div class="rank-lbl">Theory rank</div></div>
-      <div class="rank-item"><div class="rank-num">${fmt(pRank)}</div><div class="rank-lbl">PYQ rank</div></div>
-    `;
-  } catch(e){
-    el.innerHTML = '';
+async function updateSidebar(){
+  const lbEl = document.getElementById('sidebarLeaderboard');
+  const qotdEl = document.getElementById('qotdWidget');
+
+  if (lbEl){
+    lbEl.innerHTML = '<div class="loading" style="padding:10px;">Loading leaderboard…</div>';
+    try {
+      const rankings = await computeRankings();
+      mountLeaderboard(lbEl, rankings, 'overall', 5);
+    } catch(e){
+      lbEl.innerHTML = '<div class="empty-note">Could not load leaderboard.</div>';
+    }
+  }
+
+  if (qotdEl){
+    try {
+      const { chapter, video } = recommendQotd(myData);
+      qotdEl.innerHTML = `
+        <div class="qotd-chapter">Based on: ${chapter}</div>
+        <a class="qotd-link" href="${video.url}" target="_blank" rel="noopener">${video.title}</a>
+        <div class="video-dur">${video.duration}</div>
+      `;
+    } catch(e){
+      qotdEl.innerHTML = '<div class="empty-note">No recommendation available.</div>';
+    }
   }
 }
 
@@ -289,7 +297,7 @@ export async function startStudentSession(user){
   buildChapters();
   const first = document.querySelector('.chapter');
   if (first) first.classList.add('open');
-  updateRankWidget(); // fire-and-forget, doesn't block chapter rendering
+  updateSidebar(); // fire-and-forget, doesn't block chapter rendering
 }
 
 export function getCurrentUser(){ return currentUser; }
