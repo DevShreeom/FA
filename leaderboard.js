@@ -53,3 +53,52 @@ export function medal(rank){
   if (rank === 3) return '🥉';
   return null;
 }
+
+// Reusable renderer — used by both the student sidebar (compact) and the
+// teacher Class view (full top 10), so both stay in sync automatically.
+export function renderLeaderboardHTML(rankings, activeTab, limit){
+  const lists = { overall: rankings.byOverall, theory: rankings.byTheory, pyq: rankings.byPyq };
+  const pctKeys = { overall: 'overallPct', theory: 'theoryPct', pyq: 'pyqPct' };
+  const doneKeys = { overall: 'overallDone', theory: 'theoryDone', pyq: 'pyqDone' };
+  const totals = { overall: rankings.total, theory: rankings.tTheory, pyq: rankings.tPyq };
+
+  const list = lists[activeTab].slice(0, limit || 10);
+  const pctKey = pctKeys[activeTab];
+  const doneKey = doneKeys[activeTab];
+  const tot = totals[activeTab];
+
+  const rowsHtml = list.map((r, i) => {
+    const rank = i + 1;
+    const m = medal(rank);
+    return `
+      <div class="lb-row">
+        <div class="lb-rank">${m || '#' + rank}</div>
+        <div class="lb-name">${r.name}</div>
+        <div class="lb-bar"><div style="width:${r[pctKey]}%"></div></div>
+        <div class="lb-count">${r[doneKey]}/${tot}</div>
+      </div>
+    `;
+  }).join('') || '<div class="empty-note">No rankings yet.</div>';
+
+  return `
+    <div class="leaderboard-tabs">
+      <button data-lb="overall" class="${activeTab === 'overall' ? 'active' : ''}">Overall</button>
+      <button data-lb="theory" class="${activeTab === 'theory' ? 'active' : ''}">Theory</button>
+      <button data-lb="pyq" class="${activeTab === 'pyq' ? 'active' : ''}">PYQ</button>
+    </div>
+    <div class="leaderboard-list">${rowsHtml}</div>
+  `;
+}
+
+// Wires tab clicks for a leaderboard rendered into `containerEl`. Keeps its own
+// tab state and re-renders in place — pass a `limit` for compact (sidebar) use.
+export function mountLeaderboard(containerEl, rankings, initialTab, limit){
+  let tab = initialTab || 'overall';
+  function render(){
+    containerEl.innerHTML = renderLeaderboardHTML(rankings, tab, limit);
+    containerEl.querySelectorAll('.leaderboard-tabs button').forEach(btn => {
+      btn.addEventListener('click', () => { tab = btn.dataset.lb; render(); });
+    });
+  }
+  render();
+}
