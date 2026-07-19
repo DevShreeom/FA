@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Maths Final Surge + PYQ Class Tracker</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23151b23'/%3E%3Cpath d='M14 20h36M20 20v28M32 20c0 10-4 18-10 28M38 20c4 8 4 16 0 24' stroke='%235fd0a3' stroke-width='4' stroke-linecap='round' fill='none'/%3E%3Ccircle cx='46' cy='44' r='6' fill='%23e8b04b'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg: #0d1117; --panel: #151b23; --panel-2: #1b232c; --border: #29323c;
+    --text: #e6edf3; --muted: #8b98a5; --accent: #5fd0a3; --accent-dim: #2c5f4c;
+    --pyq: #e8b04b; --pyq-dim: #5c4a24; --danger: #e0685f; --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  html,body{ margin:0; padding:0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+  .wrap{ max-width: 980px; margin: 0 auto; padding: 24px 16px 80px; }
+
+  header{ display:flex; align-items:center; justify-content: space-between; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; }
+  .brand{ display:flex; align-items:center; gap: 12px; }
+  .brand img{ width: 42px; height: 42px; border-radius: 10px; flex-shrink: 0; }
+  h1{ font-size: 1.3rem; margin: 0; letter-spacing: 0.2px; }
+  .sub{ color: var(--muted); font-size: 0.8rem; margin-top: 2px; }
+
+  .mode-toggle{ display:flex; gap: 6px; background: var(--panel); border: 1px solid var(--border); border-radius: 999px; padding: 4px; }
+  .mode-toggle button{ background: transparent; border: none; color: var(--muted); padding: 7px 16px; border-radius: 999px; font-size: 0.82rem; cursor: pointer; font-weight: 600; }
+  .mode-toggle button.active{ background: var(--accent-dim); color: var(--accent); }
+
+  .card{ background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; }
+
+  #authOverlay{ text-align:center; padding: 50px 20px; }
+  #authOverlay h2{ font-size: 1.1rem; margin-bottom: 6px; }
+  #authOverlay p{ color: var(--muted); font-size: 0.85rem; margin-bottom: 18px; }
+  .auth-tabs{ display:flex; justify-content:center; gap: 6px; margin-bottom: 18px; }
+  .auth-tabs button{ background: var(--panel-2); border: 1px solid var(--border); color: var(--muted); padding: 7px 18px; border-radius: 999px; font-size: 0.82rem; cursor: pointer; font-weight: 600; }
+  .auth-tabs button.active{ background: var(--accent-dim); color: var(--accent); border-color: var(--accent-dim); }
+  .auth-form{ display:flex; flex-direction: column; align-items:center; gap: 10px; max-width: 280px; margin: 0 auto; }
+  .auth-form input{ background: var(--panel-2); border: 1px solid var(--border); color: var(--text); padding: 10px 14px; border-radius: 8px; font-size: 0.9rem; width: 100%; }
+  .auth-form button{ background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent-dim); padding: 10px 18px; border-radius: 8px; font-size: 0.9rem; cursor: pointer; font-weight: 600; width: 100%; }
+  #authError{ color: var(--danger); font-size: 0.8rem; margin-top: 10px; min-height: 18px; }
+
+  .whoami{ display:flex; align-items:center; gap: 10px; font-size: 0.8rem; color: var(--muted); }
+  .whoami button{ background: none; border: none; color: var(--accent); cursor: pointer; font-size: 0.78rem; text-decoration: underline; padding: 0; }
+
+  .overall{ display:flex; align-items:center; gap: 14px; }
+  .overall .bar{ flex: 1; height: 8px; background: var(--panel-2); border-radius: 999px; overflow:hidden; }
+  .overall .bar > div{ height: 100%; background: linear-gradient(90deg, var(--accent), var(--pyq)); width:0%; transition: width .3s ease; }
+  .overall .count{ font-variant-numeric: tabular-nums; font-size: 0.82rem; color: var(--muted); white-space:nowrap; }
+
+  .controls{ display:flex; gap:8px; margin: 4px 0 12px; flex-wrap: wrap; }
+  .controls button{ background: var(--panel); border: 1px solid var(--border); color: var(--text); padding: 6px 12px; border-radius: 8px; font-size: 0.78rem; cursor: pointer; }
+  .controls button:hover{ border-color: var(--accent); }
+  .status-msg{ font-size: 0.75rem; color: var(--muted); margin-left: auto; align-self: center; }
+
+  .chapter{ background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); margin: 10px 0; overflow: hidden; }
+  .chapter-head{ display:flex; align-items:center; justify-content: space-between; padding: 12px 14px; cursor: pointer; user-select: none; }
+  .chapter-head:hover{ background: var(--panel-2); }
+  .chapter-title{ display:flex; align-items:center; gap: 10px; }
+  .chapter-num{ color: var(--muted); font-size: 0.72rem; font-variant-numeric: tabular-nums; }
+  .chapter-name{ font-weight: 600; font-size: 0.92rem; }
+  .chapter-meta{ display:flex; align-items:center; gap: 10px; }
+  .mini-bar{ width: 60px; height: 6px; background: var(--panel-2); border-radius: 999px; overflow:hidden; }
+  .mini-bar > div{ height:100%; background: var(--accent); }
+  .chapter-count{ font-size: 0.72rem; color: var(--muted); font-variant-numeric: tabular-nums; min-width: 36px; text-align:right;}
+  .chevron{ color: var(--muted); transition: transform .2s ease; font-size: 0.75rem; }
+  .chapter.open .chevron{ transform: rotate(90deg); }
+  .chapter-body{ display:none; padding: 2px 14px 14px; border-top: 1px solid var(--border); }
+  .chapter.open .chapter-body{ display:block; }
+
+  .section-label{ font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 12px 0 6px; }
+  .section-label.pyq{ color: var(--pyq); }
+  .section-label.fs{ color: var(--accent); }
+
+  .video-row{ display:flex; align-items: flex-start; gap: 10px; padding: 7px 6px; border-radius: 8px; }
+  .video-row:hover{ background: var(--panel-2); }
+  .video-row input[type=checkbox]{ margin-top: 3px; width: 15px; height: 15px; accent-color: var(--accent); cursor: pointer; flex-shrink:0; }
+  .video-row.pyq input[type=checkbox]{ accent-color: var(--pyq); }
+  .video-info{ flex: 1; min-width: 0; }
+  .video-info a{ color: var(--text); text-decoration: none; font-size: 0.84rem; line-height: 1.35; }
+  .video-info a:hover{ color: var(--accent); text-decoration: underline; }
+  .video-row.pyq .video-info a:hover{ color: var(--pyq); }
+  .video-row.done .video-info a{ color: var(--muted); text-decoration: line-through; }
+  .video-dur{ color: var(--muted); font-size: 0.7rem; margin-left: 6px; white-space: nowrap; }
+  .empty-note{ color: var(--muted); font-size: 0.78rem; font-style: italic; padding: 6px; }
+
+  .selfcheck{ margin-top: 10px; }
+  .sc-year{ display:flex; align-items:center; gap: 8px; padding: 4px 0; }
+  .sc-year-label{ width: 42px; font-size: 0.74rem; color: var(--muted); flex-shrink:0; }
+  .sc-sess{ display:flex; align-items:center; gap: 4px; font-size: 0.7rem; color: var(--muted); cursor:pointer; }
+  .sc-sess input{ width: 13px; height: 13px; accent-color: var(--pyq); cursor:pointer; }
+
+  footer{ text-align:center; color: var(--muted); font-size: 0.72rem; margin-top: 24px; }
+
+  .stat-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap: 10px; margin-bottom: 16px; }
+  .stat-box{ background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; }
+  .stat-box .num{ font-size: 1.3rem; font-weight: 700; color: var(--accent); }
+  .stat-box .lbl{ font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+
+  table.students{ width:100%; border-collapse: collapse; font-size: 0.82rem; }
+  table.students th{ text-align:left; color: var(--muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+  table.students td{ padding: 9px 10px; border-bottom: 1px solid var(--panel-2); }
+  table.students tr:hover td{ background: var(--panel-2); }
+  .pct-pill{ display:inline-block; padding: 2px 8px; border-radius: 999px; font-size: 0.72rem; font-weight: 600; }
+  .pct-pill.low{ background: #4a2323; color: #f0a3a3; }
+  .pct-pill.mid{ background: #4a3d1e; color: var(--pyq); }
+  .pct-pill.high{ background: var(--accent-dim); color: var(--accent); }
+
+  .loading{ text-align:center; color: var(--muted); padding: 30px; font-size: 0.85rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <img src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23151b23'/%3E%3Cpath d='M14 20h36M20 20v28M32 20c0 10-4 18-10 28M38 20c4 8 4 16 0 24' stroke='%235fd0a3' stroke-width='4' stroke-linecap='round' fill='none'/%3E%3Ccircle cx='46' cy='44' r='6' fill='%23e8b04b'/%3E%3C/svg%3E" alt="logo">
+      <div>
+        <h1>JEE Maths — Final Surge + PYQ Class Tracker</h1>
+        <div class="sub">One-shot lecture → PYQ practice → year-wise self-check</div>
+      </div>
+    </div>
+    <div class="mode-toggle">
+      <button id="btnStudentMode" class="active">My progress</button>
+      <button id="btnSirMode">Class view</button>
+    </div>
+  </header>
+
+  <div id="authOverlay" style="display:none;">
+    <div class="auth-tabs">
+      <button id="tabLogin" class="active">Log in</button>
+      <button id="tabSignup">Create account</button>
+    </div>
+    <h2 id="authTitle">Log in</h2>
+    <p id="authSub">Enter your username and password to continue tracking.</p>
+    <div class="auth-form">
+      <input type="text" id="authUsername" placeholder="Username" maxlength="40" autocomplete="username">
+      <input type="password" id="authPassword" placeholder="Password (min 6 characters)" autocomplete="current-password">
+      <button id="authSubmit">Log in</button>
+    </div>
+    <div id="authError"></div>
+  </div>
+
+  <div id="studentView" style="display:none;">
+    <div class="card">
+      <div class="whoami">
+        Tracking as <strong id="whoamiName" style="color:var(--text)"></strong>
+        <button id="logoutBtn">(log out)</button>
+      </div>
+    </div>
+
+    <div class="card overall">
+      <div class="count" id="overallCount">0 / 0</div>
+      <div class="bar"><div id="overallBar"></div></div>
+      <div class="count" id="overallPct">0%</div>
+    </div>
+
+    <div class="controls">
+      <button id="expandAll">Expand all</button>
+      <button id="collapseAll">Collapse all</button>
+      <span class="status-msg" id="statusMsg"></span>
+    </div>
+
+    <div id="chapters"></div>
+    <footer>128 lectures across 27 chapters · Factorial Final Surge + PYQ Masterseries</footer>
+  </div>
+
+  <div id="sirView" style="display:none;">
+    <div class="card">
+      <div id="sirContent" class="loading">Loading class data…</div>
+    </div>
+  </div>
+</div>
+
+<script type="application/json" id="orderData">ORDER_PLACEHOLDER</script>
+<script type="application/json" id="chapterData">DATA_PLACEHOLDER</script>
+<script type="application/json" id="sessionsData">SESSIONS_PLACEHOLDER</script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import {
+  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+  onAuthStateChanged, signOut
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import {
+  getFirestore, doc, getDoc, setDoc, collection, getDocs
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCZmPc61LRxkgYalLyRyT-rRdkMswcAclg",
+  authDomain: "factorial-acadamy.firebaseapp.com",
+  projectId: "factorial-acadamy",
+  storageBucket: "factorial-acadamy.firebasestorage.app",
+  messagingSenderId: "189838287114",
+  appId: "1:189838287114:web:bda2986d1079abda1d1af3"
+};
+
+const FAKE_EMAIL_DOMAIN = "jee-tracker.local";
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const order = JSON.parse(document.getElementById('orderData').textContent);
+const data = JSON.parse(document.getElementById('chapterData').textContent);
+const SESSIONS = JSON.parse(document.getElementById('sessionsData').textContent);
+
+let currentUser = null;
+let myUsername = null;
+let myData = { theory: {}, pyq: {}, selfcheck: {}, updatedAt: null };
+let saveTimer = null;
+let authMode = 'login';
+
+function idFor(url){ return url.split('v=')[1] || url; }
+function usernameToEmail(u){ return u.trim().toLowerCase().replace(/[^a-z0-9_.]/g, '') + '@' + FAKE_EMAIL_DOMAIN; }
+function fmtChapterNum(i){ return String(i+1).padStart(2,'0'); }
+function scKey(ch, sess){ return ch + '|' + sess; }
+
+function totalForChapter(ch){ return data[ch].fs.length + data[ch].pyq.length; }
+function computeTotal(){ let t = 0; order.forEach(ch => { t += totalForChapter(ch); }); return t; }
+function computeDone(){
+  let n = 0;
+  order.forEach(ch => {
+    data[ch].fs.forEach(it => { if (myData.theory[idFor(it.url)]) n++; });
+    data[ch].pyq.forEach(it => { if (myData.pyq[idFor(it.url)]) n++; });
+  });
+  return n;
+}
+
+async function loadMyData(){
+  try {
+    const snap = await getDoc(doc(db, 'students', currentUser.uid));
+    if (snap.exists()){
+      const d = snap.data();
+      myData = { theory: d.theory || {}, pyq: d.pyq || {}, selfcheck: d.selfcheck || {}, updatedAt: d.updatedAt || null, username: d.username || myUsername };
+    } else {
+      myData = { theory: {}, pyq: {}, selfcheck: {}, updatedAt: null, username: myUsername };
+    }
+  } catch(e){
+    myData = { theory: {}, pyq: {}, selfcheck: {}, updatedAt: null, username: myUsername };
+  }
+}
+
+function saveMyDataDebounced(){
+  const statusEl = document.getElementById('statusMsg');
+  if (statusEl) statusEl.textContent = 'Saving…';
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async () => {
+    myData.username = myUsername;
+    myData.updatedAt = new Date().toISOString();
+    try {
+      await setDoc(doc(db, 'students', currentUser.uid), myData);
+      if (statusEl) statusEl.textContent = 'Saved';
+    } catch(e){
+      if (statusEl) statusEl.textContent = 'Save failed — check connection';
+    }
+  }, 600);
+}
+
+function renderVideoRow(item, kind){
+  const vid = idFor(item.url);
+  const checked = kind === 'fs' ? !!myData.theory[vid] : !!myData.pyq[vid];
+  const row = document.createElement('div');
+  row.className = 'video-row ' + (kind === 'pyq' ? 'pyq' : '') + (checked ? ' done' : '');
+  row.innerHTML = `
+    <input type="checkbox" ${checked ? 'checked' : ''}>
+    <div class="video-info">
+      <a href="${item.url}" target="_blank" rel="noopener">${item.title}</a>
+      <span class="video-dur">${item.duration ? '· ' + item.duration : ''}</span>
+    </div>
+  `;
+  const cb = row.querySelector('input');
+  cb.addEventListener('change', () => {
+    if (kind === 'fs') myData.theory[vid] = cb.checked; else myData.pyq[vid] = cb.checked;
+    row.classList.toggle('done', cb.checked);
+    updateChapterProgress(row.closest('.chapter'));
+    updateOverall();
+    saveMyDataDebounced();
+  });
+  return row;
+}
+
+function renderSelfCheck(ch){
+  const wrap = document.createElement('div');
+  wrap.className = 'selfcheck';
+  const label = document.createElement('div');
+  label.className = 'section-label pyq';
+  label.textContent = 'Year-wise PYQ self-check';
+  wrap.appendChild(label);
+
+  for (let y = 0; y < SESSIONS.length; y += 2){
+    const yearLabel = SESSIONS[y].split(' ')[0];
+    const row = document.createElement('div');
+    row.className = 'sc-year';
+    row.innerHTML = `<span class="sc-year-label">${yearLabel}</span>`;
+    [SESSIONS[y], SESSIONS[y+1]].forEach(sess => {
+      const sessLabel = sess.split(' ')[1];
+      const key = scKey(ch, sess);
+      const checked = !!myData.selfcheck[key];
+      const lbl = document.createElement('label');
+      lbl.className = 'sc-sess';
+      lbl.innerHTML = `<input type="checkbox" ${checked ? 'checked' : ''}> ${sessLabel}`;
+      const cb = lbl.querySelector('input');
+      cb.addEventListener('change', () => {
+        myData.selfcheck[key] = cb.checked;
+        saveMyDataDebounced();
+      });
+      row.appendChild(lbl);
+    });
+    wrap.appendChild(row);
+  }
+  return wrap;
+}
+
+function updateChapterProgress(chapterEl){
+  const ch = chapterEl.dataset.chapter;
+  const total = totalForChapter(ch);
+  let done = 0;
+  data[ch].fs.forEach(it => { if (myData.theory[idFor(it.url)]) done++; });
+  data[ch].pyq.forEach(it => { if (myData.pyq[idFor(it.url)]) done++; });
+  const pct = total ? Math.round(done/total*100) : 0;
+  chapterEl.querySelector('.mini-bar > div').style.width = pct + '%';
+  chapterEl.querySelector('.chapter-count').textContent = `${done}/${total}`;
+}
+
+function updateOverall(){
+  const total = computeTotal();
+  const done = computeDone();
+  document.getElementById('overallCount').textContent = `${done} / ${total}`;
+  const pct = total ? Math.round(done/total*100) : 0;
+  document.getElementById('overallPct').textContent = pct + '%';
+  document.getElementById('overallBar').style.width = pct + '%';
+}
+
+function buildChapters(){
+  const container = document.getElementById('chapters');
+  container.innerHTML = '';
+  order.forEach((ch, i) => {
+    const chData = data[ch];
+    const chapterEl = document.createElement('div');
+    chapterEl.className = 'chapter';
+    chapterEl.dataset.chapter = ch;
+
+    const head = document.createElement('div');
+    head.className = 'chapter-head';
+    head.innerHTML = `
+      <div class="chapter-title">
+        <span class="chapter-num">${fmtChapterNum(i)}</span>
+        <span class="chapter-name">${ch}</span>
+      </div>
+      <div class="chapter-meta">
+        <div class="mini-bar"><div></div></div>
+        <div class="chapter-count">0/0</div>
+        <div class="chevron">▶</div>
+      </div>
+    `;
+    head.addEventListener('click', () => chapterEl.classList.toggle('open'));
+
+    const body = document.createElement('div');
+    body.className = 'chapter-body';
+
+    const fsLabel = document.createElement('div');
+    fsLabel.className = 'section-label fs';
+    fsLabel.textContent = 'One-shot lecture(s)';
+    body.appendChild(fsLabel);
+    if (chData.fs.length === 0){
+      const n = document.createElement('div');
+      n.className = 'empty-note';
+      n.textContent = 'No one-shot lecture found for this chapter — source elsewhere.';
+      body.appendChild(n);
+    } else {
+      chData.fs.forEach(item => body.appendChild(renderVideoRow(item, 'fs')));
+    }
+
+    const pyqLabel = document.createElement('div');
+    pyqLabel.className = 'section-label pyq';
+    pyqLabel.textContent = 'PYQ practice';
+    body.appendChild(pyqLabel);
+    if (chData.pyq.length === 0){
+      const n = document.createElement('div');
+      n.className = 'empty-note';
+      n.textContent = 'No dedicated PYQ video for this chapter in the library.';
+      body.appendChild(n);
+    } else {
+      chData.pyq.forEach(item => body.appendChild(renderVideoRow(item, 'pyq')));
+    }
+
+    body.appendChild(renderSelfCheck(ch));
+
+    chapterEl.appendChild(head);
+    chapterEl.appendChild(body);
+    container.appendChild(chapterEl);
+    updateChapterProgress(chapterEl);
+  });
+  updateOverall();
+}
+
+document.getElementById('expandAll').addEventListener('click', () => {
+  document.querySelectorAll('.chapter').forEach(c => c.classList.add('open'));
+});
+document.getElementById('collapseAll').addEventListener('click', () => {
+  document.querySelectorAll('.chapter').forEach(c => c.classList.remove('open'));
+});
+
+function showAuthOverlay(){
+  document.getElementById('authOverlay').style.display = 'block';
+  document.getElementById('studentView').style.display = 'none';
+}
+
+async function startStudentSession(user){
+  currentUser = user;
+  myUsername = (user.email || '').split('@')[0];
+  document.getElementById('authOverlay').style.display = 'none';
+  document.getElementById('studentView').style.display = 'block';
+  document.getElementById('whoamiName').textContent = myUsername;
+  await loadMyData();
+  buildChapters();
+  const first = document.querySelector('.chapter');
+  if (first) first.classList.add('open');
+}
+
+document.getElementById('tabLogin').addEventListener('click', () => {
+  authMode = 'login';
+  document.getElementById('tabLogin').classList.add('active');
+  document.getElementById('tabSignup').classList.remove('active');
+  document.getElementById('authTitle').textContent = 'Log in';
+  document.getElementById('authSub').textContent = 'Enter your username and password to continue tracking.';
+  document.getElementById('authSubmit').textContent = 'Log in';
+  document.getElementById('authPassword').setAttribute('autocomplete', 'current-password');
+  document.getElementById('authError').textContent = '';
+});
+document.getElementById('tabSignup').addEventListener('click', () => {
+  authMode = 'signup';
+  document.getElementById('tabSignup').classList.add('active');
+  document.getElementById('tabLogin').classList.remove('active');
+  document.getElementById('authTitle').textContent = 'Create account';
+  document.getElementById('authSub').textContent = 'Pick a username and password. Remember it — there is no recovery.';
+  document.getElementById('authSubmit').textContent = 'Create account';
+  document.getElementById('authPassword').setAttribute('autocomplete', 'new-password');
+  document.getElementById('authError').textContent = '';
+});
+
+document.getElementById('authSubmit').addEventListener('click', async () => {
+  const uname = document.getElementById('authUsername').value.trim();
+  const pass = document.getElementById('authPassword').value;
+  const errEl = document.getElementById('authError');
+  errEl.textContent = '';
+  if (!uname || uname.length < 3){ errEl.textContent = 'Username must be at least 3 characters.'; return; }
+  if (!pass || pass.length < 6){ errEl.textContent = 'Password must be at least 6 characters.'; return; }
+  const email = usernameToEmail(uname);
+  try {
+    if (authMode === 'signup'){
+      await createUserWithEmailAndPassword(auth, email, pass);
+    } else {
+      await signInWithEmailAndPassword(auth, email, pass);
+    }
+  } catch(e){
+    if (e.code === 'auth/email-already-in-use') errEl.textContent = 'That username is taken. Try logging in instead.';
+    else if (e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password') errEl.textContent = 'Wrong username or password.';
+    else if (e.code === 'auth/user-not-found') errEl.textContent = 'No account with that username. Try creating one.';
+    else if (e.code === 'auth/weak-password') errEl.textContent = 'Password too weak — use at least 6 characters.';
+    else errEl.textContent = 'Something went wrong: ' + e.code;
+  }
+});
+document.getElementById('authPassword').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') document.getElementById('authSubmit').click();
+});
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  await signOut(auth);
+});
+
+onAuthStateChanged(auth, (user) => {
+  if (user) startStudentSession(user);
+  else showAuthOverlay();
+});
+
+function pctClass(p){ if (p < 34) return 'low'; if (p < 70) return 'mid'; return 'high'; }
+
+async function loadAllStudents(){
+  const container = document.getElementById('sirContent');
+  container.innerHTML = '<div class="loading">Loading class data…</div>';
+  let snaps;
+  try {
+    snaps = await getDocs(collection(db, 'students'));
+  } catch(e){
+    container.innerHTML = '<div class="loading">Could not load class data. Check your connection and try again.</div>';
+    return;
+  }
+  const students = [];
+  snaps.forEach(s => students.push(s.data()));
+
+  if (students.length === 0){
+    container.innerHTML = '<div class="loading">No students have started tracking yet.</div>';
+    return;
+  }
+
+  const total = computeTotal();
+  const rows = students.map(s => {
+    let done = 0;
+    order.forEach(ch => {
+      data[ch].fs.forEach(it => { if (s.theory && s.theory[idFor(it.url)]) done++; });
+      data[ch].pyq.forEach(it => { if (s.pyq && s.pyq[idFor(it.url)]) done++; });
+    });
+    const pct = total ? Math.round(done/total*100) : 0;
+    let scCount = 0;
+    if (s.selfcheck) Object.values(s.selfcheck).forEach(v => { if (v) scCount++; });
+    return { name: s.username || '(unknown)', done, total, pct, scCount, updatedAt: s.updatedAt };
+  }).sort((a,b) => b.pct - a.pct);
+
+  const avgPct = rows.length ? Math.round(rows.reduce((a,r) => a + r.pct, 0) / rows.length) : 0;
+  const avgSc = rows.length ? Math.round(rows.reduce((a,r) => a + r.scCount, 0) / rows.length) : 0;
+
+  let html = `
+    <div class="stat-grid">
+      <div class="stat-box"><div class="num">${rows.length}</div><div class="lbl">Students tracking</div></div>
+      <div class="stat-box"><div class="num">${avgPct}%</div><div class="lbl">Avg class completion</div></div>
+      <div class="stat-box"><div class="num">${avgSc}</div><div class="lbl">Avg year-sessions self-checked</div></div>
+    </div>
+    <table class="students">
+      <thead><tr><th>Student</th><th>Progress</th><th>Completion</th><th>Last active</th></tr></thead>
+      <tbody>
+  `;
+  rows.forEach(r => {
+    const dt = r.updatedAt ? new Date(r.updatedAt).toLocaleDateString() : '—';
+    html += `<tr><td>${r.name}</td><td>${r.done}/${r.total}</td><td><span class="pct-pill ${pctClass(r.pct)}">${r.pct}%</span></td><td>${dt}</td></tr>`;
+  });
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+document.getElementById('btnStudentMode').addEventListener('click', () => {
+  document.getElementById('btnStudentMode').classList.add('active');
+  document.getElementById('btnSirMode').classList.remove('active');
+  document.getElementById('sirView').style.display = 'none';
+  if (currentUser) startStudentSession(currentUser); else showAuthOverlay();
+});
+document.getElementById('btnSirMode').addEventListener('click', () => {
+  document.getElementById('btnSirMode').classList.add('active');
+  document.getElementById('btnStudentMode').classList.remove('active');
+  document.getElementById('authOverlay').style.display = 'none';
+  document.getElementById('studentView').style.display = 'none';
+  document.getElementById('sirView').style.display = 'block';
+  loadAllStudents();
+});
+</script>
+</body>
+</html>
