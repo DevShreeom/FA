@@ -3,8 +3,9 @@
 // just renders whatever Firestore allows through, and shows a clear message if it's blocked.
 
 import { db } from './firebase.js';
-import { collection, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { collection, getDocs, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { ORDER, CHAPTER_DATA } from './data.js';
+import { getCurrentUser } from './studentView.js';
 
 function idFor(url){ return url.split('v=')[1] || url; }
 function totalForChapter(ch){ return CHAPTER_DATA[ch].fs.length + CHAPTER_DATA[ch].pyq.length; }
@@ -15,6 +16,18 @@ let lastRows = [];
 let searchQuery = '';
 let sortKey = 'pct';
 let sortDir = -1;
+let isAdmin = false;
+
+async function checkIsAdmin(){
+  const user = getCurrentUser();
+  if (!user) return false;
+  try {
+    const snap = await getDoc(doc(db, 'admins', user.uid));
+    return snap.exists();
+  } catch(e){
+    return false;
+  }
+}
 
 function studentDoneCount(s){
   let done = 0;
@@ -44,43 +57,52 @@ function renderTable(){
   const filtered = searchQuery
     ? lastRows.filter(r => r.name.toLowerCase().includes(searchQuery))
     : lastRows;
-  const rows = [...filtered].sort((a, b) => (a[sortKey] > b[sortKey] ? 1 : -1) * sortDir);
+  const rows = [...filtered].sort((a, b) => {
+    if (a.flagged !== b.flagged) return a.flagged ? 1 : -1; // flagged accounts always sink to the bottom
+    return (a[sortKey] > b[sortKey] ? 1 : -1) * sortDir;
+  });
   const tbody = document.getElementById('studentsTbody');
   if (!tbody) return;
   tbody.innerHTML = rows.map(r => {
     const dt = r.updatedAt ? new Date(r.updatedAt).toLocaleDateString() : '—';
-    const flagClass = r.flagged ? ' style="background:#3a2020;"' : '';
-    const flagLabel = r.flagged ? '🚩 Flagged' : 'Flag';
-    return `<tr${flagClass}>
+    const rowStyle = r.flagged ? ' style="background:#3a2020;"' : '';
+    const lastCell = isAdmin
+      ? `<button class="flag-btn" data-id="${r.id}" data-flagged="${r.flagged}">${r.flagged ? '🚩 Flagged' : 'Flag'}</button>`
+      : (r.flagged ? '🚩 Flagged' : '—');
+    return `<tr${rowStyle}>
       <td>${r.name}</td>
       <td>${r.done}/${r.total}</td>
       <td><span class="pct-pill ${pctClass(r.pct)}">${r.pct}%</span></td>
       <td>${dt}</td>
-      <td><button class="flag-btn" data-id="${r.id}" data-flagged="${r.flagged}">${flagLabel}</button></td>
+      <td>${lastCell}</td>
     </tr>`;
   }).join('');
 
-  tbody.querySelectorAll('.flag-btn').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const id = btn.dataset.id;
-      const currentlyFlagged = btn.dataset.flagged === 'true';
-      btn.disabled = true;
-      try {
-        await setDoc(doc(db, 'flags', id), { flagged: !currentlyFlagged, updatedAt: new Date().toISOString() }, { merge: true });
-        const row = lastRows.find(r => r.id === id);
-        if (row) row.flagged = !currentlyFlagged;
-        renderTable();
-      } catch(e){
-        btn.disabled = false;
-        alert('Could not update flag — check your connection.');
-      }
+  if (isAdmin){
+    tbody.querySelectorAll('.flag-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.dataset.id;
+        const currentlyFlagged = btn.dataset.flagged === 'true';
+        btn.disabled = true;
+        try {
+          await setDoc(doc(db, 'flags', id), { flagged: !currentlyFlagged, updatedAt: new Date().toISOString() }, { merge: true });
+          const row = lastRows.find(r => r.id === id);
+          if (row) row.flagged = !currentlyFlagged;
+          renderTable();
+        } catch(e){
+          btn.disabled = false;
+          alert('Could not update flag — check your connection.');
+        }
+      });
     });
-  });
+  }
 }
 
 export async function loadTeacherView(){
   const container = document.getElementById('sirContent');
   container.innerHTML = '<div class="loading">Loading class data…</div>';
+
+  isAdmin = await checkIsAdmin();
 
   let snaps, flagSnaps;
   try {
@@ -142,7 +164,7 @@ export async function loadTeacherView(){
         <th data-key="done">Progress</th>
         <th data-key="pct">Completion</th>
         <th data-key="updatedAt">Last active</th>
-        <th>Flag</th>
+        ${isAdmin ? '<th>Flag</th>' : '<th>Status</th>'}
       </tr></thead>
       <tbody id="studentsTbody"></tbody>
     </table>
