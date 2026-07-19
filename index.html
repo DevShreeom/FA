@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Factorial Academy</title>
+<meta property="og:title" content="Factorial Academy">
+<meta property="og:description" content="Track your Final Surge lectures and PYQ practice, chapter by chapter.">
+<meta property="og:image" content="https://www.factorialacademy.com/logot.png">
+<link rel="icon" type="image/png" href="logot.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <img src="logot.png" alt="Factorial Academy logo">
+      <div>
+        <h1>Factorial Academy</h1>
+        <div class="sub">NOT WON YET, NOT DONE YET!</div>
+      </div>
+    </div>
+    <div class="mode-toggle">
+      <button id="btnStudentMode" class="active">My progress</button>
+      <button id="btnSirMode">Class view</button>
+    </div>
+  </header>
+
+  <div id="authOverlay" style="display:none;">
+    <div class="auth-tabs">
+      <button id="tabLogin" class="active">Log in</button>
+      <button id="tabSignup">Create account</button>
+    </div>
+    <h2 id="authTitle">Log in</h2>
+    <p id="authSub">Enter your username and password to continue tracking.</p>
+    <div class="auth-form">
+      <input type="text" id="authUsername" placeholder="Username" maxlength="40" autocomplete="username">
+      <input type="password" id="authPassword" placeholder="Password (min 6 characters)" autocomplete="current-password">
+      <button id="authSubmit">Log in</button>
+    </div>
+    <div id="authError"></div>
+  </div>
+
+  <div id="studentView" style="display:none;">
+    <div class="card">
+      <div class="whoami">
+        Tracking as <strong id="whoamiName" style="color:var(--text)"></strong>
+        <button id="logoutBtn">(log out)</button>
+      </div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-box"><div class="num" id="statOverallNum">0%</div><div class="lbl">Overall complete</div></div>
+      <div class="stat-box"><div class="num" id="statTheoryNum">0/0</div><div class="lbl">Theory watched</div></div>
+      <div class="stat-box pyq"><div class="num" id="statPyqNum">0/0</div><div class="lbl">PYQ practiced</div></div>
+    </div>
+
+    <div class="card">
+      <div class="rank-strip" id="rankStrip"></div>
+    </div>
+
+    <div class="card overall-bar-wrap">
+      <div class="count" id="overallCount">0 / 0</div>
+      <div class="bar"><div id="overallBar"></div></div>
+    </div>
+
+    <div class="controls">
+      <button id="expandAll">Expand all</button>
+      <button id="collapseAll">Collapse all</button>
+      <input class="search-input" id="chapterSearch" placeholder="Search chapters…">
+      <span class="status-msg" id="statusMsg"></span>
+    </div>
+
+    <div id="chapters" class="chapter-grid"></div>
+    <footer>128 lectures across 27 chapters · Factorial Final Surge + PYQ Masterseries</footer>
+  </div>
+
+  <div id="sirView" style="display:none;">
+    <div class="card">
+      <div id="sirContent" class="loading">Loading class data…</div>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="main.js"></script>
+</body>
+</html>
