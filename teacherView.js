@@ -4,12 +4,12 @@
 
 import { db } from './firebase.js';
 import { collection, getDocs, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { computeTotalAll, studentTheoryDone, studentPyqDone, idFor } from './metrics.js';
 import { ORDER, CHAPTER_DATA } from './data.js';
 import { getCurrentUser } from './studentView.js';
+import { computeRankings, medal } from './leaderboard.js';
 
-function idFor(url){ return url.split('v=')[1] || url; }
 function totalForChapter(ch){ return CHAPTER_DATA[ch].fs.length + CHAPTER_DATA[ch].pyq.length; }
-function computeTotal(){ let t = 0; ORDER.forEach(ch => { t += totalForChapter(ch); }); return t; }
 function pctClass(p){ if (p < 34) return 'low'; if (p < 70) return 'mid'; return 'high'; }
 
 let lastRows = [];
@@ -30,23 +30,19 @@ async function checkIsAdmin(){
 }
 
 function studentDoneCount(s){
-  let done = 0;
-  ORDER.forEach(ch => {
-    CHAPTER_DATA[ch].fs.forEach(it => { if (s.theory && s.theory[idFor(it.url)]) done++; });
-    CHAPTER_DATA[ch].pyq.forEach(it => { if (s.pyq && s.pyq[idFor(it.url)]) done++; });
-  });
-  return done;
+  return studentTheoryDone(s) + studentPyqDone(s);
 }
 
 function chapterCompletionAcrossClass(students){
+  const isDone = (v) => v === 'done' || v === true;
   const total = students.length || 1;
   return ORDER.map(ch => {
     const chTotal = totalForChapter(ch);
     let sumPct = 0;
     students.forEach(s => {
       let done = 0;
-      CHAPTER_DATA[ch].fs.forEach(it => { if (s.theory && s.theory[idFor(it.url)]) done++; });
-      CHAPTER_DATA[ch].pyq.forEach(it => { if (s.pyq && s.pyq[idFor(it.url)]) done++; });
+      CHAPTER_DATA[ch].fs.forEach(it => { if (s.theory && isDone(s.theory[idFor(it.url)])) done++; });
+      CHAPTER_DATA[ch].pyq.forEach(it => { if (s.pyq && isDone(s.pyq[idFor(it.url)])) done++; });
       sumPct += chTotal ? (done / chTotal) : 0;
     });
     return { chapter: ch, avgPct: Math.round((sumPct / total) * 100) };
@@ -98,6 +94,52 @@ function renderTable(){
   }
 }
 
+let currentLbTab = 'overall';
+
+function renderLeaderboardPanel(rankings){
+  const lists = { overall: rankings.byOverall, theory: rankings.byTheory, pyq: rankings.byPyq };
+  const pctKeys = { overall: 'overallPct', theory: 'theoryPct', pyq: 'pyqPct' };
+  const doneKeys = { overall: 'overallDone', theory: 'theoryDone', pyq: 'pyqDone' };
+  const totals = { overall: rankings.total, theory: rankings.tTheory, pyq: rankings.tPyq };
+
+  const list = lists[currentLbTab].slice(0, 10);
+  const pctKey = pctKeys[currentLbTab];
+  const doneKey = doneKeys[currentLbTab];
+  const tot = totals[currentLbTab];
+
+  const rowsHtml = list.map((r, i) => {
+    const rank = i + 1;
+    const m = medal(rank);
+    return `
+      <div class="lb-row">
+        <div class="lb-rank">${m || '#' + rank}</div>
+        <div class="lb-name">${r.name}</div>
+        <div class="lb-bar"><div style="width:${r[pctKey]}%"></div></div>
+        <div class="lb-count">${r[doneKey]}/${tot}</div>
+      </div>
+    `;
+  }).join('') || '<div class="empty-note">No rankings yet — no one has started tracking.</div>';
+
+  return `
+    <div class="leaderboard-tabs">
+      <button data-lb="overall" class="${currentLbTab === 'overall' ? 'active' : ''}">Overall</button>
+      <button data-lb="theory" class="${currentLbTab === 'theory' ? 'active' : ''}">Theory</button>
+      <button data-lb="pyq" class="${currentLbTab === 'pyq' ? 'active' : ''}">PYQ</button>
+    </div>
+    <div class="leaderboard-list">${rowsHtml}</div>
+  `;
+}
+
+function wireLeaderboardTabs(rankings){
+  document.querySelectorAll('.leaderboard-tabs button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentLbTab = btn.dataset.lb;
+      document.getElementById('leaderboardPanel').innerHTML = renderLeaderboardPanel(rankings);
+      wireLeaderboardTabs(rankings);
+    });
+  });
+}
+
 export async function loadTeacherView(){
   const container = document.getElementById('sirContent');
   container.innerHTML = '<div class="loading">Loading class data…</div>';
@@ -132,7 +174,7 @@ export async function loadTeacherView(){
     return;
   }
 
-  const total = computeTotal();
+  const total = computeTotalAll();
   lastRows = students.map(s => {
     const done = studentDoneCount(s);
     const pct = total ? Math.round(done/total*100) : 0;
@@ -146,9 +188,13 @@ export async function loadTeacherView(){
   const avgSc = lastRows.length ? Math.round(lastRows.reduce((a,r) => a + r.scCount, 0) / lastRows.length) : 0;
 
   const heat = chapterCompletionAcrossClass(students).sort((a,b) => a.avgPct - b.avgPct);
+  const rankings = await computeRankings();
 
   container.innerHTML = `
-    <div class="stat-grid">
+    <div class="section-label" style="margin-top:0;">🏆 Leaderboard (top 10, flagged accounts excluded)</div>
+    <div id="leaderboardPanel">${renderLeaderboardPanel(rankings)}</div>
+
+    <div class="stat-grid" style="margin-top:20px;">
       <div class="stat-box"><div class="num">${lastRows.length}</div><div class="lbl">Students tracking</div></div>
       <div class="stat-box"><div class="num">${avgPct}%</div><div class="lbl">Avg class completion</div></div>
       <div class="stat-box pyq"><div class="num">${avgSc}</div><div class="lbl">Avg year-sessions self-checked</div></div>
@@ -182,6 +228,7 @@ export async function loadTeacherView(){
   `;
 
   renderTable();
+  wireLeaderboardTabs(rankings);
 
   document.querySelectorAll('table.students th').forEach(th => {
     if (!th.dataset.key) return;
