@@ -7,7 +7,7 @@ import { collection, getDocs, doc, getDoc, setDoc } from "https://www.gstatic.co
 import { computeTotalAll, studentTheoryDone, studentPyqDone, idFor } from './metrics.js';
 import { ORDER, CHAPTER_DATA } from './data.js';
 import { getCurrentUser } from './studentView.js';
-import { computeRankings, medal } from './leaderboard.js';
+import { computeRankings, mountLeaderboard } from './leaderboard.js';
 
 function totalForChapter(ch){ return CHAPTER_DATA[ch].fs.length + CHAPTER_DATA[ch].pyq.length; }
 function pctClass(p){ if (p < 34) return 'low'; if (p < 70) return 'mid'; return 'high'; }
@@ -94,52 +94,6 @@ function renderTable(){
   }
 }
 
-let currentLbTab = 'overall';
-
-function renderLeaderboardPanel(rankings){
-  const lists = { overall: rankings.byOverall, theory: rankings.byTheory, pyq: rankings.byPyq };
-  const pctKeys = { overall: 'overallPct', theory: 'theoryPct', pyq: 'pyqPct' };
-  const doneKeys = { overall: 'overallDone', theory: 'theoryDone', pyq: 'pyqDone' };
-  const totals = { overall: rankings.total, theory: rankings.tTheory, pyq: rankings.tPyq };
-
-  const list = lists[currentLbTab].slice(0, 10);
-  const pctKey = pctKeys[currentLbTab];
-  const doneKey = doneKeys[currentLbTab];
-  const tot = totals[currentLbTab];
-
-  const rowsHtml = list.map((r, i) => {
-    const rank = i + 1;
-    const m = medal(rank);
-    return `
-      <div class="lb-row">
-        <div class="lb-rank">${m || '#' + rank}</div>
-        <div class="lb-name">${r.name}</div>
-        <div class="lb-bar"><div style="width:${r[pctKey]}%"></div></div>
-        <div class="lb-count">${r[doneKey]}/${tot}</div>
-      </div>
-    `;
-  }).join('') || '<div class="empty-note">No rankings yet — no one has started tracking.</div>';
-
-  return `
-    <div class="leaderboard-tabs">
-      <button data-lb="overall" class="${currentLbTab === 'overall' ? 'active' : ''}">Overall</button>
-      <button data-lb="theory" class="${currentLbTab === 'theory' ? 'active' : ''}">Theory</button>
-      <button data-lb="pyq" class="${currentLbTab === 'pyq' ? 'active' : ''}">PYQ</button>
-    </div>
-    <div class="leaderboard-list">${rowsHtml}</div>
-  `;
-}
-
-function wireLeaderboardTabs(rankings){
-  document.querySelectorAll('.leaderboard-tabs button').forEach(btn => {
-    btn.addEventListener('click', () => {
-      currentLbTab = btn.dataset.lb;
-      document.getElementById('leaderboardPanel').innerHTML = renderLeaderboardPanel(rankings);
-      wireLeaderboardTabs(rankings);
-    });
-  });
-}
-
 export async function loadTeacherView(){
   const container = document.getElementById('sirContent');
   container.innerHTML = '<div class="loading">Loading class data…</div>';
@@ -192,7 +146,7 @@ export async function loadTeacherView(){
 
   container.innerHTML = `
     <div class="section-label" style="margin-top:0;">🏆 Leaderboard (top 10, flagged accounts excluded)</div>
-    <div id="leaderboardPanel">${renderLeaderboardPanel(rankings)}</div>
+    <div id="leaderboardPanel"></div>
 
     <div class="stat-grid" style="margin-top:20px;">
       <div class="stat-box"><div class="num">${lastRows.length}</div><div class="lbl">Students tracking</div></div>
@@ -228,7 +182,7 @@ export async function loadTeacherView(){
   `;
 
   renderTable();
-  wireLeaderboardTabs(rankings);
+  mountLeaderboard(document.getElementById('leaderboardPanel'), rankings, 'overall', 10);
 
   document.querySelectorAll('table.students th').forEach(th => {
     if (!th.dataset.key) return;
