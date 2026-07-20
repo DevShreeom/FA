@@ -56,6 +56,7 @@
       <button class="nav-btn" data-section="leaderboard"><span class="nav-icon">🏆</span> Leaderboard</button>
       <button class="nav-btn" data-section="classview"><span class="nav-icon">👨‍🏫</span> Class View</button>
       <button class="nav-btn" data-section="updates"><span class="nav-icon">📣</span> Updates</button>
+      <button class="nav-btn" data-section="qotd"><span class="nav-icon">🎯</span> QOTD Library</button>
     </nav>
 
     <div class="content">
@@ -111,6 +112,18 @@
           <div id="updatesContent" class="loading">Loading updates...</div>
         </div>
       </section>
+      
+      <section id="sectionQotd" class="content-section">
+        <div class="card">
+          <div class="section-label" style="margin-top:0;">🎯 Question of the Day Library</div>
+          <div class="controls" style="margin-bottom: 1rem;">
+            <input class="search-input" id="qotdSearch" placeholder="Search by title or topic (e.g. 'calculus', 'probability')..." style="width: 100%;">
+          </div>
+          <div id="qotdContainer" class="chapter-grid"></div>
+        </div>
+      </section>
+      
+      
     </div>
   </div>
 </div>
