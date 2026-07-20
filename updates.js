@@ -1,8 +1,9 @@
 // updates.js - a simple announcements feed. Admins post, everyone sees.
-// Stored as one doc (updates/feed) with a growing array - fine at this scale.
+// Stored as one doc (updates/feed) with a growing array.
 
 import { db } from './firebase.js';
-import { doc, getDoc, setDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+// Notice we added arrayRemove to the import list below:
+import { doc, getDoc, setDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { getCurrentUser } from './studentView.js';
 import { checkIsAdmin } from './adminCheck.js';
 
@@ -13,9 +14,21 @@ async function fetchPosts(){
   } catch(e){ return []; }
 }
 
-function renderPost(p){
+// We updated this function to check if the user is an admin
+function renderPost(p, isAdmin){
   const dt = new Date(p.postedAt).toLocaleString();
-  return `<div class="update-post"><div class="update-date">${dt}</div><div class="update-text">${p.text}</div></div>`;
+  let html = `<div class="update-post" style="position: relative;">
+                <div class="update-date">${dt}</div>
+                <div class="update-text">${p.text}</div>`;
+                
+  if (isAdmin) {
+    // We safely attach the exact post data to the button so Firebase knows which one to delete
+    const safePostData = JSON.stringify(p).replace(/'/g, "&apos;").replace(/"/g, "&quot;");
+    html += `<button class="delete-post-btn" data-post="${safePostData}" style="position: absolute; top: 10px; right: 10px; padding: 4px 8px; font-size: 0.8rem; background: var(--surface-2); color: var(--text-dim); border: none; border-radius: 4px; cursor: pointer;">Delete</button>`;
+  }
+  
+  html += `</div>`;
+  return html;
 }
 
 export async function loadUpdatesPage(){
@@ -35,10 +48,13 @@ export async function loadUpdatesPage(){
       </div>
     `;
   }
-  html += posts.length ? posts.map(renderPost).join('') : '<div class="empty-note">No updates posted yet.</div>';
+  
+  // Pass the isAdmin status into the render function
+  html += posts.length ? posts.map(p => renderPost(p, isAdmin)).join('') : '<div class="empty-note">No updates posted yet.</div>';
   container.innerHTML = html;
 
   if (isAdmin){
+    // 1. Post logic (unchanged)
     document.getElementById('postUpdateBtn').addEventListener('click', async () => {
       const val = document.getElementById('updateText').value.trim();
       if (!val) return;
@@ -49,6 +65,26 @@ export async function loadUpdatesPage(){
         loadUpdatesPage();
       } catch(e){ alert('Could not post update - check your connection.'); }
     });
+
+    // 2. NEW: Delete logic
+    document.querySelectorAll('.delete-post-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        // Add a quick safety check so admins don't accidentally click it
+        if (!confirm("Are you sure you want to delete this update?")) return;
+
+        const postObj = JSON.parse(e.target.dataset.post);
+        try {
+          // Tell Firebase to look through the array and remove this exact object
+          await setDoc(doc(db, 'updates', 'feed'), {
+            posts: arrayRemove(postObj) 
+          }, { merge: true });
+          
+          loadUpdatesPage(); // Refresh the list
+        } catch(error) {
+          alert('Could not delete update - check your connection.');
+        }
+      });
+    });
   }
 }
 
@@ -57,5 +93,7 @@ export async function loadLatestUpdatePreview(){
   if (!el) return;
   const posts = await fetchPosts();
   if (posts.length === 0){ el.innerHTML = '<div class="empty-note">No updates yet.</div>'; return; }
-  el.innerHTML = renderPost(posts[posts.length - 1]);
+  
+  // We pass 'false' here because we don't want the delete button showing up on the main dashboard preview widget
+  el.innerHTML = renderPost(posts[posts.length - 1], false);
 }
