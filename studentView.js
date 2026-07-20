@@ -8,7 +8,7 @@
   Signature: a faint ruled-paper texture behind the whole page, and chapter numbers rendered like
              roll numbers in mono type.
 */
-:root{
+root{
   --bg: #0b0e1a; --panel: #12162a; --panel-2: #191f38; --border: #2a3155;
   --text: #eef0fa; --muted: #8b90ad; --accent: #4fd1ae; --accent-dim: #1f4a40;
   --pyq: #f2b84f; --pyq-dim: #4a3a1a; --danger: #ef6461; --radius: 10px;
