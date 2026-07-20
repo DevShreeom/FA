@@ -484,12 +484,6 @@ export const CHAPTER_DATA = {
         "duration": "50:48"
       },
       {
-        "title": "Parameter Tricks in Trigonometry | When Does an Equation Have a Solution? | JEE Advanced",
-        "url": "https://www.youtube.com/watch?v=JX2bmgy8vXw",
-        "uploaded": "2026-02-01T02:30:14",
-        "duration": "20:19"
-      },
-      {
         "title": "Conditional Identities & Max–Min in Trigonometry | Complete Concepts + Problems | JEE 2026",
         "url": "https://www.youtube.com/watch?v=L8GGajGON6Q",
         "uploaded": "2026-02-01T14:00:36",
@@ -500,6 +494,12 @@ export const CHAPTER_DATA = {
         "url": "https://www.youtube.com/watch?v=2_mWpBCKqNE",
         "uploaded": "2026-02-02T05:30:03",
         "duration": "21:32"
+      },
+      {
+        "title": "Parameter Tricks in Trigonometry | When Does an Equation Have a Solution? | JEE Advanced",
+        "url": "https://www.youtube.com/watch?v=JX2bmgy8vXw",
+        "uploaded": "2026-02-01T02:30:14",
+        "duration": "20:19"
       }
     ],
     "pyq": [
