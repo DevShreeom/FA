@@ -30,7 +30,7 @@ const SECTION_IDS = {
   dashboard: 'sectionDashboard',
   leaderboard: 'sectionLeaderboard',
   classview: 'sectionClassView',
-  updates: 'sectionUpdates'
+  updates: 'sectionUpdates',
   qotd: 'sectionQotd'
 };
 
