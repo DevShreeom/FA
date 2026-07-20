@@ -8,6 +8,7 @@ import { loadTeacherView } from './teacherView.js';
 import { computeRankings, mountLeaderboard } from './leaderboard.js';
 import { loadUpdatesPage, loadLatestUpdatePreview } from './updates.js';
 import { loadAndMergeCustomLectures } from './customLectures.js';
+import { loadQotdView } from './qotdView.js';
 
 // ---- Theme toggle ----
 const THEME_KEY = 'jee_tracker_theme';
@@ -30,12 +31,15 @@ const SECTION_IDS = {
   leaderboard: 'sectionLeaderboard',
   classview: 'sectionClassView',
   updates: 'sectionUpdates'
+  qotd: 'sectionQotd'
 };
 
 function showSection(name){
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.section === name));
   document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
   document.getElementById(SECTION_IDS[name]).classList.add('active');
+  
+  if (name === 'qotd') loadQotdView(); // <--- Added this
 
   if (name === 'leaderboard'){
     const el = document.getElementById('leaderboardPage');
