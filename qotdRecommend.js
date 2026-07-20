@@ -18,17 +18,48 @@ function chapterKeywords(ch){
     .filter(w => w.length > 3 && !['ratios','equations','inequalities','mixed','extra','revision','compilations'].includes(w));
 }
 
-export function findCurrentChapter(myData){
-  for (const ch of ORDER){
-    const chData = CHAPTER_DATA[ch];
-    const total = chData.fs.length + chData.pyq.length;
-    if (total === 0) continue;
-    let done = 0;
-    chData.fs.forEach(it => { if (isDoneVal(myData.theory[idFor(it.url)])) done++; });
-    chData.pyq.forEach(it => { if (isDoneVal(myData.pyq[idFor(it.url)])) done++; });
-    if (done < total) return ch; // first chapter that isn't fully complete yet
+export function findCurrentChapter(myData) {
+  let activeChapter = null;
+  let highestTouchedIndex = -1;
+
+  // Safe fetchers in case a new student has no data yet
+  const getTheory = (id) => myData.theory ? myData.theory[id] : null;
+  const getPyq = (id) => myData.pyq ? myData.pyq[id] : null;
+
+  for (let i = 0; i < ORDER.length; i++) {
+    const ch = ORDER[i];
+    let isWorking = false;
+    let hasTouched = false;
+
+    // Check Theory
+    CHAPTER_DATA[ch].fs.forEach(it => {
+      const status = getTheory(idFor(it.url));
+      if (status === 'progressing') isWorking = true;
+      if (status === 'done' || status === true) hasTouched = true;
+    });
+
+    // Check PYQs
+    CHAPTER_DATA[ch].pyq.forEach(it => {
+      const status = getPyq(idFor(it.url));
+      if (status === 'progressing') isWorking = true;
+      if (status === 'done' || status === true) hasTouched = true;
+    });
+
+    // Keep track of the furthest chapter they have done *anything* in
+    if (hasTouched || isWorking) highestTouchedIndex = i;
+    
+    // If they are actively 'progressing' here, mark it as the active chapter
+    if (isWorking) activeChapter = ch;
   }
-  return ORDER[0]; // everything done - just recommend against the first chapter
+
+  // 1. If they have a video actively marked as "progressing", recommend that chapter!
+  if (activeChapter) return activeChapter;
+
+  // 2. Otherwise, recommend the furthest chapter they have touched
+  if (highestTouchedIndex >= 0) return ORDER[highestTouchedIndex];
+
+  // 3. Fallback for brand new accounts
+  return ORDER[0]; 
 }
 
 export function recommendQotd(myData){
