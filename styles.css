@@ -85,10 +85,26 @@ h2{ font-family: var(--font-display); font-weight: 600; }
 .search-input{ background: var(--panel); border: 1px solid var(--border); color: var(--text); padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; min-width: 180px; font-family: var(--font-body); }
 
 /* ---- Chapter grid ---- */
-.chapter-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); gap: 12px; align-items: start; }
-@media (max-width: 900px){ .chapter-grid{ grid-template-columns: 1fr; } }
+.chapter-grid { 
+  column-count: 2; 
+  column-gap: 12px; 
+  display: block; 
+}
+@media (max-width: 900px) { 
+  .chapter-grid { column-count: 1; } 
+}
 
-.chapter{ background: var(--panel); border: 1px solid var(--border); border-left: 3px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.chapter { 
+  background: var(--panel); 
+  border: 1px solid var(--border); 
+  border-left: 3px solid var(--border); 
+  border-radius: var(--radius); 
+  overflow: hidden; 
+  display: inline-block; 
+  width: 100%; 
+  break-inside: avoid; 
+  margin-bottom: 12px; 
+}
 .chapter-head{ display:flex; align-items:center; justify-content: space-between; padding: 12px 14px; cursor: pointer; user-select: none; }
 .chapter-head:hover{ background: var(--panel-2); }
 .chapter-title{ display:flex; align-items:center; gap: 10px; min-width:0; }
