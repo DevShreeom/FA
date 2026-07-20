@@ -23,11 +23,17 @@
         <div class="sub">NOT WON YET, NOT DONE YET!</div>
       </div>
     </div>
-    <div class="mode-toggle">
-      <button id="btnStudentMode" class="active">My progress</button>
-      <button id="btnSirMode">Class view</button>
+    <div class="whoami" id="whoamiBar" style="display:none;">
+      Tracking as <strong id="whoamiName" style="color:var(--text)"></strong>
+      <button id="editNameBtn">(edit name)</button>
+      <button id="logoutBtn">(log out)</button>
     </div>
+    <button id="themeToggle" class="theme-toggle" title="Switch dark/light mode">🌙</button>
   </header>
+
+  <div id="displayNameBanner" class="banner" style="display:none;">
+    👋 New here: you can set a display name so the leaderboard and dashboard show your real name instead of your login username. Click <strong>(edit name)</strong> above.
+  </div>
 
   <div id="authOverlay" style="display:none;">
     <div class="auth-tabs">
@@ -44,20 +50,30 @@
     <div id="authError"></div>
   </div>
 
-  <div id="studentView" style="display:none;">
-    <div class="card">
-      <div class="whoami">
-        Tracking as <strong id="whoamiName" style="color:var(--text)"></strong>
-        <button id="logoutBtn">(log out)</button>
-      </div>
-    </div>
+  <div id="appShell" style="display:none;">
+    <nav class="nav-rail">
+      <button class="nav-btn active" data-section="dashboard"><span class="nav-icon">🏠</span> Dashboard</button>
+      <button class="nav-btn" data-section="leaderboard"><span class="nav-icon">🏆</span> Leaderboard</button>
+      <button class="nav-btn" data-section="classview"><span class="nav-icon">👨‍🏫</span> Class View</button>
+      <button class="nav-btn" data-section="updates"><span class="nav-icon">📣</span> Updates</button>
+    </nav>
 
-    <div class="app-shell">
-      <div class="main-col">
+    <div class="content">
+      <section id="sectionDashboard" class="content-section active">
         <div class="stat-grid">
           <div class="stat-box"><div class="num" id="statOverallNum">0%</div><div class="lbl">Overall complete</div></div>
           <div class="stat-box"><div class="num" id="statTheoryNum">0/0</div><div class="lbl">Theory watched</div></div>
           <div class="stat-box pyq"><div class="num" id="statPyqNum">0/0</div><div class="lbl">PYQ practiced</div></div>
+        </div>
+
+        <div class="card">
+          <div class="section-label pyq">📅 Question of the Day</div>
+          <div id="qotdWidget"></div>
+        </div>
+
+        <div class="card">
+          <div class="section-label">📣 Latest update</div>
+          <div id="latestUpdatePreview" class="loading">Loading…</div>
         </div>
 
         <div class="card overall-bar-wrap">
@@ -74,28 +90,27 @@
 
         <div id="chapters" class="chapter-grid"></div>
         <footer>128 lectures across 27 chapters · Factorial Final Surge + PYQ Masterseries</footer>
-      </div>
+      </section>
 
-      <aside class="sidebar">
+      <section id="sectionLeaderboard" class="content-section">
         <div class="card">
-          <div class="section-label">🏆 Leaderboard</div>
-          <div id="sidebarLeaderboard"></div>
+          <div class="section-label" style="margin-top:0;">🏆 Leaderboard</div>
+          <div id="leaderboardPage"></div>
         </div>
-        <div class="card">
-          <div class="section-label pyq">📅 Question of the Day</div>
-          <div id="qotdWidget"></div>
-        </div>
-        <div class="card">
-          <div class="section-label">📣 Updates</div>
-          <div class="empty-note">Coming soon.</div>
-        </div>
-      </aside>
-    </div>
-  </div>
+      </section>
 
-  <div id="sirView" style="display:none;">
-    <div class="card">
-      <div id="sirContent" class="loading">Loading class data…</div>
+      <section id="sectionClassView" class="content-section">
+        <div class="card">
+          <div id="sirContent" class="loading">Loading class data…</div>
+        </div>
+      </section>
+
+      <section id="sectionUpdates" class="content-section">
+        <div class="card">
+          <div class="section-label" style="margin-top:0;">📣 Updates</div>
+          <div id="updatesContent" class="loading">Loading updates…</div>
+        </div>
+      </section>
     </div>
   </div>
 </div>
