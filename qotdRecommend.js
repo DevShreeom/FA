@@ -35,18 +35,14 @@ export function recommendQotd(myData){
   const chapter = findCurrentChapter(myData);
   const keywords = chapterKeywords(chapter);
 
-  let best = null, bestScore = -1;
-  QOTD.forEach(v => {
+  const scored = QOTD.map(v => {
     let score = 0;
-    keywords.forEach(kw => {
-      if (v.tags.some(tag => tag.includes(kw))) score++;
-    });
-    if (score > bestScore){ bestScore = score; best = v; }
-  });
+    keywords.forEach(kw => { if (v.tags.some(tag => tag.includes(kw))) score++; });
+    return { video: v, score };
+  }).sort((a, b) => b.score - a.score);
 
-  if (!best || bestScore === 0){
-    // no tag overlap at all — fall back to the most recently uploaded video
-    best = QOTD[0];
-  }
-  return { chapter, video: best };
+  const matches = scored.filter(s => s.score > 0).map(s => s.video);
+  const ranked = matches.length ? matches : QOTD; // no tag overlap at all — fall back to full list
+
+  return { chapter, ranked };
 }
