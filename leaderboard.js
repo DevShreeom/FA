@@ -28,7 +28,7 @@ export async function computeRankings(){
     const overallDone = theoryDone + pyqDone;
     entries.push({
       id: s.id,
-      name: data.username || '(unknown)',
+      name: data.displayName || data.username || '(unknown)',
       theoryDone, theoryPct: tTheory ? Math.round(theoryDone/tTheory*100) : 0,
       pyqDone, pyqPct: tPyq ? Math.round(pyqDone/tPyq*100) : 0,
       overallDone, overallPct: total ? Math.round(overallDone/total*100) : 0
