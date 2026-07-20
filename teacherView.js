@@ -3,11 +3,13 @@
 // just renders whatever Firestore allows through, and shows a clear message if it's blocked.
 
 import { db } from './firebase.js';
-import { collection, getDocs, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { collection, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { computeTotalAll, studentTheoryDone, studentPyqDone, idFor } from './metrics.js';
 import { ORDER, CHAPTER_DATA } from './data.js';
 import { getCurrentUser } from './studentView.js';
 import { computeRankings, mountLeaderboard } from './leaderboard.js';
+import { checkIsAdmin } from './adminCheck.js';
+import { addCustomLecture } from './customLectures.js';
 
 function totalForChapter(ch){ return CHAPTER_DATA[ch].fs.length + CHAPTER_DATA[ch].pyq.length; }
 function pctClass(p){ if (p < 34) return 'low'; if (p < 70) return 'mid'; return 'high'; }
@@ -17,17 +19,6 @@ let searchQuery = '';
 let sortKey = 'pct';
 let sortDir = -1;
 let isAdmin = false;
-
-async function checkIsAdmin(){
-  const user = getCurrentUser();
-  if (!user) return false;
-  try {
-    const snap = await getDoc(doc(db, 'admins', user.uid));
-    return snap.exists();
-  } catch(e){
-    return false;
-  }
-}
 
 function studentDoneCount(s){
   return studentTheoryDone(s) + studentPyqDone(s);
@@ -98,7 +89,8 @@ export async function loadTeacherView(){
   const container = document.getElementById('sirContent');
   container.innerHTML = '<div class="loading">Loading class data…</div>';
 
-  isAdmin = await checkIsAdmin();
+  const user = getCurrentUser();
+  isAdmin = await checkIsAdmin(user ? user.uid : null);
 
   let snaps, flagSnaps;
   try {
@@ -135,7 +127,7 @@ export async function loadTeacherView(){
     let scCount = 0;
     if (s.selfcheck) Object.values(s.selfcheck).forEach(v => { if (v) scCount++; });
     const flagged = !!(flagMap[s.id] && flagMap[s.id].flagged);
-    return { id: s.id, name: s.username || '(unknown)', done, total, pct, scCount, updatedAt: s.updatedAt, flagged };
+    return { id: s.id, name: s.displayName || s.username || '(unknown)', done, total, pct, scCount, updatedAt: s.updatedAt, flagged };
   });
 
   const avgPct = lastRows.length ? Math.round(lastRows.reduce((a,r) => a + r.pct, 0) / lastRows.length) : 0;
@@ -145,7 +137,20 @@ export async function loadTeacherView(){
   const rankings = await computeRankings();
 
   container.innerHTML = `
-    <div class="section-label" style="margin-top:0;">🏆 Leaderboard (top 10, flagged accounts excluded)</div>
+    ${isAdmin ? `
+    <div class="section-label" style="margin-top:0;">➕ Add a missing lecture</div>
+    <div class="add-lecture-form">
+      <select id="addLecChapter">${ORDER.map(ch => `<option value="${ch}">${ch}</option>`).join('')}</select>
+      <select id="addLecType"><option value="fs">Theory</option><option value="pyq">PYQ</option></select>
+      <input id="addLecTitle" placeholder="Title">
+      <input id="addLecUrl" placeholder="YouTube URL">
+      <input id="addLecDuration" placeholder="Duration (e.g. 12:34)">
+      <button id="addLecBtn">Add</button>
+    </div>
+    <div id="addLecMsg" class="status-msg" style="margin:4px 0 16px;"></div>
+    ` : ''}
+
+    <div class="section-label">🏆 Leaderboard (top 10, flagged accounts excluded)</div>
     <div id="leaderboardPanel"></div>
 
     <div class="stat-grid" style="margin-top:20px;">
@@ -197,4 +202,26 @@ export async function loadTeacherView(){
     searchQuery = e.target.value.trim().toLowerCase();
     renderTable();
   });
+
+  if (isAdmin){
+    document.getElementById('addLecBtn').addEventListener('click', async () => {
+      const chapter = document.getElementById('addLecChapter').value;
+      const kind = document.getElementById('addLecType').value;
+      const title = document.getElementById('addLecTitle').value.trim();
+      const url = document.getElementById('addLecUrl').value.trim();
+      const duration = document.getElementById('addLecDuration').value.trim();
+      const msg = document.getElementById('addLecMsg');
+      if (!title || !url){ msg.textContent = 'Title and URL are required.'; return; }
+      msg.textContent = 'Adding…';
+      try {
+        await addCustomLecture(chapter, kind, { title, url, duration, uploaded: new Date().toISOString() });
+        msg.textContent = 'Added — visible immediately, and to everyone else next time they load the site.';
+        document.getElementById('addLecTitle').value = '';
+        document.getElementById('addLecUrl').value = '';
+        document.getElementById('addLecDuration').value = '';
+      } catch(e){
+        msg.textContent = 'Could not add — check your connection.';
+      }
+    });
+  }
 }
