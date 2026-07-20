@@ -1,325 +1,193 @@
-// studentView.js — everything for the logged-in student's own dashboard.
-//
-// Efficiency note: instead of overwriting the whole student document on every
-// single click (expensive + risks clobbering concurrent tabs), each tick writes
-// only the ONE changed field via updateDoc's dot-path syntax. Metadata like
-// 'updatedAt'/'username' rides along on each write but the tick data itself
-// (theory/pyq/selfcheck) is written per-field, not as one giant object.
-
-import { db } from './firebase.js';
-import { doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { ORDER, CHAPTER_DATA, SESSIONS } from './data.js';
-import { idFor, totalForChapter, computeTotalAll, totalTheory, totalPyq } from './metrics.js';
-import { recommendQotd } from './qotdRecommend.js';
-
-let currentUser = null;
-let myUsername = null;
-let myData = { theory: {}, pyq: {}, selfcheck: {}, updatedAt: null };
-const pendingWrites = {}; // per-field debounce timers, keyed by field path
-
-function fmtChapterNum(i){ return String(i+1).padStart(2,'0'); }
-function scKey(ch, sess){ return ch + '|' + sess; }
-
-function isDoneVal(v){ return v === 'done' || v === true; }
-
-function computeDoneTheory(){
-  let n = 0;
-  ORDER.forEach(ch => { CHAPTER_DATA[ch].fs.forEach(it => { if (isDoneVal(myData.theory[idFor(it.url)])) n++; }); });
-  return n;
+/*
+  Design notes:
+  Subject: a JEE coaching academy's lecture + PYQ tracker — a gradebook/ledger, not a generic dashboard.
+  Palette: deep indigo-ink background (not flat black) with a chalkboard-green accent for theory
+           and a highlighter-gold accent for PYQ practice — the two pens a student actually marks with.
+  Type: Sora for headings (structural, exam-paper confident), Inter for body, JetBrains Mono for every
+        number — chapter numbers, percentages, ranks, durations — so data reads like marks on a sheet.
+  Signature: a faint ruled-paper texture behind the whole page, and chapter numbers rendered like
+             roll numbers in mono type.
+*/
+:root{
+  --bg: #0b0e1a; --panel: #12162a; --panel-2: #191f38; --border: #2a3155;
+  --text: #eef0fa; --muted: #8b90ad; --accent: #4fd1ae; --accent-dim: #1f4a40;
+  --pyq: #f2b84f; --pyq-dim: #4a3a1a; --danger: #ef6461; --radius: 10px;
+  --font-display: 'Sora', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 }
-function computeDonePyq(){
-  let n = 0;
-  ORDER.forEach(ch => { CHAPTER_DATA[ch].pyq.forEach(it => { if (isDoneVal(myData.pyq[idFor(it.url)])) n++; }); });
-  return n;
+* { box-sizing: border-box; }
+html,body{
+  margin:0; padding:0; background: var(--bg); color: var(--text); font-family: var(--font-body);
+  background-image: repeating-linear-gradient(to bottom, transparent, transparent 27px, rgba(255,255,255,0.018) 28px);
 }
+.wrap{ max-width: 1320px; margin: 0 auto; padding: 24px 20px 80px; }
 
-async function loadMyData(){
-  const ref = doc(db, 'students', currentUser.uid);
-  try {
-    const snap = await getDoc(ref);
-    if (snap.exists()){
-      const d = snap.data();
-      myData = { theory: d.theory || {}, pyq: d.pyq || {}, selfcheck: d.selfcheck || {}, updatedAt: d.updatedAt || null, username: d.username || myUsername, displayName: d.displayName || null };
-    } else {
-      myData = { theory: {}, pyq: {}, selfcheck: {}, updatedAt: null, username: myUsername, displayName: null };
-      // create the doc once up front so later writes can use the lighter updateDoc() instead of setDoc()
-      try { await setDoc(ref, { ...myData, updatedAt: new Date().toISOString() }); } catch(e){ /* fine, first tick will retry via setDoc fallback */ }
-    }
-  } catch(e){
-    myData = { theory: {}, pyq: {}, selfcheck: {}, updatedAt: null, username: myUsername, displayName: null };
-  }
-}
+header{ display:flex; align-items:center; justify-content: space-between; gap: 14px; margin-bottom: 22px; flex-wrap: wrap; }
+.brand{ display:flex; align-items:center; gap: 12px; }
+.brand img{ height: 44px; width: auto; max-width: 60px; border-radius: 8px; object-fit: contain; flex-shrink: 0; }
+h1{ font-family: var(--font-display); font-weight: 700; font-size: 1.4rem; margin: 0; letter-spacing: 0.1px; }
+h2{ font-family: var(--font-display); font-weight: 600; }
+.sub{ color: var(--muted); font-size: 0.8rem; margin-top: 2px; }
 
-// Writes exactly one field (e.g. "theory.abc123" or "selfcheck.Chapter|2024 Jan"),
-// debounced per field-path so rapid re-clicks on the SAME item collapse into one write,
-// but clicks on DIFFERENT items don't wait on each other.
-function writeField(fieldPath, value){
-  const statusEl = document.getElementById('statusMsg');
-  if (statusEl) statusEl.textContent = 'Saving…';
-  clearTimeout(pendingWrites[fieldPath]);
-  pendingWrites[fieldPath] = setTimeout(async () => {
-    const ref = doc(db, 'students', currentUser.uid);
-    const payload = { [fieldPath]: value, updatedAt: new Date().toISOString(), username: myUsername };
-    try {
-      await updateDoc(ref, payload);
-      if (statusEl) statusEl.textContent = 'Saved';
-    } catch(e){
-      // doc might not exist yet (edge case) — fall back to a full setDoc with merge
-      try {
-        await setDoc(ref, payload, { merge: true });
-        if (statusEl) statusEl.textContent = 'Saved';
-      } catch(e2){
-        if (statusEl) statusEl.textContent = 'Save failed — check connection';
-      }
-    }
-  }, 400);
+.mode-toggle{ display:flex; gap: 6px; background: var(--panel); border: 1px solid var(--border); border-radius: 999px; padding: 4px; }
+.mode-toggle button{ background: transparent; border: none; color: var(--muted); padding: 7px 16px; border-radius: 999px; font-size: 0.82rem; cursor: pointer; font-weight: 600; font-family: var(--font-body); }
+.mode-toggle button.active{ background: var(--accent-dim); color: var(--accent); }
+
+.card{ background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; }
+
+/* ---- Auth ---- */
+#authOverlay{ text-align:center; padding: 50px 20px; }
+#authOverlay h2{ font-size: 1.15rem; margin-bottom: 6px; }
+#authOverlay p{ color: var(--muted); font-size: 0.85rem; margin-bottom: 18px; }
+.auth-tabs{ display:flex; justify-content:center; gap: 6px; margin-bottom: 18px; }
+.auth-tabs button{ background: var(--panel-2); border: 1px solid var(--border); color: var(--muted); padding: 7px 18px; border-radius: 999px; font-size: 0.82rem; cursor: pointer; font-weight: 600; }
+.auth-tabs button.active{ background: var(--accent-dim); color: var(--accent); border-color: var(--accent-dim); }
+.auth-form{ display:flex; flex-direction: column; align-items:center; gap: 10px; max-width: 280px; margin: 0 auto; }
+.auth-form input{ background: var(--panel-2); border: 1px solid var(--border); color: var(--text); padding: 10px 14px; border-radius: 8px; font-size: 0.9rem; width: 100%; font-family: var(--font-body); }
+.auth-form button{ background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent-dim); padding: 10px 18px; border-radius: 8px; font-size: 0.9rem; cursor: pointer; font-weight: 600; width: 100%; }
+#authError{ color: var(--danger); font-size: 0.8rem; margin-top: 10px; min-height: 18px; }
+
+.whoami{ display:flex; align-items:center; gap: 10px; font-size: 0.8rem; color: var(--muted); }
+.whoami button{ background: none; border: none; color: var(--accent); cursor: pointer; font-size: 0.78rem; text-decoration: underline; padding: 0; }
+
+/* ---- App shell: vertical nav rail + routed content sections ---- */
+#appShell{ display:flex; gap: 22px; align-items:flex-start; }
+.nav-rail{ width: 190px; flex-shrink:0; position: sticky; top: 20px; display:flex; flex-direction:column; gap: 4px; }
+.nav-btn{ display:flex; align-items:center; gap: 10px; background: transparent; border: 1px solid transparent; color: var(--muted); padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; text-align:left; font-family: var(--font-body); }
+.nav-btn:hover{ background: var(--panel-2); }
+.nav-btn.active{ background: var(--panel); border-color: var(--border); color: var(--accent); }
+.nav-icon{ font-size: 1rem; }
+.content{ flex:1; min-width:0; }
+.content-section{ display:none; }
+.content-section.active{ display:block; }
+@media (max-width: 800px){
+  #appShell{ flex-direction: column; }
+  .nav-rail{ position: static; width: 100%; flex-direction: row; overflow-x:auto; }
 }
 
-function nextStatus(current, clicked){
-  // clicked = 'progressing' | 'done'. Clicking the already-active state clears it back to 'none'.
-  if (current === clicked) return 'none';
-  return clicked;
+/* ---- Stat strip ---- */
+.stat-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: 10px; margin-bottom: 16px; }
+.stat-box{ background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
+.stat-box .num{ font-family: var(--font-mono); font-size: 1.4rem; font-weight: 700; color: var(--accent); }
+.stat-box .lbl{ font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+.stat-box.pyq .num{ color: var(--pyq); }
+
+.overall-bar-wrap{ display:flex; align-items:center; gap: 14px; }
+.overall-bar-wrap .bar{ flex: 1; height: 8px; background: var(--panel-2); border-radius: 999px; overflow:hidden; }
+.overall-bar-wrap .bar > div{ height: 100%; background: linear-gradient(90deg, var(--accent), var(--pyq)); width:0%; transition: width .3s ease; }
+.overall-bar-wrap .count{ font-family: var(--font-mono); font-size: 0.82rem; color: var(--muted); white-space:nowrap; }
+
+.controls{ display:flex; gap:8px; margin: 4px 0 14px; flex-wrap: wrap; align-items:center; }
+.controls button{ background: var(--panel); border: 1px solid var(--border); color: var(--text); padding: 6px 12px; border-radius: 8px; font-size: 0.78rem; cursor: pointer; }
+.controls button:hover{ border-color: var(--accent); }
+.status-msg{ font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); margin-left: auto; align-self: center; }
+.search-input{ background: var(--panel); border: 1px solid var(--border); color: var(--text); padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; min-width: 180px; font-family: var(--font-body); }
+
+/* ---- Chapter grid ---- */
+.chapter-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); gap: 12px; align-items: start; }
+@media (max-width: 900px){ .chapter-grid{ grid-template-columns: 1fr; } }
+
+.chapter{ background: var(--panel); border: 1px solid var(--border); border-left: 3px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.chapter-head{ display:flex; align-items:center; justify-content: space-between; padding: 12px 14px; cursor: pointer; user-select: none; }
+.chapter-head:hover{ background: var(--panel-2); }
+.chapter-title{ display:flex; align-items:center; gap: 10px; min-width:0; }
+.chapter-num{ font-family: var(--font-mono); color: var(--muted); font-size: 0.72rem; flex-shrink:0; }
+.chapter-name{ font-family: var(--font-display); font-weight: 600; font-size: 0.9rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.chapter-meta{ display:flex; align-items:center; gap: 10px; flex-shrink:0; }
+.mini-bar{ width: 50px; height: 6px; background: var(--panel-2); border-radius: 999px; overflow:hidden; }
+.mini-bar > div{ height:100%; background: var(--accent); }
+.chapter-count{ font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); min-width: 36px; text-align:right;}
+.chevron{ color: var(--muted); transition: transform .2s ease; font-size: 0.75rem; }
+.chapter.open .chevron{ transform: rotate(90deg); }
+.chapter-body{ display:none; padding: 2px 14px 14px; border-top: 1px solid var(--border); }
+.chapter.open .chapter-body{ display:block; }
+
+.section-label{ font-family: var(--font-display); font-size: 0.68rem; font-weight:600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 12px 0 6px; }
+.section-label.pyq{ color: var(--pyq); }
+.section-label.fs{ color: var(--accent); }
+
+.video-row{ display:flex; align-items: flex-start; gap: 10px; padding: 7px 6px; border-radius: 8px; }
+.video-row:hover{ background: var(--panel-2); }
+.status-btns{ display:flex; gap: 4px; margin-top: 2px; flex-shrink:0; }
+.status-btn{ width: 24px; height: 24px; border-radius: 6px; border: 1px solid var(--border); background: var(--panel-2); color: var(--muted); font-size: 0.8rem; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; }
+.status-btn.progressing.active{ background: var(--pyq-dim); border-color: var(--pyq); color: var(--pyq); }
+.status-btn.done.active{ background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+.video-info{ flex: 1; min-width: 0; }
+.video-info a{ color: var(--text); text-decoration: none; font-size: 0.83rem; line-height: 1.35; }
+.video-info a:hover{ color: var(--accent); text-decoration: underline; }
+.video-row.pyq .video-info a:hover{ color: var(--pyq); }
+.video-row.done .video-info a{ color: var(--muted); text-decoration: line-through; }
+.video-dur{ font-family: var(--font-mono); color: var(--muted); font-size: 0.7rem; margin-left: 6px; white-space: nowrap; }
+.empty-note{ color: var(--muted); font-size: 0.78rem; font-style: italic; padding: 6px; }
+
+.selfcheck{ margin-top: 10px; }
+.sc-year{ display:flex; align-items:center; gap: 8px; padding: 4px 0; }
+.sc-year-label{ font-family: var(--font-mono); width: 42px; font-size: 0.74rem; color: var(--muted); flex-shrink:0; }
+.sc-sess{ display:flex; align-items:center; gap: 4px; font-size: 0.7rem; color: var(--muted); cursor:pointer; }
+.sc-sess input{ width: 13px; height: 13px; accent-color: var(--pyq); cursor:pointer; }
+
+footer{ text-align:center; color: var(--muted); font-size: 0.72rem; margin-top: 24px; }
+
+/* ---- Leaderboard (shared: sidebar + teacher view) ---- */
+.leaderboard-tabs{ display:flex; gap: 6px; margin-bottom: 12px; }
+.leaderboard-tabs button{ background: var(--panel-2); border: 1px solid var(--border); color: var(--muted); padding: 5px 14px; border-radius: 999px; font-size: 0.76rem; cursor: pointer; font-weight: 600; }
+.leaderboard-tabs button.active{ background: var(--accent-dim); color: var(--accent); border-color: var(--accent-dim); }
+.leaderboard-list{ display:flex; flex-direction:column; gap: 6px; }
+.lb-row{ display:flex; align-items:center; gap: 10px; background: var(--panel-2); border-radius: 8px; padding: 7px 10px; }
+.lb-rank{ font-family: var(--font-mono); width: 28px; text-align:center; font-weight:700; font-size: 0.85rem; flex-shrink:0; }
+.lb-name{ flex-shrink:1; font-size: 0.8rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; }
+.lb-bar{ flex:1; height: 6px; background: var(--panel); border-radius: 999px; overflow:hidden; min-width: 30px; }
+.lb-bar > div{ height:100%; background: linear-gradient(90deg, var(--accent), var(--pyq)); }
+.lb-count{ font-family: var(--font-mono); width: 50px; text-align:right; color: var(--muted); font-size: 0.72rem; flex-shrink:0; }
+
+/* ---- Question of the Day widget ---- */
+.qotd-chapter{ font-size: 0.72rem; color: var(--muted); margin-bottom: 6px; }
+.qotd-link{ display:block; color: var(--text); text-decoration:none; font-size: 0.85rem; line-height:1.4; margin-bottom: 4px; }
+.qotd-link:hover{ color: var(--pyq); text-decoration: underline; }
+
+/* ---- Teacher / class view ---- */
+.stat-box.pyq{ } /* reused above */
+table.students{ width:100%; border-collapse: collapse; font-size: 0.82rem; }
+table.students th{ font-family: var(--font-display); text-align:left; color: var(--muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 8px 10px; border-bottom: 1px solid var(--border); cursor:pointer; }
+table.students th:hover{ color: var(--text); }
+table.students td{ padding: 9px 10px; border-bottom: 1px solid var(--panel-2); }
+table.students tr:hover td{ background: var(--panel-2); }
+.pct-pill{ font-family: var(--font-mono); display:inline-block; padding: 2px 8px; border-radius: 999px; font-size: 0.72rem; font-weight: 600; }
+.pct-pill.low{ background: #4a2323; color: #f0a3a3; }
+.pct-pill.mid{ background: var(--pyq-dim); color: var(--pyq); }
+.pct-pill.high{ background: var(--accent-dim); color: var(--accent); }
+
+.chapter-heat{ display:flex; flex-direction:column; gap: 6px; margin-top: 6px; }
+.heat-row{ display:flex; align-items:center; gap: 10px; font-size: 0.78rem; }
+.heat-name{ width: 220px; flex-shrink:0; color: var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.heat-bar{ flex:1; height: 8px; background: var(--panel-2); border-radius: 999px; overflow:hidden; }
+.heat-bar > div{ height:100%; background: linear-gradient(90deg, var(--accent), var(--pyq)); }
+.heat-pct{ font-family: var(--font-mono); width: 40px; text-align:right; color: var(--muted); }
+
+:root[data-theme="light"]{
+  --bg:#f4f5fb; --panel:#ffffff; --panel-2:#eef0f8; --border:#dadfee;
+  --text:#1a1d2e; --muted:#5c6178; --accent-dim:#d3f3e8; --pyq-dim:#fbe9c9;
 }
+:root[data-theme="light"] html,html[data-theme="light"] body{ background-image:none; }
 
-function renderVideoRow(item, kind){
-  const vid = idFor(item.url);
-  const dataMap = kind === 'fs' ? myData.theory : myData.pyq;
-  const rawVal = dataMap[vid];
-  const status = rawVal === true ? 'done' : (rawVal || 'none'); // legacy boolean compat
+.theme-toggle{ background: var(--panel); border: 1px solid var(--border); border-radius: 999px; width: 38px; height: 38px; font-size: 1rem; cursor: pointer; margin-left: 10px; }
 
-  const row = document.createElement('div');
-  row.className = 'video-row ' + (kind === 'pyq' ? 'pyq' : '') + (status === 'done' ? ' done' : '');
-  row.innerHTML = `
-    <div class="status-btns">
-      <button class="status-btn progressing ${status === 'progressing' ? 'active' : ''}" title="Mark as progressing">◐</button>
-      <button class="status-btn done ${status === 'done' ? 'active' : ''}" title="Mark as done">✓</button>
-    </div>
-    <div class="video-info">
-      <a href="${item.url}" target="_blank" rel="noopener">${item.title}</a>
-      <span class="video-dur">${item.duration ? '· ' + item.duration : ''}</span>
-    </div>
-  `;
+.banner{ background: var(--pyq-dim); border: 1px solid var(--pyq); color: var(--text); border-radius: 8px; padding: 10px 14px; font-size: 0.82rem; margin-bottom: 16px; }
 
-  const fieldPath = (kind === 'fs' ? 'theory.' : 'pyq.') + vid;
+.update-composer{ display:flex; flex-direction:column; gap: 8px; margin-bottom: 14px; }
+.update-composer textarea{ background: var(--panel-2); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 10px; font-family: var(--font-body); font-size: 0.85rem; resize: vertical; }
+.update-composer button{ align-self: flex-start; background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent-dim); padding: 7px 16px; border-radius: 8px; font-weight: 600; cursor:pointer; }
+.update-post{ border-bottom: 1px solid var(--border); padding: 10px 0; }
+.update-date{ font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); margin-bottom: 3px; }
+.update-text{ font-size: 0.88rem; white-space: pre-wrap; }
 
-  function applyStatus(newStatus){
-    dataMap[vid] = newStatus;
-    row.classList.toggle('done', newStatus === 'done');
-    row.querySelector('.status-btn.progressing').classList.toggle('active', newStatus === 'progressing');
-    row.querySelector('.status-btn.done').classList.toggle('active', newStatus === 'done');
-    updateChapterProgress(row.closest('.chapter'));
-    updateStatStrip();
-    writeField(fieldPath, newStatus);
-  }
+.add-lecture-form{ display:flex; flex-wrap:wrap; gap: 6px; margin-bottom: 4px; }
+.add-lecture-form select, .add-lecture-form input{ background: var(--panel-2); border: 1px solid var(--border); color: var(--text); padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; font-family: var(--font-body); }
+.add-lecture-form input{ flex: 1; min-width: 140px; }
+.add-lecture-form button{ background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent-dim); padding: 6px 16px; border-radius: 8px; font-weight: 600; cursor:pointer; }
 
-  row.querySelector('.status-btn.progressing').addEventListener('click', () => {
-    applyStatus(nextStatus(dataMap[vid] || 'none', 'progressing'));
-  });
-  row.querySelector('.status-btn.done').addEventListener('click', () => {
-    applyStatus(nextStatus(dataMap[vid] || 'none', 'done'));
-  });
+.qotd-footer{ display:flex; align-items:center; justify-content:space-between; margin-top: 4px; }
+.qotd-another{ background: var(--panel-2); border: 1px solid var(--border); color: var(--muted); padding: 4px 10px; border-radius: 999px; font-size: 0.72rem; cursor: pointer; }
 
-  return row;
-}
-
-function renderSelfCheck(ch){
-  const wrap = document.createElement('div');
-  wrap.className = 'selfcheck';
-  const label = document.createElement('div');
-  label.className = 'section-label pyq';
-  label.textContent = 'Year-wise PYQ self-check';
-  wrap.appendChild(label);
-
-  for (let y = 0; y < SESSIONS.length; y += 2){
-    const yearLabel = SESSIONS[y].split(' ')[0];
-    const row = document.createElement('div');
-    row.className = 'sc-year';
-    row.innerHTML = `<span class="sc-year-label">${yearLabel}</span>`;
-    [SESSIONS[y], SESSIONS[y+1]].forEach(sess => {
-      const sessLabel = sess.split(' ')[1];
-      const key = scKey(ch, sess);
-      const checked = !!myData.selfcheck[key];
-      const lbl = document.createElement('label');
-      lbl.className = 'sc-sess';
-      lbl.innerHTML = `<input type="checkbox" ${checked ? 'checked' : ''}> ${sessLabel}`;
-      const cb = lbl.querySelector('input');
-      cb.addEventListener('change', () => {
-        myData.selfcheck[key] = cb.checked;
-        writeField('selfcheck.' + key, cb.checked);
-      });
-      row.appendChild(lbl);
-    });
-    wrap.appendChild(row);
-  }
-  return wrap;
-}
-
-function updateChapterProgress(chapterEl){
-  const ch = chapterEl.dataset.chapter;
-  const total = totalForChapter(ch);
-  let done = 0;
-  CHAPTER_DATA[ch].fs.forEach(it => { if (isDoneVal(myData.theory[idFor(it.url)])) done++; });
-  CHAPTER_DATA[ch].pyq.forEach(it => { if (isDoneVal(myData.pyq[idFor(it.url)])) done++; });
-  const pct = total ? Math.round(done/total*100) : 0;
-  chapterEl.querySelector('.mini-bar > div').style.width = pct + '%';
-  chapterEl.querySelector('.chapter-count').textContent = `${done}/${total}`;
-}
-
-function updateStatStrip(){
-  const total = computeTotalAll();
-  const doneTheory = computeDoneTheory();
-  const donePyq = computeDonePyq();
-  const done = doneTheory + donePyq;
-  const pct = total ? Math.round(done/total*100) : 0;
-
-  document.getElementById('statOverallNum').textContent = pct + '%';
-  document.getElementById('statTheoryNum').textContent = `${doneTheory}/${totalTheory()}`;
-  document.getElementById('statPyqNum').textContent = `${donePyq}/${totalPyq()}`;
-  document.getElementById('overallCount').textContent = `${done} / ${total}`;
-  document.getElementById('overallBar').style.width = pct + '%';
-}
-
-let qotdIndex = 0;
-let qotdRanked = [];
-
-function renderQotdCard(){
-  const qotdEl = document.getElementById('qotdWidget');
-  if (!qotdEl || qotdRanked.length === 0) return;
-  const video = qotdRanked[qotdIndex % qotdRanked.length];
-  qotdEl.innerHTML = `
-    <div class="qotd-chapter">Based on: ${qotdChapterName}</div>
-    <a class="qotd-link" href="${video.url}" target="_blank" rel="noopener">${video.title}</a>
-    <div class="qotd-footer">
-      <span class="video-dur">${video.duration}</span>
-      ${qotdRanked.length > 1 ? '<button id="qotdAnotherBtn" class="qotd-another">🔀 Show another</button>' : ''}
-    </div>
-  `;
-  const btn = document.getElementById('qotdAnotherBtn');
-  if (btn) btn.addEventListener('click', () => { qotdIndex++; renderQotdCard(); });
-}
-
-let qotdChapterName = '';
-
-async function updateDashboardExtras(){
-  const qotdEl = document.getElementById('qotdWidget');
-  if (qotdEl){
-    try {
-      const { chapter, ranked } = recommendQotd(myData);
-      qotdChapterName = chapter;
-      qotdRanked = ranked;
-      qotdIndex = 0;
-      renderQotdCard();
-    } catch(e){
-      qotdEl.innerHTML = '<div class="empty-note">No recommendation available.</div>';
-    }
-  }
-}
-
-function buildChapters(){
-  const container = document.getElementById('chapters');
-  container.innerHTML = '';
-  ORDER.forEach((ch, i) => {
-    const chData = CHAPTER_DATA[ch];
-    const chapterEl = document.createElement('div');
-    chapterEl.className = 'chapter';
-    chapterEl.dataset.chapter = ch;
-
-    const head = document.createElement('div');
-    head.className = 'chapter-head';
-    head.innerHTML = `
-      <div class="chapter-title">
-        <span class="chapter-num">${fmtChapterNum(i)}</span>
-        <span class="chapter-name">${ch}</span>
-      </div>
-      <div class="chapter-meta">
-        <div class="mini-bar"><div></div></div>
-        <div class="chapter-count">0/0</div>
-        <div class="chevron">▶</div>
-      </div>
-    `;
-    head.addEventListener('click', () => chapterEl.classList.toggle('open'));
-
-    const body = document.createElement('div');
-    body.className = 'chapter-body';
-
-    const fsLabel = document.createElement('div');
-    fsLabel.className = 'section-label fs';
-    fsLabel.textContent = 'One-shot lecture(s)';
-    body.appendChild(fsLabel);
-    if (chData.fs.length === 0){
-      const n = document.createElement('div');
-      n.className = 'empty-note';
-      n.textContent = 'No one-shot lecture found for this chapter — source elsewhere.';
-      body.appendChild(n);
-    } else {
-      chData.fs.forEach(item => body.appendChild(renderVideoRow(item, 'fs')));
-    }
-
-    const pyqLabel = document.createElement('div');
-    pyqLabel.className = 'section-label pyq';
-    pyqLabel.textContent = 'PYQ practice';
-    body.appendChild(pyqLabel);
-    if (chData.pyq.length === 0){
-      const n = document.createElement('div');
-      n.className = 'empty-note';
-      n.textContent = 'No dedicated PYQ video for this chapter in the library.';
-      body.appendChild(n);
-    } else {
-      chData.pyq.forEach(item => body.appendChild(renderVideoRow(item, 'pyq')));
-    }
-
-    body.appendChild(renderSelfCheck(ch));
-
-    chapterEl.appendChild(head);
-    chapterEl.appendChild(body);
-    container.appendChild(chapterEl);
-    updateChapterProgress(chapterEl);
-  });
-  updateStatStrip();
-}
-
-export function wireStudentControls(){
-  document.getElementById('expandAll').addEventListener('click', () => {
-    document.querySelectorAll('.chapter').forEach(c => c.classList.add('open'));
-  });
-  document.getElementById('collapseAll').addEventListener('click', () => {
-    document.querySelectorAll('.chapter').forEach(c => c.classList.remove('open'));
-  });
-  document.getElementById('chapterSearch').addEventListener('input', (e) => {
-    const q = e.target.value.trim().toLowerCase();
-    document.querySelectorAll('.chapter').forEach(el => {
-      const name = el.dataset.chapter.toLowerCase();
-      el.style.display = name.includes(q) ? '' : 'none';
-    });
-  });
-  document.getElementById('editNameBtn').addEventListener('click', () => {
-    const current = myData.displayName || '';
-    const val = window.prompt('Set your display name — this is what shows on the leaderboard and dashboard instead of your login username:', current);
-    if (val === null) return;
-    const trimmed = val.trim();
-    if (!trimmed) return;
-    myData.displayName = trimmed;
-    document.getElementById('whoamiName').textContent = trimmed;
-    const banner = document.getElementById('displayNameBanner');
-    if (banner) banner.style.display = 'none';
-    writeField('displayName', trimmed);
-  });
-}
-
-export async function startStudentSession(user){
-  currentUser = user;
-  myUsername = (user.email || '').split('@')[0];
-  document.getElementById('authOverlay').style.display = 'none';
-  document.getElementById('appShell').style.display = 'flex';
-  document.getElementById('whoamiBar').style.display = 'flex';
-  await loadMyData();
-  document.getElementById('whoamiName').textContent = myData.displayName || myUsername;
-  const banner = document.getElementById('displayNameBanner');
-  if (banner) banner.style.display = myData.displayName ? 'none' : 'block';
-  buildChapters();
-  const first = document.querySelector('.chapter');
-  if (first) first.classList.add('open');
-  updateDashboardExtras(); // fire-and-forget, doesn't block chapter rendering
-}
-
-export function getCurrentUser(){ return currentUser; }
+.loading{ text-align:center; color: var(--muted); padding: 30px; font-size: 0.85rem; }
