@@ -186,3 +186,11 @@ table.students tr:hover td{ background: var(--panel-2); }
 .add-lecture-form button{ background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent-dim); padding: 6px 16px; border-radius: 8px; font-weight: 600; cursor:pointer; }
 .qotd-another{ background: var(--panel-2); border: 1px solid var(--border); color: var(--muted); padding: 4px 10px; border-radius: 999px; font-size: 0.72rem; cursor: pointer; }
 .loading{ text-align:center; color: var(--muted); padding: 30px; font-size: 0.85rem; }
+
+.pagination{ display:flex; align-items:center; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+.page-btn{ background: var(--panel-2); border: 1px solid var(--border); color: var(--muted); padding: 6px 12px; border-radius: 8px; font-size: 0.78rem; cursor: pointer; font-family: var(--font-mono); }
+.page-btn:hover:not(:disabled){ border-color: var(--accent); color: var(--text); }
+.page-btn.active{ background: var(--accent-dim); color: var(--accent); border-color: var(--accent-dim); }
+.page-btn:disabled{ opacity: 0.4; cursor: default; }
+.page-ellipsis{ color: var(--muted); padding: 0 2px; }
+.page-count{ margin-left: auto; font-size: 0.72rem; color: var(--muted); font-family: var(--font-mono); }
