@@ -1,10 +1,4 @@
-// studentView.js - everything for the logged-in student's own dashboard.
-//
-// Efficiency note: instead of overwriting the whole student document on every
-// single click (expensive + risks clobbering concurrent tabs), each tick writes
-// only the ONE changed field via updateDoc's dot-path syntax. Metadata like
-// 'updatedAt'/'username' rides along on each write but the tick data itself
-// (theory/pyq/selfcheck) is written per-field, not as one giant object.
+// studentView.js
 
 import { db } from './firebase.js';
 import { doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
@@ -15,11 +9,10 @@ import { recommendQotd } from './qotdRecommend.js';
 let currentUser = null;
 let myUsername = null;
 let myData = { theory: {}, pyq: {}, selfcheck: {}, updatedAt: null };
-const pendingWrites = {}; // per-field debounce timers, keyed by field path
+const pendingWrites = {}; 
 
 function fmtChapterNum(i){ return String(i+1).padStart(2,'0'); }
 function scKey(ch, sess){ return ch + '|' + sess; }
-
 function isDoneVal(v){ return v === 'done' || v === true; }
 
 function computeDoneTheory(){
@@ -42,17 +35,13 @@ async function loadMyData(){
       myData = { theory: d.theory || {}, pyq: d.pyq || {}, selfcheck: d.selfcheck || {}, updatedAt: d.updatedAt || null, username: d.username || myUsername, displayName: d.displayName || null };
     } else {
       myData = { theory: {}, pyq: {}, selfcheck: {}, updatedAt: null, username: myUsername, displayName: null };
-      // create the doc once up front so later writes can use the lighter updateDoc() instead of setDoc()
-      try { await setDoc(ref, { ...myData, updatedAt: new Date().toISOString() }); } catch(e){ /* fine, first tick will retry via setDoc fallback */ }
+      try { await setDoc(ref, { ...myData, updatedAt: new Date().toISOString() }); } catch(e){}
     }
   } catch(e){
     myData = { theory: {}, pyq: {}, selfcheck: {}, updatedAt: null, username: myUsername, displayName: null };
   }
 }
 
-// Writes exactly one field (e.g. "theory.abc123" or "selfcheck.Chapter|2024 Jan"),
-// debounced per field-path so rapid re-clicks on the SAME item collapse into one write,
-// but clicks on DIFFERENT items don't wait on each other.
 function writeField(fieldPath, value){
   const statusEl = document.getElementById('statusMsg');
   if (statusEl) statusEl.textContent = 'Saving...';
@@ -64,7 +53,6 @@ function writeField(fieldPath, value){
       await updateDoc(ref, payload);
       if (statusEl) statusEl.textContent = 'Saved';
     } catch(e){
-      // doc might not exist yet (edge case) - fall back to a full setDoc with merge
       try {
         await setDoc(ref, payload, { merge: true });
         if (statusEl) statusEl.textContent = 'Saved';
@@ -76,16 +64,71 @@ function writeField(fieldPath, value){
 }
 
 function nextStatus(current, clicked){
-  // clicked = 'progressing' | 'done'. Clicking the already-active state clears it back to 'none'.
   if (current === clicked) return 'none';
   return clicked;
 }
+
+// --- NEW CONTINUE WATCHING LOGIC ---
+function findVideoById(searchId) {
+  for (let ch of ORDER) {
+    for (let it of CHAPTER_DATA[ch].fs) {
+      if (idFor(it.url) === searchId) return { chapter: ch, item: it, type: 'fs' };
+    }
+    for (let it of CHAPTER_DATA[ch].pyq) {
+      if (idFor(it.url) === searchId) return { chapter: ch, item: it, type: 'pyq' };
+    }
+  }
+  return null;
+}
+
+function updateContinueWatching() {
+  const cwEl = document.getElementById('continueWatchingWidget');
+  if (!cwEl) return;
+
+  let target = null;
+  // 1. Look for progressing items
+  for (let vid in myData.theory) {
+    if (myData.theory[vid] === 'progressing') { target = findVideoById(vid); break; }
+  }
+  if (!target) {
+    for (let vid in myData.pyq) {
+      if (myData.pyq[vid] === 'progressing') { target = findVideoById(vid); break; }
+    }
+  }
+
+  // 2. Fallback to first unwatched
+  if (!target) {
+    for (let ch of ORDER) {
+      let foundUnwatched = false;
+      for (let it of CHAPTER_DATA[ch].fs) {
+        if (!isDoneVal(myData.theory[idFor(it.url)])) { target = { chapter: ch, item: it }; foundUnwatched = true; break; }
+      }
+      if (foundUnwatched) break;
+      for (let it of CHAPTER_DATA[ch].pyq) {
+        if (!isDoneVal(myData.pyq[idFor(it.url)])) { target = { chapter: ch, item: it }; foundUnwatched = true; break; }
+      }
+      if (foundUnwatched) break;
+    }
+  }
+
+  // 3. Render
+  if (target && target.item) {
+     cwEl.innerHTML = `
+       <div class="widget-meta">${target.chapter}</div>
+       <div class="widget-title">${target.item.title}</div>
+       <a href="${target.item.url}" target="_blank" class="widget-btn" style="text-decoration:none; display:inline-block; text-align:center;">Resume Video</a>
+     `;
+  } else {
+     cwEl.innerHTML = `<div class="empty-note">You're all caught up!</div>`;
+  }
+}
+// --- END CONTINUE WATCHING LOGIC ---
 
 function renderVideoRow(item, kind){
   const vid = idFor(item.url);
   const dataMap = kind === 'fs' ? myData.theory : myData.pyq;
   const rawVal = dataMap[vid];
-  const status = rawVal === true ? 'done' : (rawVal || 'none'); // legacy boolean compat
+  const status = rawVal === true ? 'done' : (rawVal || 'none'); 
 
   const row = document.createElement('div');
   row.className = 'video-row ' + (kind === 'pyq' ? 'pyq' : '') + (status === 'done' ? ' done' : '');
@@ -110,6 +153,9 @@ function renderVideoRow(item, kind){
     updateChapterProgress(row.closest('.chapter'));
     updateStatStrip();
     writeField(fieldPath, newStatus);
+    
+    // Call the widget update whenever a status changes!
+    updateContinueWatching(); 
   }
 
   row.querySelector('.status-btn.progressing').addEventListener('click', () => {
@@ -186,12 +232,14 @@ function renderQotdCard(){
   const qotdEl = document.getElementById('qotdWidget');
   if (!qotdEl || qotdRanked.length === 0) return;
   const video = qotdRanked[qotdIndex % qotdRanked.length];
+  
+  // Adjusted for the new Premium UI Widget layout
   qotdEl.innerHTML = `
-    <div class="qotd-chapter">Based on: ${qotdChapterName}</div>
-    <a class="qotd-link" href="${video.url}" target="_blank" rel="noopener">${video.title}</a>
-    <div class="qotd-footer">
-      <span class="video-dur">${video.duration}</span>
-      ${qotdRanked.length > 1 ? '<button id="qotdAnotherBtn" class="qotd-another">🔀 Show another</button>' : ''}
+    <div class="widget-meta">Based on: ${qotdChapterName}</div>
+    <div class="widget-title">${video.title}</div>
+    <div class="qotd-footer" style="margin-top: auto; display: flex; justify-content: space-between; align-items: center; width: 100%;">
+      <span class="widget-meta">${video.duration}</span>
+      ${qotdRanked.length > 1 ? '<button id="qotdAnotherBtn" class="widget-btn" style="padding: 4px 10px; font-size: 0.7rem;">🔀 Next</button>' : ''}
     </div>
   `;
   const btn = document.getElementById('qotdAnotherBtn');
@@ -294,7 +342,7 @@ export function wireStudentControls(){
   });
   document.getElementById('editNameBtn').addEventListener('click', () => {
     const current = myData.displayName || '';
-    const val = window.prompt('Set your display name - this is what shows on the leaderboard and dashboard instead of your login username:', current);
+    const val = window.prompt('Set your display name:', current);
     if (val === null) return;
     const trimmed = val.trim();
     if (!trimmed) return;
@@ -310,16 +358,25 @@ export async function startStudentSession(user){
   currentUser = user;
   myUsername = (user.email || '').split('@')[0];
   document.getElementById('authOverlay').style.display = 'none';
-  document.getElementById('appShell').style.display = 'flex';
+  document.getElementById('appShell').style.display = 'block'; // Adjusted for new layout
   document.getElementById('whoamiBar').style.display = 'flex';
   await loadMyData();
   document.getElementById('whoamiName').textContent = myData.displayName || myUsername;
+  
+  // Fix the avatar letter to match their username/display name
+  const nameToUse = myData.displayName || myUsername;
+  const avatarEl = document.getElementById('avatarLetter');
+  if (avatarEl) avatarEl.textContent = nameToUse.charAt(0).toUpperCase();
+
   const banner = document.getElementById('displayNameBanner');
   if (banner) banner.style.display = myData.displayName ? 'none' : 'block';
+  
   buildChapters();
   const first = document.querySelector('.chapter');
   if (first) first.classList.add('open');
-  updateDashboardExtras(); // fire-and-forget, doesn't block chapter rendering
+  
+  updateDashboardExtras(); 
+  updateContinueWatching(); // Initial load of the Continue Watching widget
 }
 
 export function getCurrentUser(){ return currentUser; }
