@@ -2,7 +2,11 @@
 
 import { auth, FAKE_EMAIL_DOMAIN } from './firebase.js';
 import {
-  createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword, 
+  signOut,
+  GoogleAuthProvider,      // <--- Added for Google Login
+  signInWithPopup          // <--- Added for Google Login
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
 let authMode = 'login';
@@ -13,7 +17,8 @@ function usernameToEmail(u){
 
 export function showAuthOverlay(){
   document.getElementById('authOverlay').style.display = 'block';
-  document.getElementById('studentView').style.display = 'none';
+  const sv = document.getElementById('studentView');
+  if(sv) sv.style.display = 'none';
 }
 
 export function hideAuthOverlay(){
@@ -69,6 +74,20 @@ export function initAuthForm(){
   document.getElementById('authPassword').addEventListener('keydown', (e) => {
     if (e.key === 'Enter') document.getElementById('authSubmit').click();
   });
+
+  // --- NEW GOOGLE LOGIN LOGIC ---
+  const googleBtn = document.getElementById('authGoogleBtn');
+  if (googleBtn) {
+    googleBtn.addEventListener('click', async () => {
+      const provider = new GoogleAuthProvider();
+      try {
+        await signInWithPopup(auth, provider);
+        // On success, main.js's onAuthStateChanged takes over automatically!
+      } catch(e) {
+        document.getElementById('authError').textContent = 'Google sign-in failed: ' + e.message;
+      }
+    });
+  }
 
   document.getElementById('logoutBtn').addEventListener('click', async () => {
     await signOut(auth);
