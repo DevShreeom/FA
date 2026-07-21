@@ -12,17 +12,26 @@ import { loadQotdView } from './qotdView.js';
 
 // ---- Theme toggle ----
 const THEME_KEY = 'jee_tracker_theme';
-function applyTheme(theme){
-  document.documentElement.setAttribute('data-theme', theme);
-  document.getElementById('themeToggle').textContent = theme === 'light' ? '☀️' : '🌙';
+const themes = ['dark', 'forest', 'light'];
+let currentTheme = localStorage.getItem(THEME_KEY) || 'dark';
+
+// Apply saved theme on load
+if (currentTheme !== 'dark') {
+  document.documentElement.setAttribute('data-theme', currentTheme);
 }
-const savedTheme = localStorage.getItem(THEME_KEY) || 'dark';
-applyTheme(savedTheme);
+
+// Cycle through all 3 themes on click
 document.getElementById('themeToggle').addEventListener('click', () => {
-  const current = document.documentElement.getAttribute('data-theme') || 'dark';
-  const next = current === 'dark' ? 'light' : 'dark';
-  localStorage.setItem(THEME_KEY, next);
-  applyTheme(next);
+  let idx = themes.indexOf(currentTheme);
+  idx = (idx + 1) % themes.length; // Moves to the next theme in the array
+  currentTheme = themes[idx];
+  
+  if (currentTheme === 'dark') {
+    document.documentElement.removeAttribute('data-theme');
+  } else {
+    document.documentElement.setAttribute('data-theme', currentTheme);
+  }
+  localStorage.setItem(THEME_KEY, currentTheme);
 });
 
 // ---- Nav rail routing ----
