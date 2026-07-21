@@ -19,6 +19,8 @@ let searchQuery = '';
 let sortKey = 'pct';
 let sortDir = -1;
 let isAdmin = false;
+let currentPage = 1;
+const PAGE_SIZE = 10;
 
 function studentDoneCount(s){
   return studentTheoryDone(s) + studentPyqDone(s);
@@ -44,13 +46,19 @@ function renderTable(){
   const filtered = searchQuery
     ? lastRows.filter(r => r.name.toLowerCase().includes(searchQuery))
     : lastRows;
-  const rows = [...filtered].sort((a, b) => {
+  const sorted = [...filtered].sort((a, b) => {
     if (a.flagged !== b.flagged) return a.flagged ? 1 : -1; // flagged accounts always sink to the bottom
     return (a[sortKey] > b[sortKey] ? 1 : -1) * sortDir;
   });
+
+  const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
+  if (currentPage > totalPages) currentPage = totalPages;
+  if (currentPage < 1) currentPage = 1;
+  const pageRows = sorted.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
   const tbody = document.getElementById('studentsTbody');
   if (!tbody) return;
-  tbody.innerHTML = rows.map(r => {
+  tbody.innerHTML = pageRows.map(r => {
     const dt = r.updatedAt ? new Date(r.updatedAt).toLocaleDateString() : '-';
     const rowStyle = r.flagged ? ' style="background:#3a2020;"' : '';
     const lastCell = isAdmin
@@ -64,6 +72,8 @@ function renderTable(){
       <td>${lastCell}</td>
     </tr>`;
   }).join('');
+
+  renderPagination(totalPages, sorted.length);
 
   if (isAdmin){
     tbody.querySelectorAll('.flag-btn').forEach(btn => {
@@ -83,6 +93,33 @@ function renderTable(){
       });
     });
   }
+}
+
+function renderPagination(totalPages, totalCount){
+  const el = document.getElementById('studentsPagination');
+  if (!el) return;
+  if (totalPages <= 1){ el.innerHTML = ''; return; }
+
+  const pages = new Set([1, totalPages, currentPage, currentPage - 1, currentPage + 1, currentPage - 2, currentPage + 2]);
+  const sortedPages = [...pages].filter(p => p >= 1 && p <= totalPages).sort((a,b) => a-b);
+
+  let html = `<button class="page-btn" data-page="${currentPage - 1}" ${currentPage === 1 ? 'disabled' : ''}>&lsaquo; Prev</button>`;
+  let prev = 0;
+  sortedPages.forEach(p => {
+    if (p - prev > 1) html += `<span class="page-ellipsis">...</span>`;
+    html += `<button class="page-btn ${p === currentPage ? 'active' : ''}" data-page="${p}">${p}</button>`;
+    prev = p;
+  });
+  html += `<button class="page-btn" data-page="${currentPage + 1}" ${currentPage === totalPages ? 'disabled' : ''}>Next &rsaquo;</button>`;
+  html += `<span class="page-count">${totalCount} students total</span>`;
+
+  el.innerHTML = html;
+  el.querySelectorAll('.page-btn[data-page]:not([disabled])').forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentPage = parseInt(btn.dataset.page, 10);
+      renderTable();
+    });
+  });
 }
 
 export async function loadTeacherView(){
@@ -173,6 +210,7 @@ export async function loadTeacherView(){
       </tr></thead>
       <tbody id="studentsTbody"></tbody>
     </table>
+    <div id="studentsPagination" class="pagination"></div>
 
     <div class="section-label" style="margin-top:22px;">Chapter completion across class (lowest first - where the class is stuck)</div>
     <div class="chapter-heat">
@@ -194,12 +232,14 @@ export async function loadTeacherView(){
     th.addEventListener('click', () => {
       const key = th.dataset.key;
       if (sortKey === key) sortDir *= -1; else { sortKey = key; sortDir = 1; }
+      currentPage = 1;
       renderTable();
     });
   });
 
   document.getElementById('studentSearch').addEventListener('input', (e) => {
     searchQuery = e.target.value.trim().toLowerCase();
+    currentPage = 1;
     renderTable();
   });
 
