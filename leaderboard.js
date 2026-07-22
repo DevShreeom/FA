@@ -107,7 +107,7 @@ export function renderLeaderboardHTML(rankings, activeTab, limitCount) {
 }
 
 // Function to populate and show the User Card
-function showStudentCard(entry, rank, totals) {
+export function showStudentCard(entry, rank, totals) {
   const d = entry.rawData;
   const m = medal(rank) || `#${rank}`;
   const titleStr = `${m} &bull; ${entry.name} ${d.isPublic && d.grade ? `(${d.grade})` : ''}`;
