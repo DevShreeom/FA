@@ -1,13 +1,11 @@
-// teacherView.js - Class view. Real access control lives in Firestore security rules
-// (only UIDs listed in the 'admins' collection can list all student docs) - this file
-// just renders whatever Firestore allows through, and shows a clear message if it's blocked.
+// teacherView.js
 
 import { db } from './firebase.js';
 import { collection, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { computeTotalAll, studentTheoryDone, studentPyqDone, idFor } from './metrics.js';
 import { ORDER, CHAPTER_DATA } from './data.js';
 import { getCurrentUser } from './studentView.js';
-import { computeRankings, mountLeaderboard } from './leaderboard.js';
+import { computeRankings, mountLeaderboard, showStudentCard } from './leaderboard.js'; // <--- ADDED IMPORT
 import { checkIsAdmin } from './adminCheck.js';
 import { addCustomLecture } from './customLectures.js';
 
@@ -21,6 +19,7 @@ let sortDir = -1;
 let isAdmin = false;
 let currentPage = 1;
 const PAGE_SIZE = 10;
+let currentRankings = null; // Store rankings globally for the modal
 
 function studentDoneCount(s){
   return studentTheoryDone(s) + studentPyqDone(s);
@@ -47,7 +46,7 @@ function renderTable(){
     ? lastRows.filter(r => r.name.toLowerCase().includes(searchQuery))
     : lastRows;
   const sorted = [...filtered].sort((a, b) => {
-    if (a.flagged !== b.flagged) return a.flagged ? 1 : -1; // flagged accounts always sink to the bottom
+    if (a.flagged !== b.flagged) return a.flagged ? 1 : -1; 
     return (a[sortKey] > b[sortKey] ? 1 : -1) * sortDir;
   });
 
@@ -64,8 +63,13 @@ function renderTable(){
     const lastCell = isAdmin
       ? `<button class="flag-btn" data-id="${r.id}" data-flagged="${r.flagged}">${r.flagged ? '🚩 Flagged' : 'Flag'}</button>`
       : (r.flagged ? '🚩 Flagged' : '-');
+      
+    // NEW: Render the name as a clickable link with the grade badge
+    const gradeBadge = (r.rawData.isPublic && r.rawData.grade) ? `<span style="font-size:0.7rem; color:var(--muted); font-weight:400; margin-left:6px;">(${r.rawData.grade})</span>` : '';
+    const nameCell = `<span class="cv-user-link" data-id="${r.id}" style="cursor:pointer; font-weight:600; text-decoration:underline; text-decoration-color:var(--border); text-underline-offset:3px;">${r.name}${gradeBadge}</span>`;
+
     return `<tr${rowStyle}>
-      <td>${r.name}</td>
+      <td>${nameCell}</td>
       <td>${r.done}/${r.total}</td>
       <td><span class="pct-pill ${pctClass(r.pct)}">${r.pct}%</span></td>
       <td>${dt}</td>
@@ -74,6 +78,32 @@ function renderTable(){
   }).join('');
 
   renderPagination(totalPages, sorted.length);
+
+  // NEW: Wire up the click listener for the modal card!
+  tbody.querySelectorAll('.cv-user-link').forEach(link => {
+    link.addEventListener('click', () => {
+      const id = link.dataset.id;
+      const r = lastRows.find(x => x.id === id);
+      
+      // Look up their rank
+      let rank = "?";
+      if (currentRankings) {
+         const idx = currentRankings.byOverall.findIndex(x => x.id === id);
+         if (idx !== -1) rank = idx + 1;
+      }
+
+      // Build the entry object the modal expects
+      const entry = {
+        rawData: r.rawData,
+        name: r.name,
+        overallDone: r.done,
+        theoryDone: r.theoryDone,
+        pyqDone: r.pyqDone
+      };
+      
+      showStudentCard(entry, rank, currentRankings);
+    });
+  });
 
   if (isAdmin){
     tbody.querySelectorAll('.flag-btn').forEach(btn => {
@@ -143,7 +173,7 @@ export async function loadTeacherView(){
   try {
     flagSnaps = await getDocs(collection(db, 'flags'));
   } catch(e){
-    flagSnaps = null; // flags are optional - don't block the whole dashboard if this fails
+    flagSnaps = null; 
   }
 
   const flagMap = {};
@@ -158,20 +188,32 @@ export async function loadTeacherView(){
   }
 
   const total = computeTotalAll();
+  
+  // NEW: Store rawData, theoryDone, and pyqDone so the modal can access it!
   lastRows = students.map(s => {
     const done = studentDoneCount(s);
+    const tDone = studentTheoryDone(s);
+    const pDone = studentPyqDone(s);
     const pct = total ? Math.round(done/total*100) : 0;
     let scCount = 0;
     if (s.selfcheck) Object.values(s.selfcheck).forEach(v => { if (v) scCount++; });
     const flagged = !!(flagMap[s.id] && flagMap[s.id].flagged);
-    return { id: s.id, name: s.displayName || s.username || '(unknown)', done, total, pct, scCount, updatedAt: s.updatedAt, flagged };
+    
+    return { 
+      id: s.id, 
+      name: s.displayName || s.username || '(unknown)', 
+      done, total, pct, scCount, updatedAt: s.updatedAt, flagged,
+      rawData: s,
+      theoryDone: tDone,
+      pyqDone: pDone 
+    };
   });
 
   const avgPct = lastRows.length ? Math.round(lastRows.reduce((a,r) => a + r.pct, 0) / lastRows.length) : 0;
   const avgSc = lastRows.length ? Math.round(lastRows.reduce((a,r) => a + r.scCount, 0) / lastRows.length) : 0;
-
   const heat = chapterCompletionAcrossClass(students).sort((a,b) => a.avgPct - b.avgPct);
-  const rankings = await computeRankings();
+  
+  currentRankings = await computeRankings();
 
   container.innerHTML = `
     ${isAdmin ? `
@@ -225,7 +267,7 @@ export async function loadTeacherView(){
   `;
 
   renderTable();
-  mountLeaderboard(document.getElementById('leaderboardPanel'), rankings, 'overall', 10);
+  mountLeaderboard(document.getElementById('leaderboardPanel'), currentRankings, 'overall', 10);
 
   document.querySelectorAll('table.students th').forEach(th => {
     if (!th.dataset.key) return;
