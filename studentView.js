@@ -305,6 +305,7 @@ export function wireStudentControls(){
     document.getElementById('setGrade').value = myData.grade || '';
     document.getElementById('setTelegram').value = myData.telegram || '';
     document.getElementById('setIsPublic').checked = myData.isPublic || false;
+    document.getElementById('setNavStyle').value = localStorage.getItem('jee_tracker_nav') || 'sidebar'; // ADD THIS LINE
   }
 
   document.getElementById('editNameBtn').addEventListener('click', openSettings);
@@ -322,6 +323,14 @@ document.getElementById('saveSettingsBtn').addEventListener('click', async () =>
     const btn = document.getElementById('saveSettingsBtn');
     btn.textContent = 'Saving...';
     btn.disabled = true; // Prevent spam-clicking
+
+  
+  // --- SAVE DOCK PREFERENCE ---
+    const newNav = document.getElementById('setNavStyle').value;
+    localStorage.setItem('jee_tracker_nav', newNav);
+    if (newNav === 'dock') document.body.classList.add('dock-mode'); 
+    else document.body.classList.remove('dock-mode');
+    // ----------------------------
     
     const newName = document.getElementById('setDisplayName').value.trim();
     const newGrade = document.getElementById('setGrade').value;
