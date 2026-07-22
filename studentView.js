@@ -39,11 +39,12 @@ async function loadMyData(){
         updatedAt: d.updatedAt || null, 
         username: d.username || myUsername, 
         displayName: d.displayName || null,
-        targetDate: d.targetDate || null
+        targetDate: d.targetDate || null,
+        totalDone: d.totalDone !== undefined ? d.totalDone : undefined
       };
     } else {
       // First time login setup:
-      myData = { theory: {}, pyq: {}, selfcheck: {}, updatedAt: null, username: myUsername, displayName: null };
+      myData = { theory: {}, pyq: {}, selfcheck: {}, updatedAt: null, username: myUsername, displayName: null, totalDone: 0 };
       
       // Create their document in Firestore and initialize totalDone to 0
       try { 
@@ -64,10 +65,11 @@ function writeField(fieldPath, value){
     
     // Calculate total completed topics
     const totalDone = computeDoneTheory() + computeDonePyq();
+    myData.totalDone = totalDone;
 
     const payload = { 
       [fieldPath]: value, 
-      totalDone: totalDone, // <--- ADDED: Enables efficient leaderboard queries
+      totalDone: totalDone, // Enables efficient leaderboard queries
       updatedAt: new Date().toISOString(), 
       username: myUsername 
     };
@@ -86,13 +88,12 @@ function writeField(fieldPath, value){
   }, 400);
 }
 
-
 function nextStatus(current, clicked){
   if (current === clicked) return 'none';
   return clicked;
 }
 
-// --- NEW CONTINUE WATCHING LOGIC ---
+// --- CONTINUE WATCHING LOGIC ---
 function findVideoById(searchId) {
   for (let ch of ORDER) {
     for (let it of CHAPTER_DATA[ch].fs) {
@@ -178,7 +179,6 @@ function renderVideoRow(item, kind){
     updateStatStrip();
     writeField(fieldPath, newStatus);
     
-    // Call the widget update whenever a status changes!
     updateContinueWatching(); 
   }
 
@@ -257,7 +257,6 @@ function renderQotdCard(){
   if (!qotdEl || qotdRanked.length === 0) return;
   const video = qotdRanked[qotdIndex % qotdRanked.length];
   
-  // Adjusted for the new Premium UI Widget layout
   qotdEl.innerHTML = `
     <div class="widget-meta">Based on: ${qotdChapterName}</div>
     <div class="widget-title">${video.title}</div>
@@ -382,12 +381,30 @@ export async function startStudentSession(user){
   currentUser = user;
   myUsername = (user.email || '').split('@')[0];
   document.getElementById('authOverlay').style.display = 'none';
-  document.getElementById('appShell').style.display = 'block'; // Adjusted for new layout
+  document.getElementById('appShell').style.display = 'block'; 
   document.getElementById('whoamiBar').style.display = 'flex';
+  
   await loadMyData();
+
+  // AUTO-HEAL: Compute and save totalDone if missing for existing users
+  if (myData && myData.totalDone === undefined) {
+    const totalDone = computeDoneTheory() + computeDonePyq();
+    myData.totalDone = totalDone;
+    
+    const ref = doc(db, 'students', currentUser.uid);
+    try {
+      await updateDoc(ref, { 
+        totalDone: totalDone,
+        updatedAt: new Date().toISOString() 
+      });
+      console.log("Auto-healed totalDone for existing user!");
+    } catch(e) {
+      console.error("Auto-heal write failed:", e);
+    }
+  }
+
   document.getElementById('whoamiName').textContent = myData.displayName || myUsername;
   
-  // Fix the avatar letter to match their username/display name
   const nameToUse = myData.displayName || myUsername;
   const avatarEl = document.getElementById('avatarLetter');
   if (avatarEl) avatarEl.textContent = nameToUse.charAt(0).toUpperCase();
@@ -400,7 +417,7 @@ export async function startStudentSession(user){
   if (first) first.classList.add('open');
   
   updateDashboardExtras(); 
-  updateContinueWatching(); // Initial load of the Continue Watching widget
+  updateContinueWatching(); 
 }
 
 export function getCurrentUser(){ return currentUser; }
