@@ -1,7 +1,6 @@
 // studentView.js
-import { doc, getDoc, setDoc, updateDoc, collection, getDocs, query, where, getCountFromServer } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { db } from './firebase.js';
-import { doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { doc, getDoc, setDoc, updateDoc, collection, getDocs, query, where, getCountFromServer } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { ORDER, CHAPTER_DATA, SESSIONS } from './data.js';
 import { idFor, totalForChapter, computeTotalAll, totalTheory, totalPyq } from './metrics.js';
 import { recommendQotd } from './qotdRecommend.js';
