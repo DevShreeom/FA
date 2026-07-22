@@ -1,41 +1,38 @@
-// leaderboard.js - computes Overall / Theory / PYQ rankings across top students.
-// Scaled for high traffic: queries top documents using Firestore index.
-// Flagged accounts are excluded entirely from rankings.
+// leaderboard.js - Safe transition version that fixes missing totalDone fields
 
 import { db } from './firebase.js';
-import { collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { computeTotalAll, totalTheory, totalPyq, studentTheoryDone, studentPyqDone } from './metrics.js';
 
 export async function computeRankings() {
-  // 1. Fetch flagged users first (if any)
   let flagMap = {};
   try {
     const flagSnaps = await getDocs(collection(db, 'flags'));
     flagSnaps.forEach(f => { flagMap[f.id] = f.data(); });
-  } catch(e) { /* flags are optional */ }
+  } catch(e) {}
 
   const total = computeTotalAll();
   const tTheory = totalTheory();
   const tPyq = totalPyq();
 
-  // 2. Query ONLY the top 20 students sorted by totalDone descending
-  const q = query(
-    collection(db, 'students'),
-    orderBy('totalDone', 'desc'),
-    limit(20)
-  );
-
-  const snaps = await getDocs(q);
+  // Fetch all students (safe for now while backfilling)
+  const snaps = await getDocs(collection(db, 'students'));
   const entries = [];
 
   snaps.forEach(s => {
     const data = s.data();
     const flagged = !!(flagMap[s.id] && flagMap[s.id].flagged);
-    if (flagged) return; // excluded from all leaderboards
+    if (flagged) return;
 
     const theoryDone = studentTheoryDone(data);
     const pyqDone = studentPyqDone(data);
-    const overallDone = data.totalDone || (theoryDone + pyqDone);
+    const calculatedTotal = theoryDone + pyqDone;
+
+    // SILENT BACKFILL: If totalDone is missing in Firestore, save it in the background
+    if (data.totalDone === undefined) {
+      const ref = doc(db, 'students', s.id);
+      updateDoc(ref, { totalDone: calculatedTotal }).catch(() => {});
+    }
 
     entries.push({
       id: s.id,
@@ -44,8 +41,8 @@ export async function computeRankings() {
       theoryPct: tTheory ? Math.round(theoryDone / tTheory * 100) : 0,
       pyqDone, 
       pyqPct: tPyq ? Math.round(pyqDone / tPyq * 100) : 0,
-      overallDone, 
-      overallPct: total ? Math.round(overallDone / total * 100) : 0
+      overallDone: calculatedTotal, 
+      overallPct: total ? Math.round(calculatedTotal / total * 100) : 0
     });
   });
 
