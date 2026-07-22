@@ -40,16 +40,15 @@ async function loadMyData(){
         username: d.username || myUsername, 
         displayName: d.displayName || null,
         targetDate: d.targetDate || null,
-        totalDone: d.totalDone !== undefined ? d.totalDone : undefined
+        totalDone: d.totalDone !== undefined ? d.totalDone : undefined,
+        // NEW PROFILE FIELDS
+        grade: d.grade || '',
+        telegram: d.telegram || '',
+        isPublic: d.isPublic || false
       };
     } else {
-      // First time login setup:
       myData = { theory: {}, pyq: {}, selfcheck: {}, updatedAt: null, username: myUsername, displayName: null, totalDone: 0 };
-      
-      // Create their document in Firestore and initialize totalDone to 0
-      try { 
-        await setDoc(ref, { ...myData, totalDone: 0, updatedAt: new Date().toISOString() }); 
-      } catch(e){}
+      try { await setDoc(ref, { ...myData, totalDone: 0, updatedAt: new Date().toISOString() }); } catch(e){}
     }
   } catch(e){
     myData = { theory: {}, pyq: {}, selfcheck: {}, updatedAt: null, username: myUsername, displayName: null };
@@ -62,14 +61,12 @@ function writeField(fieldPath, value){
   clearTimeout(pendingWrites[fieldPath]);
   pendingWrites[fieldPath] = setTimeout(async () => {
     const ref = doc(db, 'students', currentUser.uid);
-    
-    // Calculate total completed topics
     const totalDone = computeDoneTheory() + computeDonePyq();
     myData.totalDone = totalDone;
 
     const payload = { 
       [fieldPath]: value, 
-      totalDone: totalDone, // Enables efficient leaderboard queries
+      totalDone: totalDone,
       updatedAt: new Date().toISOString(), 
       username: myUsername 
     };
@@ -93,15 +90,10 @@ function nextStatus(current, clicked){
   return clicked;
 }
 
-// --- CONTINUE WATCHING LOGIC ---
 function findVideoById(searchId) {
   for (let ch of ORDER) {
-    for (let it of CHAPTER_DATA[ch].fs) {
-      if (idFor(it.url) === searchId) return { chapter: ch, item: it, type: 'fs' };
-    }
-    for (let it of CHAPTER_DATA[ch].pyq) {
-      if (idFor(it.url) === searchId) return { chapter: ch, item: it, type: 'pyq' };
-    }
+    for (let it of CHAPTER_DATA[ch].fs) if (idFor(it.url) === searchId) return { chapter: ch, item: it, type: 'fs' };
+    for (let it of CHAPTER_DATA[ch].pyq) if (idFor(it.url) === searchId) return { chapter: ch, item: it, type: 'pyq' };
   }
   return null;
 }
@@ -111,43 +103,24 @@ function updateContinueWatching() {
   if (!cwEl) return;
 
   let target = null;
-  // 1. Look for progressing items
-  for (let vid in myData.theory) {
-    if (myData.theory[vid] === 'progressing') { target = findVideoById(vid); break; }
-  }
-  if (!target) {
-    for (let vid in myData.pyq) {
-      if (myData.pyq[vid] === 'progressing') { target = findVideoById(vid); break; }
-    }
-  }
-
-  // 2. Fallback to first unwatched
+  for (let vid in myData.theory) { if (myData.theory[vid] === 'progressing') { target = findVideoById(vid); break; } }
+  if (!target) { for (let vid in myData.pyq) { if (myData.pyq[vid] === 'progressing') { target = findVideoById(vid); break; } } }
   if (!target) {
     for (let ch of ORDER) {
       let foundUnwatched = false;
-      for (let it of CHAPTER_DATA[ch].fs) {
-        if (!isDoneVal(myData.theory[idFor(it.url)])) { target = { chapter: ch, item: it }; foundUnwatched = true; break; }
-      }
+      for (let it of CHAPTER_DATA[ch].fs) { if (!isDoneVal(myData.theory[idFor(it.url)])) { target = { chapter: ch, item: it }; foundUnwatched = true; break; } }
       if (foundUnwatched) break;
-      for (let it of CHAPTER_DATA[ch].pyq) {
-        if (!isDoneVal(myData.pyq[idFor(it.url)])) { target = { chapter: ch, item: it }; foundUnwatched = true; break; }
-      }
+      for (let it of CHAPTER_DATA[ch].pyq) { if (!isDoneVal(myData.pyq[idFor(it.url)])) { target = { chapter: ch, item: it }; foundUnwatched = true; break; } }
       if (foundUnwatched) break;
     }
   }
 
-  // 3. Render
   if (target && target.item) {
-     cwEl.innerHTML = `
-       <div class="widget-meta">${target.chapter}</div>
-       <div class="widget-title">${target.item.title}</div>
-       <a href="${target.item.url}" target="_blank" class="widget-btn" style="text-decoration:none; display:inline-block; text-align:center;">Resume Video</a>
-     `;
+     cwEl.innerHTML = `<div class="widget-meta">${target.chapter}</div><div class="widget-title">${target.item.title}</div><a href="${target.item.url}" target="_blank" class="widget-btn" style="text-decoration:none; display:inline-block; text-align:center;">Resume Video</a>`;
   } else {
      cwEl.innerHTML = `<div class="empty-note">You're all caught up!</div>`;
   }
 }
-// --- END CONTINUE WATCHING LOGIC ---
 
 function renderVideoRow(item, kind){
   const vid = idFor(item.url);
@@ -178,16 +151,11 @@ function renderVideoRow(item, kind){
     updateChapterProgress(row.closest('.chapter'));
     updateStatStrip();
     writeField(fieldPath, newStatus);
-    
     updateContinueWatching(); 
   }
 
-  row.querySelector('.status-btn.progressing').addEventListener('click', () => {
-    applyStatus(nextStatus(dataMap[vid] || 'none', 'progressing'));
-  });
-  row.querySelector('.status-btn.done').addEventListener('click', () => {
-    applyStatus(nextStatus(dataMap[vid] || 'none', 'done'));
-  });
+  row.querySelector('.status-btn.progressing').addEventListener('click', () => applyStatus(nextStatus(dataMap[vid] || 'none', 'progressing')));
+  row.querySelector('.status-btn.done').addEventListener('click', () => applyStatus(nextStatus(dataMap[vid] || 'none', 'done')));
 
   return row;
 }
@@ -213,10 +181,7 @@ function renderSelfCheck(ch){
       lbl.className = 'sc-sess';
       lbl.innerHTML = `<input type="checkbox" ${checked ? 'checked' : ''}> ${sessLabel}`;
       const cb = lbl.querySelector('input');
-      cb.addEventListener('change', () => {
-        myData.selfcheck[key] = cb.checked;
-        writeField('selfcheck.' + key, cb.checked);
-      });
+      cb.addEventListener('change', () => { myData.selfcheck[key] = cb.checked; writeField('selfcheck.' + key, cb.checked); });
       row.appendChild(lbl);
     });
     wrap.appendChild(row);
@@ -297,50 +262,21 @@ function buildChapters(){
 
     const head = document.createElement('div');
     head.className = 'chapter-head';
-    head.innerHTML = `
-      <div class="chapter-title">
-        <span class="chapter-num">${fmtChapterNum(i)}</span>
-        <span class="chapter-name">${ch}</span>
-      </div>
-      <div class="chapter-meta">
-        <div class="mini-bar"><div></div></div>
-        <div class="chapter-count">0/0</div>
-        <div class="chevron">▶</div>
-      </div>
-    `;
+    head.innerHTML = `<div class="chapter-title"><span class="chapter-num">${fmtChapterNum(i)}</span><span class="chapter-name">${ch}</span></div><div class="chapter-meta"><div class="mini-bar"><div></div></div><div class="chapter-count">0/0</div><div class="chevron">▶</div></div>`;
     head.addEventListener('click', () => chapterEl.classList.toggle('open'));
 
     const body = document.createElement('div');
     body.className = 'chapter-body';
 
-    const fsLabel = document.createElement('div');
-    fsLabel.className = 'section-label fs';
-    fsLabel.textContent = 'One-shot lecture(s)';
-    body.appendChild(fsLabel);
-    if (chData.fs.length === 0){
-      const n = document.createElement('div');
-      n.className = 'empty-note';
-      n.textContent = 'No one-shot lecture found for this chapter - source elsewhere.';
-      body.appendChild(n);
-    } else {
-      chData.fs.forEach(item => body.appendChild(renderVideoRow(item, 'fs')));
-    }
+    const fsLabel = document.createElement('div'); fsLabel.className = 'section-label fs'; fsLabel.textContent = 'One-shot lecture(s)'; body.appendChild(fsLabel);
+    if (chData.fs.length === 0){ body.innerHTML += '<div class="empty-note">No one-shot lecture found for this chapter - source elsewhere.</div>'; } 
+    else { chData.fs.forEach(item => body.appendChild(renderVideoRow(item, 'fs'))); }
 
-    const pyqLabel = document.createElement('div');
-    pyqLabel.className = 'section-label pyq';
-    pyqLabel.textContent = 'PYQ practice';
-    body.appendChild(pyqLabel);
-    if (chData.pyq.length === 0){
-      const n = document.createElement('div');
-      n.className = 'empty-note';
-      n.textContent = 'No dedicated PYQ video for this chapter in the library.';
-      body.appendChild(n);
-    } else {
-      chData.pyq.forEach(item => body.appendChild(renderVideoRow(item, 'pyq')));
-    }
+    const pyqLabel = document.createElement('div'); pyqLabel.className = 'section-label pyq'; pyqLabel.textContent = 'PYQ practice'; body.appendChild(pyqLabel);
+    if (chData.pyq.length === 0){ body.innerHTML += '<div class="empty-note">No dedicated PYQ video for this chapter in the library.</div>'; } 
+    else { chData.pyq.forEach(item => body.appendChild(renderVideoRow(item, 'pyq'))); }
 
     body.appendChild(renderSelfCheck(ch));
-
     chapterEl.appendChild(head);
     chapterEl.appendChild(body);
     container.appendChild(chapterEl);
@@ -350,30 +286,72 @@ function buildChapters(){
 }
 
 export function wireStudentControls(){
-  document.getElementById('expandAll').addEventListener('click', () => {
-    document.querySelectorAll('.chapter').forEach(c => c.classList.add('open'));
-  });
-  document.getElementById('collapseAll').addEventListener('click', () => {
-    document.querySelectorAll('.chapter').forEach(c => c.classList.remove('open'));
-  });
+  document.getElementById('expandAll').addEventListener('click', () => { document.querySelectorAll('.chapter').forEach(c => c.classList.add('open')); });
+  document.getElementById('collapseAll').addEventListener('click', () => { document.querySelectorAll('.chapter').forEach(c => c.classList.remove('open')); });
   document.getElementById('chapterSearch').addEventListener('input', (e) => {
     const q = e.target.value.trim().toLowerCase();
-    document.querySelectorAll('.chapter').forEach(el => {
-      const name = el.dataset.chapter.toLowerCase();
-      el.style.display = name.includes(q) ? '' : 'none';
-    });
+    document.querySelectorAll('.chapter').forEach(el => { el.style.display = el.dataset.chapter.toLowerCase().includes(q) ? '' : 'none'; });
   });
-  document.getElementById('editNameBtn').addEventListener('click', () => {
-    const current = myData.displayName || '';
-    const val = window.prompt('Set your display name:', current);
-    if (val === null) return;
-    const trimmed = val.trim();
-    if (!trimmed) return;
-    myData.displayName = trimmed;
-    document.getElementById('whoamiName').textContent = trimmed;
+
+  // NEW: Settings Modal Logic
+  const overlay = document.getElementById('modalOverlay');
+  const settingsModal = document.getElementById('settingsModal');
+  const cardModal = document.getElementById('studentCardModal');
+  
+  function openSettings() {
+    overlay.style.display = 'flex';
+    settingsModal.style.display = 'block';
+    cardModal.style.display = 'none';
+    document.getElementById('setDisplayName').value = myData.displayName || '';
+    document.getElementById('setGrade').value = myData.grade || '';
+    document.getElementById('setTelegram').value = myData.telegram || '';
+    document.getElementById('setIsPublic').checked = myData.isPublic || false;
+  }
+
+  document.getElementById('editNameBtn').addEventListener('click', openSettings);
+  if(document.getElementById('settingsCapsule')) document.getElementById('settingsCapsule').addEventListener('click', openSettings);
+
+  document.querySelectorAll('.close-modal').forEach(btn => {
+    btn.addEventListener('click', () => { overlay.style.display = 'none'; settingsModal.style.display = 'none'; cardModal.style.display = 'none'; });
+  });
+  
+  overlay.addEventListener('click', (e) => {
+    if(e.target === overlay) { overlay.style.display = 'none'; settingsModal.style.display = 'none'; cardModal.style.display = 'none'; }
+  });
+
+  document.getElementById('saveSettingsBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('saveSettingsBtn');
+    btn.textContent = 'Saving...';
+    
+    const newName = document.getElementById('setDisplayName').value.trim();
+    const newGrade = document.getElementById('setGrade').value;
+    const newTele = document.getElementById('setTelegram').value.trim();
+    const newPub = document.getElementById('setIsPublic').checked;
+
+    myData.displayName = newName;
+    myData.grade = newGrade;
+    myData.telegram = newTele;
+    myData.isPublic = newPub;
+
+    const ref = doc(db, 'students', currentUser.uid);
+    await updateDoc(ref, {
+      displayName: newName,
+      grade: newGrade,
+      telegram: newTele,
+      isPublic: newPub,
+      updatedAt: new Date().toISOString()
+    });
+
+    document.getElementById('whoamiName').textContent = newName || myUsername;
     const banner = document.getElementById('displayNameBanner');
     if (banner) banner.style.display = 'none';
-    writeField('displayName', trimmed);
+    
+    btn.textContent = 'Saved!';
+    setTimeout(() => {
+      overlay.style.display = 'none';
+      settingsModal.style.display = 'none';
+      btn.textContent = 'Save Profile';
+    }, 600);
   });
 }
 
@@ -386,25 +364,13 @@ export async function startStudentSession(user){
   
   await loadMyData();
 
-  // AUTO-HEAL: Compute and save totalDone if missing for existing users
   if (myData && myData.totalDone === undefined) {
     const totalDone = computeDoneTheory() + computeDonePyq();
     myData.totalDone = totalDone;
-    
-    const ref = doc(db, 'students', currentUser.uid);
-    try {
-      await updateDoc(ref, { 
-        totalDone: totalDone,
-        updatedAt: new Date().toISOString() 
-      });
-      console.log("Auto-healed totalDone for existing user!");
-    } catch(e) {
-      console.error("Auto-heal write failed:", e);
-    }
+    try { await updateDoc(doc(db, 'students', currentUser.uid), { totalDone: totalDone, updatedAt: new Date().toISOString() }); } catch(e) {}
   }
 
   document.getElementById('whoamiName').textContent = myData.displayName || myUsername;
-  
   const nameToUse = myData.displayName || myUsername;
   const avatarEl = document.getElementById('avatarLetter');
   if (avatarEl) avatarEl.textContent = nameToUse.charAt(0).toUpperCase();
