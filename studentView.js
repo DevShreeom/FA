@@ -1,5 +1,5 @@
 // studentView.js
-
+import { doc, getDoc, setDoc, updateDoc, collection, getDocs, query, where, getCountFromServer } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { db } from './firebase.js';
 import { doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { ORDER, CHAPTER_DATA, SESSIONS } from './data.js';
@@ -398,6 +398,30 @@ export async function startStudentSession(user){
   
   updateDashboardExtras(); 
   updateContinueWatching(); 
+  updateLiveOnlineCount();
 }
 
+export async function updateLiveOnlineCount() {
+  const capsuleText = document.getElementById('onlineCountText');
+  if (!capsuleText) return;
+
+  try {
+    // Calculate the time exactly 60 minutes ago
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    
+    // Query Firestore
+    const activeQuery = query(collection(db, 'students'), where('updatedAt', '>=', oneHourAgo));
+    
+    // 🔥 THE MAGIC BULLET: getCountFromServer only costs 1 single read!
+    const snapshot = await getCountFromServer(activeQuery);
+    
+    // Fallback to at least 1 (themselves)
+    const activeCount = Math.max(1, snapshot.data().count); 
+    
+    capsuleText.textContent = `${activeCount} online`;
+  } catch (error) {
+    console.error("Could not fetch live count:", error);
+    capsuleText.textContent = `1 online`; // Silent fallback
+  }
+}
 export function getCurrentUser(){ return currentUser; }
