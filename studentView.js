@@ -322,21 +322,28 @@ export function wireStudentControls(){
 document.getElementById('saveSettingsBtn').addEventListener('click', async () => {
     const btn = document.getElementById('saveSettingsBtn');
     btn.textContent = 'Saving...';
+    btn.disabled = true; // Prevent spam-clicking
     
     const newName = document.getElementById('setDisplayName').value.trim();
     const newGrade = document.getElementById('setGrade').value;
     const newTele = document.getElementById('setTelegram').value.trim();
     const newPub = document.getElementById('setIsPublic').checked;
 
+    // 1. Update local data instantly
     myData.displayName = newName;
     myData.grade = newGrade;
     myData.telegram = newTele;
     myData.isPublic = newPub;
 
+    // 2. Update the UI instantly so it feels lightning fast
+    document.getElementById('whoamiName').textContent = newName || myUsername;
+    const banner = document.getElementById('displayNameBanner');
+    if (banner) banner.style.display = 'none';
+
     const ref = doc(db, 'students', currentUser.uid);
     
     try {
-      // FIX: Changed to setDoc with { merge: true } to prevent silent "document not found" errors!
+      // 3. Send to Firebase
       await setDoc(ref, {
         displayName: newName,
         grade: newGrade,
@@ -345,21 +352,19 @@ document.getElementById('saveSettingsBtn').addEventListener('click', async () =>
         updatedAt: new Date().toISOString()
       }, { merge: true });
 
-      document.getElementById('whoamiName').textContent = newName || myUsername;
-      const banner = document.getElementById('displayNameBanner');
-      if (banner) banner.style.display = 'none';
-      
       btn.textContent = 'Saved!';
+      
+    } catch (error) {
+      console.error("Save error:", error);
+      btn.textContent = 'Error!';
+    } finally {
+      // 4. THIS ALWAYS RUNS! No more stuck buttons.
       setTimeout(() => {
         document.getElementById('modalOverlay').style.display = 'none';
         document.getElementById('settingsModal').style.display = 'none';
         btn.textContent = 'Save Profile';
+        btn.disabled = false;
       }, 600);
-      
-    } catch (error) {
-      console.error("Save error:", error);
-      btn.textContent = 'Error! Try again.';
-      setTimeout(() => { btn.textContent = 'Save Profile'; }, 2000);
     }
   });
 }
