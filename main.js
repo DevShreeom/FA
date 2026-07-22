@@ -34,6 +34,12 @@ document.getElementById('themeToggle').addEventListener('click', () => {
   localStorage.setItem(THEME_KEY, currentTheme);
 });
 
+// ---- Navigation style memory ----
+const NAV_KEY = 'jee_tracker_nav';
+if (localStorage.getItem(NAV_KEY) === 'dock') {
+  document.body.classList.add('dock-mode');
+}
+
 // ---- Nav rail routing ----
 const SECTION_IDS = {
   dashboard: 'sectionDashboard',
