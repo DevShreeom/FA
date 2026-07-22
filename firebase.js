@@ -15,6 +15,11 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+
+// Instead of getFirestore(app), initialize with persistentLocalCache:
+export const db = initializeFirestore(app, {
+  localCache: persistentLocalCache()
+});
+
 export const auth = getAuth(app);
-export const db = getFirestore(app);
 export const FAKE_EMAIL_DOMAIN = "jee-tracker.local";
