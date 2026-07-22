@@ -292,7 +292,7 @@ export function wireStudentControls(){
     document.querySelectorAll('.chapter').forEach(el => { el.style.display = el.dataset.chapter.toLowerCase().includes(q) ? '' : 'none'; });
   });
 
-  // NEW: Settings Modal Logic
+  // Settings Modal Logic
   const overlay = document.getElementById('modalOverlay');
   const settingsModal = document.getElementById('settingsModal');
   const cardModal = document.getElementById('studentCardModal');
@@ -301,16 +301,28 @@ export function wireStudentControls(){
     overlay.style.display = 'flex';
     settingsModal.style.display = 'block';
     cardModal.style.display = 'none';
+    
+    // Load existing profile data
     document.getElementById('setDisplayName').value = myData.displayName || '';
     document.getElementById('setGrade').value = myData.grade || '';
     document.getElementById('setTelegram').value = myData.telegram || '';
     document.getElementById('setIsPublic').checked = myData.isPublic || false;
-    document.getElementById('setNavStyle').value = localStorage.getItem('jee_tracker_nav') || 'sidebar'; // ADD THIS LINE
+    
+    // Load existing Dock preference
+    const navDropdown = document.getElementById('setNavStyle');
+    if(navDropdown) navDropdown.value = localStorage.getItem('jee_tracker_nav') || 'sidebar';
   }
 
+  // 1. Profile "(edit)" button
   document.getElementById('editNameBtn').addEventListener('click', openSettings);
+  
+  // 2. Old floating profile button (Sidebar mode)
   if(document.getElementById('settingsCapsule')) document.getElementById('settingsCapsule').addEventListener('click', openSettings);
+  
+  // 3. NEW: The Glass Dock Settings Button!
+  if(document.getElementById('dockSettingsBtn')) document.getElementById('dockSettingsBtn').addEventListener('click', openSettings);
 
+  // Close modal listeners
   document.querySelectorAll('.close-modal').forEach(btn => {
     btn.addEventListener('click', () => { overlay.style.display = 'none'; settingsModal.style.display = 'none'; cardModal.style.display = 'none'; });
   });
@@ -319,23 +331,26 @@ export function wireStudentControls(){
     if(e.target === overlay) { overlay.style.display = 'none'; settingsModal.style.display = 'none'; cardModal.style.display = 'none'; }
   });
 
-document.getElementById('saveSettingsBtn').addEventListener('click', async () => {
+  // Bulletproof Save Button Logic
+  document.getElementById('saveSettingsBtn').addEventListener('click', async () => {
     const btn = document.getElementById('saveSettingsBtn');
     btn.textContent = 'Saving...';
     btn.disabled = true; // Prevent spam-clicking
-
-  
-  // --- SAVE DOCK PREFERENCE ---
-    const newNav = document.getElementById('setNavStyle').value;
-    localStorage.setItem('jee_tracker_nav', newNav);
-    if (newNav === 'dock') document.body.classList.add('dock-mode'); 
-    else document.body.classList.remove('dock-mode');
-    // ----------------------------
     
     const newName = document.getElementById('setDisplayName').value.trim();
     const newGrade = document.getElementById('setGrade').value;
     const newTele = document.getElementById('setTelegram').value.trim();
     const newPub = document.getElementById('setIsPublic').checked;
+
+    // --- SAVE DOCK PREFERENCE ---
+    const navDropdown = document.getElementById('setNavStyle');
+    if (navDropdown) {
+      const newNav = navDropdown.value;
+      localStorage.setItem('jee_tracker_nav', newNav);
+      if (newNav === 'dock') document.body.classList.add('dock-mode'); 
+      else document.body.classList.remove('dock-mode');
+    }
+    // ----------------------------
 
     // 1. Update local data instantly
     myData.displayName = newName;
@@ -376,6 +391,7 @@ document.getElementById('saveSettingsBtn').addEventListener('click', async () =>
     }
   });
 }
+
 
 export async function startStudentSession(user){
   currentUser = user;
