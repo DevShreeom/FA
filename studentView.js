@@ -48,7 +48,17 @@ function writeField(fieldPath, value){
   clearTimeout(pendingWrites[fieldPath]);
   pendingWrites[fieldPath] = setTimeout(async () => {
     const ref = doc(db, 'students', currentUser.uid);
-    const payload = { [fieldPath]: value, updatedAt: new Date().toISOString(), username: myUsername };
+    
+    // Calculate total completed topics
+    const totalDone = computeDoneTheory() + computeDonePyq();
+
+    const payload = { 
+      [fieldPath]: value, 
+      totalDone: totalDone, // <--- ADDED: Enables efficient leaderboard queries
+      updatedAt: new Date().toISOString(), 
+      username: myUsername 
+    };
+
     try {
       await updateDoc(ref, payload);
       if (statusEl) statusEl.textContent = 'Saved';
@@ -62,7 +72,6 @@ function writeField(fieldPath, value){
     }
   }, 400);
 }
-
 function nextStatus(current, clicked){
   if (current === clicked) return 'none';
   return clicked;
