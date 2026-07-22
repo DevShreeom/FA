@@ -219,11 +219,90 @@ table.students tr:hover td{ background: var(--panel-2); }
 }
 
 /* 3. Glass Dock (On PC when toggled from Settings) */
-body.dock-mode .main-content { margin-left: 0 !important; max-width: 1100px; padding-bottom: 100px; margin: 0 auto; }
-body.dock-mode .sidebar { position: fixed !important; bottom: 20px !important; left: 50% !important; transform: translateX(-50%) !important; top: auto !important; width: auto !important; min-width: 320px; height: 65px !important; flex-direction: row !important; justify-content: center !important; align-items: center !important; background: rgba(30, 41, 59, 0.7) !important; backdrop-filter: blur(12px) !important; -webkit-backdrop-filter: blur(12px) !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; border-radius: 30px !important; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important; padding: 0 20px !important; z-index: 9999 !important; border-right: none !important; }
+
+/* Center the entire app beautifully */
+body.dock-mode .main-content { 
+  margin-left: auto !important; 
+  margin-right: auto !important; 
+  max-width: 1200px !important; 
+  padding-left: 30px !important;
+  padding-right: 30px !important;
+  padding-bottom: 120px !important; 
+}
+
+/* Hide the floating profile button (you can still use 'edit' at the top) */
+body.dock-mode #settingsCapsule {
+  display: none !important;
+}
+
+/* The True Apple-Style Glass Dock */
+body.dock-mode .sidebar { 
+  position: fixed !important; 
+  bottom: 24px !important; 
+  left: 50% !important; 
+  transform: translateX(-50%) !important; 
+  top: auto !important; 
+  width: auto !important; 
+  min-width: 300px !important;
+  height: 64px !important; 
+  
+  display: flex !important;
+  flex-direction: row !important; 
+  justify-content: center !important; 
+  align-items: center !important; 
+  
+  /* Ultra-Premium Glass Effect */
+  background: rgba(255, 255, 255, 0.06) !important; 
+  backdrop-filter: blur(24px) saturate(150%) !important; 
+  -webkit-backdrop-filter: blur(24px) saturate(150%) !important; 
+  
+  border: 1px solid rgba(255, 255, 255, 0.08) !important; 
+  border-top: 1px solid rgba(255, 255, 255, 0.2) !important; /* Glossy top lip */
+  border-radius: 999px !important; 
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.05) !important; 
+  
+  padding: 0 16px !important; 
+  z-index: 9999 !important; 
+  border-right: none !important; 
+}
+
 body.dock-mode .brand { display: none !important; }
-body.dock-mode .nav-rail { flex-direction: row !important; gap: 15px; }
-body.dock-mode .nav-btn { padding: 12px !important; background: transparent !important; font-size: 0 !important; } /* Hides text, keeps icon */
-body.dock-mode .nav-btn.active { background: rgba(255,255,255,0.1) !important; box-shadow: inset 0 0 10px rgba(255,255,255,0.05); }
-body.dock-mode .nav-icon { margin: 0 !important; }
+
+/* Perfect Center Alignment for Icons */
+body.dock-mode .nav-rail { 
+  display: flex !important;
+  flex-direction: row !important; 
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 12px !important;
+  margin: 0 !important;
+}
+
+/* Icon Button Styling */
+body.dock-mode .nav-btn { 
+  padding: 0 !important; 
+  background: transparent !important; 
+  font-size: 0 !important; /* Hides text */
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 50% !important; /* Perfect circles */
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+}
+
+/* Smooth Mac Hover Animation */
+body.dock-mode .nav-btn:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  transform: translateY(-4px) !important;
+}
+
+body.dock-mode .nav-btn.active { 
+  background: rgba(255, 255, 255, 0.15) !important; 
+  color: #fff !important;
+  box-shadow: inset 0 0 10px rgba(255,255,255,0.05) !important;
+}
+
+body.dock-mode .nav-icon { margin: 0 !important; display: flex !important; }
 body.dock-mode .nav-icon svg { width: 22px !important; height: 22px !important; }
