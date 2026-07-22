@@ -3,7 +3,8 @@
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+// FIX: Import initializeFirestore and persistentLocalCache instead of getFirestore
+import { initializeFirestore, persistentLocalCache } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCZmPc61LRxkgYalLyRyT-rRdkMswcAclg",
@@ -16,7 +17,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-// Instead of getFirestore(app), initialize with persistentLocalCache:
+// Initialize Firestore with persistent offline caching
 export const db = initializeFirestore(app, {
   localCache: persistentLocalCache()
 });
