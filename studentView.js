@@ -32,10 +32,23 @@ async function loadMyData(){
     const snap = await getDoc(ref);
     if (snap.exists()){
       const d = snap.data();
-      myData = { theory: d.theory || {}, pyq: d.pyq || {}, selfcheck: d.selfcheck || {}, updatedAt: d.updatedAt || null, username: d.username || myUsername, displayName: d.displayName || null };
+      myData = { 
+        theory: d.theory || {}, 
+        pyq: d.pyq || {}, 
+        selfcheck: d.selfcheck || {}, 
+        updatedAt: d.updatedAt || null, 
+        username: d.username || myUsername, 
+        displayName: d.displayName || null,
+        targetDate: d.targetDate || null
+      };
     } else {
+      // First time login setup:
       myData = { theory: {}, pyq: {}, selfcheck: {}, updatedAt: null, username: myUsername, displayName: null };
-      try { await setDoc(ref, { ...myData, updatedAt: new Date().toISOString() }); } catch(e){}
+      
+      // Create their document in Firestore and initialize totalDone to 0
+      try { 
+        await setDoc(ref, { ...myData, totalDone: 0, updatedAt: new Date().toISOString() }); 
+      } catch(e){}
     }
   } catch(e){
     myData = { theory: {}, pyq: {}, selfcheck: {}, updatedAt: null, username: myUsername, displayName: null };
@@ -72,6 +85,8 @@ function writeField(fieldPath, value){
     }
   }, 400);
 }
+
+
 function nextStatus(current, clicked){
   if (current === clicked) return 'none';
   return clicked;
