@@ -319,7 +319,7 @@ export function wireStudentControls(){
     if(e.target === overlay) { overlay.style.display = 'none'; settingsModal.style.display = 'none'; cardModal.style.display = 'none'; }
   });
 
- document.getElementById('saveSettingsBtn').addEventListener('click', async () => {
+document.getElementById('saveSettingsBtn').addEventListener('click', async () => {
     const btn = document.getElementById('saveSettingsBtn');
     btn.textContent = 'Saving...';
     
@@ -336,7 +336,7 @@ export function wireStudentControls(){
     const ref = doc(db, 'students', currentUser.uid);
     
     try {
-      // Changed to setDoc with merge: true to prevent silent "document not found" errors!
+      // FIX: Changed to setDoc with { merge: true } to prevent silent "document not found" errors!
       await setDoc(ref, {
         displayName: newName,
         grade: newGrade,
