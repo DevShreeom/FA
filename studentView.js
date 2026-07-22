@@ -319,7 +319,7 @@ export function wireStudentControls(){
     if(e.target === overlay) { overlay.style.display = 'none'; settingsModal.style.display = 'none'; cardModal.style.display = 'none'; }
   });
 
-  document.getElementById('saveSettingsBtn').addEventListener('click', async () => {
+ document.getElementById('saveSettingsBtn').addEventListener('click', async () => {
     const btn = document.getElementById('saveSettingsBtn');
     btn.textContent = 'Saving...';
     
@@ -334,24 +334,33 @@ export function wireStudentControls(){
     myData.isPublic = newPub;
 
     const ref = doc(db, 'students', currentUser.uid);
-    await updateDoc(ref, {
-      displayName: newName,
-      grade: newGrade,
-      telegram: newTele,
-      isPublic: newPub,
-      updatedAt: new Date().toISOString()
-    });
-
-    document.getElementById('whoamiName').textContent = newName || myUsername;
-    const banner = document.getElementById('displayNameBanner');
-    if (banner) banner.style.display = 'none';
     
-    btn.textContent = 'Saved!';
-    setTimeout(() => {
-      overlay.style.display = 'none';
-      settingsModal.style.display = 'none';
-      btn.textContent = 'Save Profile';
-    }, 600);
+    try {
+      // Changed to setDoc with merge: true to prevent silent "document not found" errors!
+      await setDoc(ref, {
+        displayName: newName,
+        grade: newGrade,
+        telegram: newTele,
+        isPublic: newPub,
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
+
+      document.getElementById('whoamiName').textContent = newName || myUsername;
+      const banner = document.getElementById('displayNameBanner');
+      if (banner) banner.style.display = 'none';
+      
+      btn.textContent = 'Saved!';
+      setTimeout(() => {
+        document.getElementById('modalOverlay').style.display = 'none';
+        document.getElementById('settingsModal').style.display = 'none';
+        btn.textContent = 'Save Profile';
+      }, 600);
+      
+    } catch (error) {
+      console.error("Save error:", error);
+      btn.textContent = 'Error! Try again.';
+      setTimeout(() => { btn.textContent = 'Save Profile'; }, 2000);
+    }
   });
 }
 
