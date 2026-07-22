@@ -148,6 +148,48 @@
   </div>
 </div>
 
+    <button id="settingsCapsule" style="position: fixed; bottom: 20px; left: 20px; background: var(--panel-2); color: var(--text); border: 1px solid var(--border); padding: 10px 16px; border-radius: 50px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 500; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 100;">
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+  My Profile
+</button>
+
+<div id="modalOverlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+  
+  <div id="settingsModal" style="display: none; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; width: 90%; max-width: 400px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <h3 style="margin: 0; font-family: var(--font-display);">⚙️ Settings</h3>
+      <button class="close-modal" style="background:none; border:none; color:var(--text); font-size:1.5rem; cursor:pointer;">&times;</button>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div><label style="font-size:0.8rem; color:var(--muted);">Display Name</label><br><input type="text" id="setDisplayName" placeholder="e.g. Aarav" style="width:100%; box-sizing:border-box; padding: 10px; border-radius: 8px; background: var(--panel); border: 1px solid var(--border); color: var(--text); margin-top:4px;"></div>
+      <div><label style="font-size:0.8rem; color:var(--muted);">Target Grade</label><br><select id="setGrade" style="width:100%; box-sizing:border-box; padding: 10px; border-radius: 8px; background: var(--panel); border: 1px solid var(--border); color: var(--text); margin-top:4px;">
+        <option value="">Select...</option>
+        <option value="11th Grade">11th Grade</option>
+        <option value="12th Grade">12th Grade</option>
+        <option value="Dropper">Dropper</option>
+      </select></div>
+      <div><label style="font-size:0.8rem; color:var(--muted);">Telegram Handle (Optional)</label><br><input type="text" id="setTelegram" placeholder="@username" style="width:100%; box-sizing:border-box; padding: 10px; border-radius: 8px; background: var(--panel); border: 1px solid var(--border); color: var(--text); margin-top:4px;"></div>
+      
+      <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--text); cursor: pointer; background: var(--panel-2); padding: 10px; border-radius: 8px; border: 1px solid var(--border);">
+        <input type="checkbox" id="setIsPublic"> Allow others to see my profile & Telegram
+      </label>
+      <button id="saveSettingsBtn" style="background: var(--accent); color: #000; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 700; margin-top: 10px; transition: 0.2s;">Save Profile</button>
+    </div>
+  </div>
+
+  <div id="studentCardModal" style="display: none; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; width: 90%; max-width: 400px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+      <h3 id="scTitle" style="margin: 0; font-family: var(--font-display);">Profile</h3>
+      <button class="close-modal" style="background:none; border:none; color:var(--text); font-size:1.5rem; cursor:pointer;">&times;</button>
+    </div>
+    <div id="scBody" style="font-size: 0.95rem; color: var(--text);">
+      </div>
+  </div>
+
+</div>
+
+
+    
 <script type="module" src="main.js"></script>
 </body>
 </html>
