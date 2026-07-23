@@ -84,7 +84,7 @@ onAuthStateChanged(auth, async (user) => {
   } else {
     document.getElementById('appShell').style.display = 'none';
     document.getElementById('whoamiBar').style.display = 'none';
-    if(document.getElementById('settingsCapsule')) document.getElementById('settingsCapsule').style.display = 'flex';
+    if(document.getElementById('settingsCapsule')) document.getElementById('settingsCapsule').style.display = 'none';
     showAuthOverlay();
   }
 });
