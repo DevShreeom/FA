@@ -399,6 +399,7 @@ export async function startStudentSession(user){
   document.getElementById('authOverlay').style.display = 'none';
   document.getElementById('appShell').style.display = 'block'; 
   document.getElementById('whoamiBar').style.display = 'flex';
+  if(document.getElementById('settingsCapsule')) document.getElementById('settingsCapsule').style.display = 'flex';
   
   await loadMyData();
 
