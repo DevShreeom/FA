@@ -40,29 +40,37 @@ if (localStorage.getItem(NAV_KEY) === 'dock') {
   document.body.classList.add('dock-mode');
 }
 
+
 // ---- Nav rail routing ----
 const SECTION_IDS = {
   dashboard: 'sectionDashboard',
-  notes: 'sectionNotes', // <-- ADDED
+  notes: 'sectionNotes',
+  qotd: 'sectionQotd',
   leaderboard: 'sectionLeaderboard',
   classview: 'sectionClassView',
-  updates: 'sectionUpdates',
-  qotd: 'sectionQotd'
+  updates: 'sectionUpdates'
 };
 
 function showSection(name){
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.section === name));
   document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
-  document.getElementById(SECTION_IDS[name]).classList.add('active');
   
-  if (name === 'qotd') loadQotdView(); // <--- Added this
-  if (name === 'notes') buildNotesView(); // <-- ADDED
+  // CRASH PROTECTION: Check if the section actually exists before adding classes
+  const targetSection = document.getElementById(SECTION_IDS[name]);
+  if (targetSection) {
+    targetSection.classList.add('active');
+  } else {
+    console.error("Missing HTML section for:", name);
+  }
+  
+  if (name === 'qotd') loadQotdView();
+  if (name === 'notes') buildNotesView(); 
 
   if (name === 'leaderboard'){
     const el = document.getElementById('leaderboardPage');
-    el.innerHTML = '<div class="loading">Loading leaderboard...</div>';
+    if(el) el.innerHTML = '<div class="loading">Loading leaderboard...</div>';
     computeRankings().then(rankings => mountLeaderboard(el, rankings, 'overall', 20))
-      .catch(() => { el.innerHTML = '<div class="empty-note">Could not load leaderboard.</div>'; });
+      .catch(() => { if(el) el.innerHTML = '<div class="empty-note">Could not load leaderboard.</div>'; });
   }
   if (name === 'classview') loadTeacherView();
   if (name === 'updates') loadUpdatesPage();
