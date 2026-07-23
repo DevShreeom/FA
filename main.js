@@ -3,7 +3,6 @@
 import { auth } from './firebase.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { initAuthForm, showAuthOverlay, hideAuthOverlay } from './auth.js';
-import { wireStudentControls, startStudentSession, getCurrentUser } from './studentView.js';
 import { loadTeacherView } from './teacherView.js';
 import { computeRankings, mountLeaderboard } from './leaderboard.js';
 import { loadUpdatesPage, loadLatestUpdatePreview } from './updates.js';
