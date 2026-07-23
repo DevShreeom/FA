@@ -358,3 +358,64 @@ body.dock-mode .nav-icon svg { width: 22px !important; height: 22px !important; 
   .note-time { width: 100%; text-align: left; }
   .note-actions { justify-content: flex-end; margin-top: 4px; }
 }
+/* ========================================= */
+/* === ULTIMATE MOBILE UX FIXES === */
+/* ========================================= */
+@media (max-width: 768px) {
+  
+  /* 1. Stat Grid: Full width Overall, 50/50 Theory & PYQ */
+  .stat-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px !important;
+  }
+  .stat-grid .stat-box:first-child {
+    grid-column: span 2 !important; /* Makes 'Overall complete' stretch 100% */
+  }
+
+  /* 2. Fix Dock Overlap: Give the page room to breathe at the bottom */
+  .main-content {
+    padding-bottom: 120px !important;
+  }
+
+  /* 3. Swipeable Glass Dock: Prevents cramped fat-finger taps */
+  .sidebar {
+    justify-content: flex-start !important;
+    overflow-x: auto !important; /* Lets users swipe the dock left/right */
+    -webkit-overflow-scrolling: touch !important;
+    padding: 0 20px !important;
+  }
+  .sidebar::-webkit-scrollbar { 
+    display: none !important; /* Hides the ugly scrollbar for a clean iOS look */
+  }
+  .nav-rail {
+    justify-content: flex-start !important;
+    width: max-content !important;
+    gap: 16px !important;
+  }
+
+  /* 4. Kill the Box-in-a-Box & Enlarge CTA Buttons */
+  .dashboard-top-row .card {
+    padding: 16px !important;
+  }
+  .widget-inner {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin-top: 8px !important;
+  }
+  .widget-btn {
+    width: 100% !important; /* Massive, easy-to-tap button */
+    padding: 14px !important;
+    font-size: 0.95rem !important;
+  }
+
+  /* 5. Header / Theme Toggle Alignment */
+  header {
+    flex-wrap: nowrap !important;
+    justify-content: space-between !important;
+  }
+  .whoami {
+    margin-right: auto !important; /* Pushes theme toggle to the far right */
+  }
+}
