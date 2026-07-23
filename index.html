@@ -68,8 +68,10 @@
         </div>
       </div>
       
-      <div class="nav-rail">
+<div class="nav-rail">
         <button class="nav-btn active" data-section="dashboard"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span> Dashboard</button>
+        <button class="nav-btn" data-section="notes"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></span> Notes</button>
+        <button class="nav-btn" data-section="qotd"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span> QOTD</button>
         <button class="nav-btn" data-section="leaderboard"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg></span> Leaderboard</button>
         <button class="nav-btn" data-section="classview"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span> Class View</button>
         <button class="nav-btn" data-section="updates"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg></span> Updates</button>
@@ -147,6 +149,23 @@
       <div id="chapters" class="chapter-grid"></div>
       <footer>128 lectures across 27 chapters · Factorial Final Surge + PYQ Masterseries</footer>
     </section>
+      
+    <section id="sectionNotes" class="content-section">
+      <div class="card">
+        <div class="section-label" style="margin-top:0;">📝 Revision Notes & Timestamps</div>
+        <div class="controls" style="margin-bottom: 20px;">
+          <input class="search-input" id="notesSearch" placeholder="Search footnotes & videos..." style="width: 100%; max-width: 400px;">
+        </div>
+        <div id="notesContainer" class="chapter-grid"></div>
+      </div>
+    </section>
+
+    <section id="sectionQotd" class="content-section">
+      <div class="card">
+        <div class="section-label" style="margin-top:0;">💡 QOTD Library</div>
+        <div id="qotdLibraryContent" class="loading">Loading QOTD Library...</div>
+      </div>
+    </section>  
 
     <section id="sectionLeaderboard" class="content-section">
       <div class="card">
