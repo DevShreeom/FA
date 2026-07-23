@@ -5,7 +5,7 @@ import { collection, getDocs, doc, setDoc } from "https://www.gstatic.com/fireba
 import { computeTotalAll, studentTheoryDone, studentPyqDone, idFor } from './metrics.js';
 import { ORDER, CHAPTER_DATA } from './data.js';
 import { getCurrentUser } from './studentView.js';
-import { computeRankings, mountLeaderboard, showStudentCard } from './leaderboard.js'; // <--- ADDED IMPORT
+import { computeRankings, mountLeaderboard, showStudentCard } from './leaderboard.js'; 
 import { checkIsAdmin } from './adminCheck.js';
 import { addCustomLecture } from './customLectures.js';
 
@@ -19,7 +19,7 @@ let sortDir = -1;
 let isAdmin = false;
 let currentPage = 1;
 const PAGE_SIZE = 10;
-let currentRankings = null; // Store rankings globally for the modal
+let currentRankings = null; 
 
 function studentDoneCount(s){
   return studentTheoryDone(s) + studentPyqDone(s);
@@ -64,7 +64,6 @@ function renderTable(){
       ? `<button class="flag-btn" data-id="${r.id}" data-flagged="${r.flagged}">${r.flagged ? '🚩 Flagged' : 'Flag'}</button>`
       : (r.flagged ? '🚩 Flagged' : '-');
       
-    // NEW: Render the name as a clickable link with the grade badge
     const gradeBadge = (r.rawData.isPublic && r.rawData.grade) ? `<span style="font-size:0.7rem; color:var(--muted); font-weight:400; margin-left:6px;">(${r.rawData.grade})</span>` : '';
     const nameCell = `<span class="cv-user-link" data-id="${r.id}" style="cursor:pointer; font-weight:600; text-decoration:underline; text-decoration-color:var(--border); text-underline-offset:3px;">${r.name}${gradeBadge}</span>`;
 
@@ -79,20 +78,17 @@ function renderTable(){
 
   renderPagination(totalPages, sorted.length);
 
-  // NEW: Wire up the click listener for the modal card!
   tbody.querySelectorAll('.cv-user-link').forEach(link => {
     link.addEventListener('click', () => {
       const id = link.dataset.id;
       const r = lastRows.find(x => x.id === id);
       
-      // Look up their rank
       let rank = "?";
       if (currentRankings) {
          const idx = currentRankings.byOverall.findIndex(x => x.id === id);
          if (idx !== -1) rank = idx + 1;
       }
 
-      // Build the entry object the modal expects
       const entry = {
         rawData: r.rawData,
         name: r.name,
@@ -141,7 +137,7 @@ function renderPagination(totalPages, totalCount){
     prev = p;
   });
   html += `<button class="page-btn" data-page="${currentPage + 1}" ${currentPage === totalPages ? 'disabled' : ''}>Next &rsaquo;</button>`;
-  html += `<span class="page-count">${totalCount} students total</span>`;
+  html += `<span class="page-count">${totalCount} students</span>`;
 
   el.innerHTML = html;
   el.querySelectorAll('.page-btn[data-page]:not([disabled])').forEach(btn => {
@@ -189,7 +185,6 @@ export async function loadTeacherView(){
 
   const total = computeTotalAll();
   
-  // NEW: Store rawData, theoryDone, and pyqDone so the modal can access it!
   lastRows = students.map(s => {
     const done = studentDoneCount(s);
     const tDone = studentTheoryDone(s);
@@ -215,54 +210,60 @@ export async function loadTeacherView(){
   
   currentRankings = await computeRankings();
 
+  // INJECTING HTML WITH MOBILE-FRIENDLY WRAPPERS & STYLES
   container.innerHTML = `
     ${isAdmin ? `
     <div class="section-label" style="margin-top:0;">➕ Add a missing lecture</div>
-    <div class="add-lecture-form">
-      <select id="addLecChapter">${ORDER.map(ch => `<option value="${ch}">${ch}</option>`).join('')}</select>
-      <select id="addLecType"><option value="fs">Theory</option><option value="pyq">PYQ</option></select>
-      <input id="addLecTitle" placeholder="Title">
-      <input id="addLecUrl" placeholder="YouTube URL">
-      <input id="addLecDuration" placeholder="Duration (e.g. 12:34)">
-      <button id="addLecBtn">Add</button>
+    <div class="add-lecture-form" style="display:flex; flex-wrap:wrap; gap:8px;">
+      <select id="addLecChapter" style="flex:1; min-width:130px;">${ORDER.map(ch => `<option value="${ch}">${ch}</option>`).join('')}</select>
+      <select id="addLecType" style="flex:1; min-width:100px;"><option value="fs">Theory</option><option value="pyq">PYQ</option></select>
+      <input id="addLecTitle" placeholder="Title" style="flex:2; min-width:200px;">
+      <input id="addLecUrl" placeholder="YouTube URL" style="flex:2; min-width:150px;">
+      <input id="addLecDuration" placeholder="Duration (e.g. 12:34)" style="flex:1; min-width:120px;">
+      <button id="addLecBtn" style="flex:1; min-width:100px;">Add</button>
     </div>
     <div id="addLecMsg" class="status-msg" style="margin:4px 0 16px;"></div>
     ` : ''}
 
-    <div class="section-label">🏆 Leaderboard (top 10, flagged accounts excluded)</div>
+    <div class="section-label">🏆 Leaderboard (top 10, flagged excluded)</div>
     <div id="leaderboardPanel"></div>
 
     <div class="stat-grid" style="margin-top:20px;">
       <div class="stat-box"><div class="num">${lastRows.length}</div><div class="lbl">Students tracking</div></div>
       <div class="stat-box"><div class="num">${avgPct}%</div><div class="lbl">Avg class completion</div></div>
-      <div class="stat-box pyq"><div class="num">${avgSc}</div><div class="lbl">Avg year-sessions self-checked</div></div>
+      <div class="stat-box pyq"><div class="num">${avgSc}</div><div class="lbl">Avg year-sessions checked</div></div>
     </div>
 
-    <div class="controls">
-      <input class="search-input" id="studentSearch" placeholder="Search student...">
+    <div class="controls" style="margin-top:20px; margin-bottom:10px;">
+      <input class="search-input" id="studentSearch" placeholder="Search student..." style="width:100%; max-width:400px; box-sizing:border-box;">
     </div>
 
-    <table class="students">
-      <thead><tr>
-        <th data-key="name">Student</th>
-        <th data-key="done">Progress</th>
-        <th data-key="pct">Completion</th>
-        <th data-key="updatedAt">Last active</th>
-        ${isAdmin ? '<th>Flag</th>' : '<th>Status</th>'}
-      </tr></thead>
-      <tbody id="studentsTbody"></tbody>
-    </table>
-    <div id="studentsPagination" class="pagination"></div>
+    <div style="width:100%; overflow-x:auto; border:1px solid var(--border); border-radius:8px; background:var(--panel); -webkit-overflow-scrolling:touch;">
+      <table class="students" style="min-width:650px; margin:0; width:100%; border:none;">
+        <thead><tr>
+          <th data-key="name">Student</th>
+          <th data-key="done">Progress</th>
+          <th data-key="pct">Completion</th>
+          <th data-key="updatedAt">Last active</th>
+          ${isAdmin ? '<th>Flag</th>' : '<th>Status</th>'}
+        </tr></thead>
+        <tbody id="studentsTbody"></tbody>
+      </table>
+    </div>
+    <div id="studentsPagination" class="pagination" style="margin-top:12px; display:flex; justify-content:center; flex-wrap:wrap;"></div>
 
-    <div class="section-label" style="margin-top:22px;">Chapter completion across class (lowest first - where the class is stuck)</div>
-    <div class="chapter-heat">
-      ${heat.map(h => `
-        <div class="heat-row">
-          <div class="heat-name">${h.chapter}</div>
-          <div class="heat-bar"><div style="width:${h.avgPct}%"></div></div>
-          <div class="heat-pct">${h.avgPct}%</div>
-        </div>
-      `).join('')}
+    <div class="section-label" style="margin-top:32px;">Chapter completion across class (where they are stuck)</div>
+    
+    <div style="width:100%; overflow-x:auto; padding-bottom:10px; -webkit-overflow-scrolling:touch;">
+      <div class="chapter-heat" style="min-width:550px;">
+        ${heat.map(h => `
+          <div class="heat-row">
+            <div class="heat-name">${h.chapter}</div>
+            <div class="heat-bar"><div style="width:${h.avgPct}%"></div></div>
+            <div class="heat-pct">${h.avgPct}%</div>
+          </div>
+        `).join('')}
+      </div>
     </div>
   `;
 
