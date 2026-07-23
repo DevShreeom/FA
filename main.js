@@ -9,6 +9,7 @@ import { computeRankings, mountLeaderboard } from './leaderboard.js';
 import { loadUpdatesPage, loadLatestUpdatePreview } from './updates.js';
 import { loadAndMergeCustomLectures } from './customLectures.js';
 import { loadQotdView } from './qotdView.js';
+import { wireStudentControls, startStudentSession, getCurrentUser, buildNotesView } from './studentView.js';
 
 // ---- Theme toggle ----
 const THEME_KEY = 'jee_tracker_theme';
@@ -43,6 +44,7 @@ if (localStorage.getItem(NAV_KEY) === 'dock') {
 // ---- Nav rail routing ----
 const SECTION_IDS = {
   dashboard: 'sectionDashboard',
+  notes: 'sectionNotes', // <-- ADDED
   leaderboard: 'sectionLeaderboard',
   classview: 'sectionClassView',
   updates: 'sectionUpdates',
@@ -55,6 +57,7 @@ function showSection(name){
   document.getElementById(SECTION_IDS[name]).classList.add('active');
   
   if (name === 'qotd') loadQotdView(); // <--- Added this
+  if (name === 'notes') buildNotesView(); // <-- ADDED
 
   if (name === 'leaderboard'){
     const el = document.getElementById('leaderboardPage');
