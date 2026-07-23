@@ -23,7 +23,7 @@ if (currentTheme !== 'dark') {
 // Cycle through all 3 themes on click
 document.getElementById('themeToggle').addEventListener('click', () => {
   let idx = themes.indexOf(currentTheme);
-  idx = (idx + 1) % themes.length; // Moves to the next theme in the array
+  idx = (idx + 1) % themes.length; 
   currentTheme = themes[idx];
   
   if (currentTheme === 'dark') {
@@ -40,7 +40,6 @@ if (localStorage.getItem(NAV_KEY) === 'dock') {
   document.body.classList.add('dock-mode');
 }
 
-
 // ---- Nav rail routing ----
 const SECTION_IDS = {
   dashboard: 'sectionDashboard',
@@ -55,7 +54,6 @@ function showSection(name){
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.section === name));
   document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
   
-  // CRASH PROTECTION: Check if the section actually exists before adding classes
   const targetSection = document.getElementById(SECTION_IDS[name]);
   if (targetSection) {
     targetSection.classList.add('active');
@@ -76,14 +74,19 @@ function showSection(name){
   if (name === 'updates') loadUpdatesPage();
 }
 
+// FIXED: Only route if the button has a data-section (prevents Settings bug)
 document.querySelectorAll('.nav-btn').forEach(btn => {
-  btn.addEventListener('click', () => showSection(btn.dataset.section));
+  btn.addEventListener('click', () => {
+    if (btn.dataset.section) {
+      showSection(btn.dataset.section);
+    }
+  });
 });
 
 // ---- Boot ----
 initAuthForm();
 wireStudentControls();
-await loadAndMergeCustomLectures(); // pull in any admin-added lectures before the first render
+await loadAndMergeCustomLectures(); 
 
 onAuthStateChanged(auth, async (user) => {
   if (user){
@@ -92,7 +95,9 @@ onAuthStateChanged(auth, async (user) => {
   } else {
     document.getElementById('appShell').style.display = 'none';
     document.getElementById('whoamiBar').style.display = 'none';
+    
     if(document.getElementById('settingsCapsule')) document.getElementById('settingsCapsule').style.display = 'none';
+    
     showAuthOverlay();
   }
 });
