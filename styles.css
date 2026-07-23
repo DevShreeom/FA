@@ -22,6 +22,27 @@
   --pyq: #d9914c; --pyq-dim: #fcf4ec; 
 }
 
+/* --- OCEAN THEME (Deep Slate & Blue/Purple) --- */
+:root[data-theme="ocean"] {
+  --bg: #0f172a; --panel: #1e293b; --panel-2: #334155; --border: #475569;
+  --text: #f8fafc; --muted: #94a3b8; --accent: #3b82f6; --accent-dim: #1e3a8a;
+  --pyq: #a855f7; --pyq-dim: #3b0764; 
+}
+
+/* --- CRIMSON THEME (Intense Dark Red & Orange) --- */
+:root[data-theme="crimson"] {
+  --bg: #1a0f0f; --panel: #261414; --panel-2: #331c1c; --border: #4d2b2b;
+  --text: #fce8e8; --muted: #b38282; --accent: #ef4444; --accent-dim: #451212;
+  --pyq: #f97316; --pyq-dim: #431d04; 
+}
+
+/* --- CYBER THEME (Pitch Black & Neon Green) --- */
+:root[data-theme="cyber"] {
+  --bg: #09090b; --panel: #18181b; --panel-2: #27272a; --border: #3f3f46;
+  --text: #f4f4f5; --muted: #a1a1aa; --accent: #10b981; --accent-dim: #022c22;
+  --pyq: #eab308; --pyq-dim: #422006; 
+}
+
 * { box-sizing: border-box; }
 html,body { margin:0; padding:0; background: var(--bg); color: var(--text); font-family: var(--font-body); transition: background 0.3s ease, color 0.3s ease; }
 
