@@ -35,6 +35,7 @@ async function loadMyData(){
         theory: d.theory || {}, 
         pyq: d.pyq || {}, 
         selfcheck: d.selfcheck || {}, 
+        notes: d.notes || {}, // <--- THIS IS THE MAGIC FIX
         updatedAt: d.updatedAt || null, 
         username: d.username || myUsername, 
         displayName: d.displayName || null,
