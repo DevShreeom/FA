@@ -448,4 +448,134 @@ export async function updateLiveOnlineCount() {
     capsuleText.textContent = `1 online`; // Silent fallback
   }
 }
+
 export function getCurrentUser(){ return currentUser; }
+
+// ==========================================
+// === THE NEW REVISION NOTES ENGINE ========
+// ==========================================
+
+export function buildNotesView() {
+  const container = document.getElementById('notesContainer');
+  const searchInput = document.getElementById('notesSearch');
+  if(!container || !searchInput) return;
+  
+  const queryStr = searchInput.value.toLowerCase();
+  container.innerHTML = '';
+
+  ORDER.forEach((ch, i) => {
+    const chData = CHAPTER_DATA[ch];
+    const chapterEl = document.createElement('div');
+    chapterEl.className = 'chapter';
+    
+    const head = document.createElement('div');
+    head.className = 'chapter-head';
+    head.innerHTML = `<div class="chapter-title"><span class="chapter-num">${fmtChapterNum(i)}</span><span class="chapter-name">${ch}</span></div><div class="chevron">▶</div>`;
+    head.addEventListener('click', () => chapterEl.classList.toggle('open'));
+    
+    const body = document.createElement('div');
+    body.className = 'chapter-body notes-body';
+    let hasVisibleNotes = false;
+
+    const renderVids = (vids, label) => {
+      if(vids.length === 0) return;
+      
+      const vidsWrapper = document.createElement('div');
+      let vidsAdded = 0;
+      
+      vids.forEach(vid => {
+        const vidId = idFor(vid.url);
+        const vidNotes = myData.notes[vidId] || Array(10).fill({time:'', text:''});
+        
+        // Universal Search filter
+        const matchesSearch = queryStr === '' || vid.title.toLowerCase().includes(queryStr) || vidNotes.some(n => n.text.toLowerCase().includes(queryStr));
+        if(!matchesSearch) return;
+
+        vidsAdded++;
+        hasVisibleNotes = true;
+
+        const vRow = document.createElement('div');
+        vRow.className = 'note-video-row';
+        vRow.innerHTML = `<div class="note-vid-title"><a href="${vid.url}" target="_blank">${vid.title}</a></div><div class="note-slots"></div>`;
+        const slotsContainer = vRow.querySelector('.note-slots');
+
+        for(let j=0; j<10; j++) {
+          const slot = document.createElement('div');
+          slot.className = 'note-slot';
+          const nData = vidNotes[j] || {time:'', text:''};
+          
+          slot.innerHTML = `
+            <div class="note-slot-inputs">
+              <input type="text" class="note-time" placeholder="HH:MM:SS" value="${nData.time}" maxlength="8">
+              <input type="text" class="note-text" placeholder="Add footnote here..." value="${nData.text}">
+            </div>
+            <div class="note-actions">
+              <button class="note-jump" title="Jump to Timestamp" ${!nData.time ? 'disabled' : ''}>▶ Jump</button>
+              <button class="note-clear" title="Clear Slot">✖</button>
+            </div>
+          `;
+
+          const timeIn = slot.querySelector('.note-time');
+          const textIn = slot.querySelector('.note-text');
+          const jumpBtn = slot.querySelector('.note-jump');
+          const clearBtn = slot.querySelector('.note-clear');
+
+          const saveSlot = () => {
+            let t = timeIn.value.trim();
+            // SMART FORMATTING: Auto-inserts colons!
+            if(t.length === 6 && !t.includes(':') && !isNaN(t)) t = `${t.slice(0,2)}:${t.slice(2,4)}:${t.slice(4,6)}`;
+            else if(t.length === 4 && !t.includes(':') && !isNaN(t)) t = `${t.slice(0,2)}:${t.slice(2,4)}`;
+            timeIn.value = t;
+            
+            jumpBtn.disabled = !t;
+
+            const newNotes = [...(myData.notes[vidId] || Array(10).fill({time:'', text:''}))];
+            newNotes[j] = { time: t, text: textIn.value.trim() };
+            myData.notes[vidId] = newNotes;
+
+            writeField('notes.' + vidId, newNotes); // Debounced Firebase Save
+          };
+
+          timeIn.addEventListener('blur', saveSlot);
+          textIn.addEventListener('blur', saveSlot);
+
+          jumpBtn.addEventListener('click', () => {
+            let t = timeIn.value.trim();
+            let parts = t.split(':').reverse();
+            let secs = 0;
+            if(parts[0]) secs += parseInt(parts[0]);
+            if(parts[1]) secs += parseInt(parts[1]) * 60;
+            if(parts[2]) secs += parseInt(parts[2]) * 3600;
+            window.open(vid.url + '&t=' + secs + 's', '_blank');
+          });
+
+          clearBtn.addEventListener('click', () => { timeIn.value = ''; textIn.value = ''; saveSlot(); });
+          slotsContainer.appendChild(slot);
+        }
+        vidsWrapper.appendChild(vRow);
+      });
+
+      if(vidsAdded > 0) {
+        const lbl = document.createElement('div'); lbl.className = 'section-label'; lbl.textContent = label;
+        body.appendChild(lbl);
+        body.appendChild(vidsWrapper);
+      }
+    };
+
+    renderVids(chData.fs, 'One-shot lecture(s)');
+    renderVids(chData.pyq, 'PYQ practice');
+
+    if(hasVisibleNotes) {
+      if (queryStr !== '') chapterEl.classList.add('open');
+      chapterEl.appendChild(head);
+      chapterEl.appendChild(body);
+      container.appendChild(chapterEl);
+    }
+  });
+}
+
+// Make search live
+document.addEventListener('DOMContentLoaded', () => {
+  const notesSearch = document.getElementById('notesSearch');
+  if(notesSearch) notesSearch.addEventListener('input', () => { clearTimeout(notesSearch.timer); notesSearch.timer = setTimeout(buildNotesView, 300); });
+});
