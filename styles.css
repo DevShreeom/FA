@@ -410,12 +410,19 @@ body.dock-mode .nav-icon svg { width: 22px !important; height: 22px !important; 
     font-size: 0.95rem !important;
   }
 
-  /* 5. Header / Theme Toggle Alignment */
+/* 5. Header / Theme Toggle & Live Capsule Alignment */
   header {
     flex-wrap: nowrap !important;
-    justify-content: space-between !important;
+    gap: 8px !important;
   }
   .whoami {
-    margin-right: auto !important; /* Pushes theme toggle to the far right */
+    margin-right: auto !important; /* Pushes the capsule and toggle to the right */
+    max-width: 50% !important; /* Prevents long names from breaking the layout */
+    overflow: hidden !important;
   }
-}
+  #liveOnlineCapsule {
+    width: auto !important; /* Kills the old 100% width rule */
+    margin: 0 !important;
+    padding: 4px 10px !important;
+    white-space: nowrap !important;
+  }
