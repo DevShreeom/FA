@@ -269,11 +269,11 @@ function buildChapters(){
     body.className = 'chapter-body';
 
     const fsLabel = document.createElement('div'); fsLabel.className = 'section-label fs'; fsLabel.textContent = 'One-shot lecture(s)'; body.appendChild(fsLabel);
-    if (chData.fs.length === 0){ body.innerHTML += '<div class="empty-note">No one-shot lecture found for this chapter - source elsewhere.</div>'; } 
+    if (chData.fs.length === 0){ body.insertAdjacentHTML('beforeend', '<div class="empty-note">No one-shot lecture found for this chapter - source elsewhere.</div>'); }
     else { chData.fs.forEach(item => body.appendChild(renderVideoRow(item, 'fs'))); }
 
     const pyqLabel = document.createElement('div'); pyqLabel.className = 'section-label pyq'; pyqLabel.textContent = 'PYQ practice'; body.appendChild(pyqLabel);
-    if (chData.pyq.length === 0){ body.innerHTML += '<div class="empty-note">No dedicated PYQ video for this chapter in the library.</div>'; } 
+    if (chData.pyq.length === 0){ body.insertAdjacentHTML('beforeend', '<div class="empty-note">No dedicated PYQ video for this chapter in the library.</div>'); }
     else { chData.pyq.forEach(item => body.appendChild(renderVideoRow(item, 'pyq'))); }
 
     body.appendChild(renderSelfCheck(ch));
