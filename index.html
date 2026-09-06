@@ -101,6 +101,17 @@
       </button>
     </header>
 
+<!-- INJECT THIS RIGHT ABOVE <section id="sectionDashboard"> -->
+<div id="integratedPlayerWrapper">
+  <div class="player-header">
+    <h3 id="nowPlayingTitle" class="player-title">Loading...</h3>
+    <button id="closePlayerBtn" class="close-player-btn">Close Video</button>
+  </div>
+  <div class="iframe-container">
+    <iframe id="youtubeIframe" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+  </div>
+</div>
+
     <section id="sectionDashboard" class="content-section active">
       <div class="stat-grid">
         <div class="stat-box"><div class="num" id="statOverallNum">0%</div><div class="lbl">Overall complete</div></div>
@@ -212,7 +223,14 @@
         <option value="Dropper">Dropper</option>
       </select></div>
       <div><label style="font-size:0.8rem; color:var(--muted);">Telegram Handle (Optional)</label><br><input type="text" id="setTelegram" placeholder="@username" style="width:100%; box-sizing:border-box; padding: 10px; border-radius: 8px; background: var(--panel); border: 1px solid var(--border); color: var(--text); margin-top:4px;"></div>
-      
+      <div>
+      <label style="font-size:0.8rem; color:var(--muted);">Video Playback</label><br>
+      <select id="setVideoPlayer" style="width:100%; box-sizing:border-box; padding: 10px; border-radius: 8px; background: var(--panel); border: 1px solid var(--border); color: var(--text); margin-top:4px;">
+    <option value="inline">Play inline (Dashboard Player)</option>
+      <option value="youtube">Open in YouTube (New Tab)</option>
+       </select>
+      </div>
+
       <div><label style="font-size:0.8rem; color:var(--muted);">PC Navigation Style</label><br><select id="setNavStyle" style="width:100%; box-sizing:border-box; padding: 10px; border-radius: 8px; background: var(--panel); border: 1px solid var(--border); color: var(--text); margin-top:4px;">
         <option value="sidebar">Classic Sidebar</option>
         <option value="dock">Dock</option>
