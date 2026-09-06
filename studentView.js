@@ -35,13 +35,12 @@ async function loadMyData(){
         theory: d.theory || {}, 
         pyq: d.pyq || {}, 
         selfcheck: d.selfcheck || {}, 
-        notes: d.notes || {}, // <--- THIS IS THE MAGIC FIX
+        notes: d.notes || {}, 
         updatedAt: d.updatedAt || null, 
         username: d.username || myUsername, 
         displayName: d.displayName || null,
         targetDate: d.targetDate || null,
         totalDone: d.totalDone !== undefined ? d.totalDone : undefined,
-        // NEW PROFILE FIELDS
         grade: d.grade || '',
         telegram: d.telegram || '',
         isPublic: d.isPublic || false
@@ -58,8 +57,9 @@ async function loadMyData(){
 function writeField(fieldPath, value){
   const statusEl = document.getElementById('statusMsg');
   if (statusEl) statusEl.textContent = 'Saving...';
+  
   clearTimeout(pendingWrites[fieldPath]);
-  pendingWrites[fieldPath] = setTimeout(async () => {
+  pendingWrites[fieldPath] = setTimeout(() => {
     const ref = doc(db, 'students', currentUser.uid);
     const totalDone = computeDoneTheory() + computeDonePyq();
     myData.totalDone = totalDone;
@@ -71,20 +71,23 @@ function writeField(fieldPath, value){
       username: myUsername 
     };
 
-    try {
-      await updateDoc(ref, payload);
-      if (statusEl) statusEl.textContent = 'Saved';
-    } catch(e){
-      try {
-        await setDoc(ref, payload, { merge: true });
-        if (statusEl) statusEl.textContent = 'Saved';
-      } catch(e2){
-        if (statusEl) statusEl.textContent = 'Save failed - check connection';
-      }
+    // 1. Optimistic UI: Immediately show success so it never gets stuck
+    if (statusEl) {
+      statusEl.textContent = 'Saved';
+      // Optional: Clear the message after 2 seconds to keep the header clean
+      setTimeout(() => { 
+        if (statusEl.textContent === 'Saved') statusEl.textContent = ''; 
+      }, 2000); 
     }
+
+    // 2. Fire-and-forget Database Sync (No 'await' to freeze the thread)
+    updateDoc(ref, payload).catch(() => {
+      setDoc(ref, payload, { merge: true }).catch(() => {
+        if (statusEl) statusEl.textContent = 'Offline (Saved Locally)';
+      });
+    });
   }, 400);
 }
-
 function nextStatus(current, clicked){
   if (current === clicked) return 'none';
   return clicked;
@@ -293,6 +296,13 @@ export function wireStudentControls(){
     document.querySelectorAll('.chapter').forEach(el => { el.style.display = el.dataset.chapter.toLowerCase().includes(q) ? '' : 'none'; });
   });
 
+  // Load Initial Preferences
+  const videoDropdown = document.getElementById('setVideoPlayer');
+  if(videoDropdown) videoDropdown.value = localStorage.getItem('jee_tracker_player') || 'inline';
+
+  const navDropdown = document.getElementById('setNavStyle');
+  if(navDropdown) navDropdown.value = localStorage.getItem('jee_tracker_nav') || 'sidebar';
+
   // Settings Modal Logic
   const overlay = document.getElementById('modalOverlay');
   const settingsModal = document.getElementById('settingsModal');
@@ -303,27 +313,21 @@ export function wireStudentControls(){
     settingsModal.style.display = 'block';
     cardModal.style.display = 'none';
     
-    // Load existing profile data
     document.getElementById('setDisplayName').value = myData.displayName || '';
     document.getElementById('setGrade').value = myData.grade || '';
     document.getElementById('setTelegram').value = myData.telegram || '';
     document.getElementById('setIsPublic').checked = myData.isPublic || false;
-    
-    // Load existing Dock preference
-    const navDropdown = document.getElementById('setNavStyle');
-    if(navDropdown) navDropdown.value = localStorage.getItem('jee_tracker_nav') || 'sidebar';
   }
 
-  // 1. Profile "(edit)" button
-  document.getElementById('editNameBtn').addEventListener('click', openSettings);
+  const editNameBtn = document.getElementById('editNameBtn');
+  if(editNameBtn) editNameBtn.addEventListener('click', openSettings);
   
-  // 2. Old floating profile button (Sidebar mode)
-  if(document.getElementById('settingsCapsule')) document.getElementById('settingsCapsule').addEventListener('click', openSettings);
+  const settingsCap = document.getElementById('settingsCapsule');
+  if(settingsCap) settingsCap.addEventListener('click', openSettings);
   
-  // 3. NEW: The Glass Dock Settings Button!
-  if(document.getElementById('dockSettingsBtn')) document.getElementById('dockSettingsBtn').addEventListener('click', openSettings);
+  const dockSetBtn = document.getElementById('dockSettingsBtn');
+  if(dockSetBtn) dockSetBtn.addEventListener('click', openSettings);
 
-  // Close modal listeners
   document.querySelectorAll('.close-modal').forEach(btn => {
     btn.addEventListener('click', () => { overlay.style.display = 'none'; settingsModal.style.display = 'none'; cardModal.style.display = 'none'; });
   });
@@ -332,68 +336,101 @@ export function wireStudentControls(){
     if(e.target === overlay) { overlay.style.display = 'none'; settingsModal.style.display = 'none'; cardModal.style.display = 'none'; }
   });
 
-  // Bulletproof Save Button Logic
-  document.getElementById('saveSettingsBtn').addEventListener('click', async () => {
-    const btn = document.getElementById('saveSettingsBtn');
-    btn.textContent = 'Saving...';
-    btn.disabled = true; // Prevent spam-clicking
-    
-    const newName = document.getElementById('setDisplayName').value.trim();
-    const newGrade = document.getElementById('setGrade').value;
-    const newTele = document.getElementById('setTelegram').value.trim();
-    const newPub = document.getElementById('setIsPublic').checked;
+  // FIRE-AND-FORGET SAVE BUTTON
+  const saveBtn = document.getElementById('saveSettingsBtn');
+  if(saveBtn) {
+    saveBtn.addEventListener('click', () => {
+      saveBtn.textContent = 'Saving...';
+      saveBtn.disabled = true;
+      
+      const newName = document.getElementById('setDisplayName').value.trim();
+      const newGrade = document.getElementById('setGrade').value;
+      const newTele = document.getElementById('setTelegram').value.trim();
+      const newPub = document.getElementById('setIsPublic').checked;
 
-    // --- SAVE DOCK PREFERENCE ---
-    const navDropdown = document.getElementById('setNavStyle');
-    if (navDropdown) {
-      const newNav = navDropdown.value;
-      localStorage.setItem('jee_tracker_nav', newNav);
-      if (newNav === 'dock') document.body.classList.add('dock-mode'); 
-      else document.body.classList.remove('dock-mode');
-    }
-    // ----------------------------
+      if (videoDropdown) localStorage.setItem('jee_tracker_player', videoDropdown.value);
+      if (navDropdown) {
+        localStorage.setItem('jee_tracker_nav', navDropdown.value);
+        if (navDropdown.value === 'dock') document.body.classList.add('dock-mode'); 
+        else document.body.classList.remove('dock-mode');
+      }
 
-    // 1. Update local data instantly
-    myData.displayName = newName;
-    myData.grade = newGrade;
-    myData.telegram = newTele;
-    myData.isPublic = newPub;
+      // UI update instantly
+      myData.displayName = newName;
+      myData.grade = newGrade;
+      myData.telegram = newTele;
+      myData.isPublic = newPub;
+      document.getElementById('whoamiName').textContent = newName || myUsername;
+      
+      const banner = document.getElementById('displayNameBanner');
+      if (banner) banner.style.display = 'none';
 
-    // 2. Update the UI instantly so it feels lightning fast
-    document.getElementById('whoamiName').textContent = newName || myUsername;
-    const banner = document.getElementById('displayNameBanner');
-    if (banner) banner.style.display = 'none';
-
-    const ref = doc(db, 'students', currentUser.uid);
-    
-    try {
-      // 3. Send to Firebase
-      await setDoc(ref, {
+      // Background Firebase save (does not freeze UI)
+      const ref = doc(db, 'students', currentUser.uid);
+      setDoc(ref, {
         displayName: newName,
         grade: newGrade,
         telegram: newTele,
         isPublic: newPub,
         updatedAt: new Date().toISOString()
-      }, { merge: true });
+      }, { merge: true }).catch(console.error);
 
-      btn.textContent = 'Saved!';
-      
-    } catch (error) {
-      console.error("Save error:", error);
-      btn.textContent = 'Error!';
-    } finally {
-      // 4. THIS ALWAYS RUNS! No more stuck buttons.
+      // Close instantly
       setTimeout(() => {
-        document.getElementById('modalOverlay').style.display = 'none';
-        document.getElementById('settingsModal').style.display = 'none';
-        btn.textContent = 'Save Profile';
-        btn.disabled = false;
-      }, 600);
+        overlay.style.display = 'none';
+        settingsModal.style.display = 'none';
+        saveBtn.textContent = 'Save Profile';
+        saveBtn.disabled = false;
+      }, 300);
+    });
+  }
+
+  // Custom Video Player Interceptor
+  const playerWrapper = document.getElementById('integratedPlayerWrapper');
+  const iframe = document.getElementById('youtubeIframe');
+  const titleEl = document.getElementById('nowPlayingTitle');
+  const closeBtn = document.getElementById('closePlayerBtn');
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      iframe.src = ''; 
+      if(playerWrapper) playerWrapper.style.display = 'none'; 
+      document.body.classList.remove('video-mode-active');
+    });
+  }
+
+  document.addEventListener('click', function(e) {
+    const link = e.target.closest('a');
+    if (!link) return;
+
+    const href = link.getAttribute('href');
+    if (href && (href.includes('youtube.com') || href.includes('youtu.be'))) {
+      const playerPref = localStorage.getItem('jee_tracker_player') || 'inline';
+      
+      if (playerPref === 'youtube') {
+        link.setAttribute('target', '_blank');
+        return; 
+      }
+
+      e.preventDefault(); 
+      let videoId = '';
+      if (href.includes('youtu.be/')) videoId = href.split('youtu.be/')[1].split('?')[0];
+      else if (href.includes('youtube.com/watch')) videoId = new URL(href).searchParams.get('v');
+      
+      if (videoId) {
+        iframe.src = `https://www.youtube.com/embed/${videoId}?rel=0&autoplay=1`;
+        titleEl.textContent = link.textContent || 'Playing Video';
+        
+        document.body.classList.add('video-mode-active');
+        
+        if(playerWrapper) {
+          playerWrapper.style.display = 'block';
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }
     }
   });
 }
-
-
 export async function startStudentSession(user){
   currentUser = user;
   myUsername = (user.email || '').split('@')[0];
@@ -432,22 +469,13 @@ export async function updateLiveOnlineCount() {
   if (!capsuleText) return;
 
   try {
-    // Calculate the time exactly 60 minutes ago
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-    
-    // Query Firestore
     const activeQuery = query(collection(db, 'students'), where('updatedAt', '>=', oneHourAgo));
-    
-    // 🔥 THE MAGIC BULLET: getCountFromServer only costs 1 single read!
     const snapshot = await getCountFromServer(activeQuery);
-    
-    // Fallback to at least 1 (themselves)
     const activeCount = Math.max(1, snapshot.data().count); 
-    
     capsuleText.textContent = `${activeCount} online`;
   } catch (error) {
-    console.error("Could not fetch live count:", error);
-    capsuleText.textContent = `1 online`; // Silent fallback
+    capsuleText.textContent = `1 online`;
   }
 }
 
@@ -489,7 +517,6 @@ export function buildNotesView() {
         const vidId = idFor(vid.url);
         const vidNotes = myData.notes[vidId] || Array(10).fill({time:'', text:''});
         
-        // Universal Search filter
         const matchesSearch = queryStr === '' || vid.title.toLowerCase().includes(queryStr) || vidNotes.some(n => n.text.toLowerCase().includes(queryStr));
         if(!matchesSearch) return;
 
@@ -524,7 +551,6 @@ export function buildNotesView() {
 
           const saveSlot = () => {
             let t = timeIn.value.trim();
-            // SMART FORMATTING: Auto-inserts colons!
             if(t.length === 6 && !t.includes(':') && !isNaN(t)) t = `${t.slice(0,2)}:${t.slice(2,4)}:${t.slice(4,6)}`;
             else if(t.length === 4 && !t.includes(':') && !isNaN(t)) t = `${t.slice(0,2)}:${t.slice(2,4)}`;
             timeIn.value = t;
@@ -535,7 +561,7 @@ export function buildNotesView() {
             newNotes[j] = { time: t, text: textIn.value.trim() };
             myData.notes[vidId] = newNotes;
 
-            writeField('notes.' + vidId, newNotes); // Debounced Firebase Save
+            writeField('notes.' + vidId, newNotes); 
           };
 
           timeIn.addEventListener('blur', saveSlot);
@@ -548,7 +574,27 @@ export function buildNotesView() {
             if(parts[0]) secs += parseInt(parts[0]);
             if(parts[1]) secs += parseInt(parts[1]) * 60;
             if(parts[2]) secs += parseInt(parts[2]) * 3600;
-            window.open(vid.url + '&t=' + secs + 's', '_blank');
+            
+            const playerPref = localStorage.getItem('jee_tracker_player') || 'inline';
+            
+            if (playerPref === 'youtube') {
+              window.open(vid.url + '&t=' + secs + 's', '_blank');
+              return;
+            }
+
+            const playerWrapper = document.getElementById('integratedPlayerWrapper');
+            const iframe = document.getElementById('youtubeIframe');
+            const titleEl = document.getElementById('nowPlayingTitle');
+            
+            iframe.src = `https://www.youtube.com/embed/${vidId}?rel=0&autoplay=1&start=${secs}`;
+            titleEl.textContent = `Jumped to ${t} - ${vid.title}`;
+            
+            document.body.classList.add('video-mode-active');
+            
+            if (playerWrapper) {
+              playerWrapper.style.display = 'block';
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
           });
 
           clearBtn.addEventListener('click', () => { timeIn.value = ''; textIn.value = ''; saveSlot(); });
@@ -576,7 +622,6 @@ export function buildNotesView() {
   });
 }
 
-// Make search live
 document.addEventListener('DOMContentLoaded', () => {
   const notesSearch = document.getElementById('notesSearch');
   if(notesSearch) notesSearch.addEventListener('input', () => { clearTimeout(notesSearch.timer); notesSearch.timer = setTimeout(buildNotesView, 300); });
