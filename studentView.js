@@ -71,16 +71,13 @@ function writeField(fieldPath, value){
       username: myUsername 
     };
 
-    // 1. Optimistic UI: Immediately show success so it never gets stuck
     if (statusEl) {
       statusEl.textContent = 'Saved';
-      // Optional: Clear the message after 2 seconds to keep the header clean
       setTimeout(() => { 
         if (statusEl.textContent === 'Saved') statusEl.textContent = ''; 
       }, 2000); 
     }
 
-    // 2. Fire-and-forget Database Sync (No 'await' to freeze the thread)
     updateDoc(ref, payload).catch(() => {
       setDoc(ref, payload, { merge: true }).catch(() => {
         if (statusEl) statusEl.textContent = 'Offline (Saved Locally)';
@@ -88,6 +85,7 @@ function writeField(fieldPath, value){
     });
   }, 400);
 }
+
 function nextStatus(current, clicked){
   if (current === clicked) return 'none';
   return clicked;
@@ -296,14 +294,9 @@ export function wireStudentControls(){
     document.querySelectorAll('.chapter').forEach(el => { el.style.display = el.dataset.chapter.toLowerCase().includes(q) ? '' : 'none'; });
   });
 
-  // Load Initial Preferences
-  const videoDropdown = document.getElementById('setVideoPlayer');
-  if(videoDropdown) videoDropdown.value = localStorage.getItem('jee_tracker_player') || 'inline';
-
   const navDropdown = document.getElementById('setNavStyle');
   if(navDropdown) navDropdown.value = localStorage.getItem('jee_tracker_nav') || 'sidebar';
 
-  // Settings Modal Logic
   const overlay = document.getElementById('modalOverlay');
   const settingsModal = document.getElementById('settingsModal');
   const cardModal = document.getElementById('studentCardModal');
@@ -336,7 +329,6 @@ export function wireStudentControls(){
     if(e.target === overlay) { overlay.style.display = 'none'; settingsModal.style.display = 'none'; cardModal.style.display = 'none'; }
   });
 
-  // FIRE-AND-FORGET SAVE BUTTON
   const saveBtn = document.getElementById('saveSettingsBtn');
   if(saveBtn) {
     saveBtn.addEventListener('click', () => {
@@ -348,14 +340,12 @@ export function wireStudentControls(){
       const newTele = document.getElementById('setTelegram').value.trim();
       const newPub = document.getElementById('setIsPublic').checked;
 
-      if (videoDropdown) localStorage.setItem('jee_tracker_player', videoDropdown.value);
       if (navDropdown) {
         localStorage.setItem('jee_tracker_nav', navDropdown.value);
         if (navDropdown.value === 'dock') document.body.classList.add('dock-mode'); 
         else document.body.classList.remove('dock-mode');
       }
 
-      // UI update instantly
       myData.displayName = newName;
       myData.grade = newGrade;
       myData.telegram = newTele;
@@ -365,7 +355,6 @@ export function wireStudentControls(){
       const banner = document.getElementById('displayNameBanner');
       if (banner) banner.style.display = 'none';
 
-      // Background Firebase save (does not freeze UI)
       const ref = doc(db, 'students', currentUser.uid);
       setDoc(ref, {
         displayName: newName,
@@ -375,7 +364,6 @@ export function wireStudentControls(){
         updatedAt: new Date().toISOString()
       }, { merge: true }).catch(console.error);
 
-      // Close instantly
       setTimeout(() => {
         overlay.style.display = 'none';
         settingsModal.style.display = 'none';
@@ -384,53 +372,8 @@ export function wireStudentControls(){
       }, 300);
     });
   }
-
-  // Custom Video Player Interceptor
-  const playerWrapper = document.getElementById('integratedPlayerWrapper');
-  const iframe = document.getElementById('youtubeIframe');
-  const titleEl = document.getElementById('nowPlayingTitle');
-  const closeBtn = document.getElementById('closePlayerBtn');
-
-  if (closeBtn) {
-    closeBtn.addEventListener('click', () => {
-      iframe.src = ''; 
-      if(playerWrapper) playerWrapper.style.display = 'none'; 
-      document.body.classList.remove('video-mode-active');
-    });
-  }
-
-  document.addEventListener('click', function(e) {
-    const link = e.target.closest('a');
-    if (!link) return;
-
-    const href = link.getAttribute('href');
-    if (href && (href.includes('youtube.com') || href.includes('youtu.be'))) {
-      const playerPref = localStorage.getItem('jee_tracker_player') || 'inline';
-      
-      if (playerPref === 'youtube') {
-        link.setAttribute('target', '_blank');
-        return; 
-      }
-
-      e.preventDefault(); 
-      let videoId = '';
-      if (href.includes('youtu.be/')) videoId = href.split('youtu.be/')[1].split('?')[0];
-      else if (href.includes('youtube.com/watch')) videoId = new URL(href).searchParams.get('v');
-      
-      if (videoId) {
-        iframe.src = `https://www.youtube.com/embed/${videoId}?rel=0&autoplay=1`;
-        titleEl.textContent = link.textContent || 'Playing Video';
-        
-        document.body.classList.add('video-mode-active');
-        
-        if(playerWrapper) {
-          playerWrapper.style.display = 'block';
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-      }
-    }
-  });
 }
+
 export async function startStudentSession(user){
   currentUser = user;
   myUsername = (user.email || '').split('@')[0];
@@ -480,10 +423,6 @@ export async function updateLiveOnlineCount() {
 }
 
 export function getCurrentUser(){ return currentUser; }
-
-// ==========================================
-// === THE NEW REVISION NOTES ENGINE ========
-// ==========================================
 
 export function buildNotesView() {
   const container = document.getElementById('notesContainer');
@@ -575,26 +514,7 @@ export function buildNotesView() {
             if(parts[1]) secs += parseInt(parts[1]) * 60;
             if(parts[2]) secs += parseInt(parts[2]) * 3600;
             
-            const playerPref = localStorage.getItem('jee_tracker_player') || 'inline';
-            
-            if (playerPref === 'youtube') {
-              window.open(vid.url + '&t=' + secs + 's', '_blank');
-              return;
-            }
-
-            const playerWrapper = document.getElementById('integratedPlayerWrapper');
-            const iframe = document.getElementById('youtubeIframe');
-            const titleEl = document.getElementById('nowPlayingTitle');
-            
-            iframe.src = `https://www.youtube.com/embed/${vidId}?rel=0&autoplay=1&start=${secs}`;
-            titleEl.textContent = `Jumped to ${t} - ${vid.title}`;
-            
-            document.body.classList.add('video-mode-active');
-            
-            if (playerWrapper) {
-              playerWrapper.style.display = 'block';
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
+            window.open(vid.url + '&t=' + secs + 's', '_blank');
           });
 
           clearBtn.addEventListener('click', () => { timeIn.value = ''; textIn.value = ''; saveSlot(); });
