@@ -224,15 +224,17 @@ function renderQotdCard(){
   const video = qotdRanked[qotdIndex % qotdRanked.length];
   
   qotdEl.innerHTML = `
-    <div class="widget-meta">Based on: ${qotdChapterName}</div>
-    <div class="widget-title">${video.title}</div>
-    <div class="qotd-footer" style="margin-top: auto; display: flex; justify-content: space-between; align-items: center; width: 100%;">
+    <a href="${video.url}" target="_blank" style="text-decoration:none; display:flex; flex-direction:column; gap:8px; flex-grow:1; cursor:pointer;">
+      <div class="widget-meta">Based on: ${qotdChapterName}</div>
+      <div class="widget-title" style="color: var(--accent); transition: 0.2s;">${video.title}</div>
+    </a>
+    <div class="qotd-footer" style="margin-top: auto; display: flex; justify-content: space-between; align-items: center; width: 100%; padding-top: 12px;">
       <span class="widget-meta">${video.duration}</span>
-      ${qotdRanked.length > 1 ? '<button id="qotdAnotherBtn" class="widget-btn" style="padding: 4px 10px; font-size: 0.7rem;">🔀 Next</button>' : ''}
+      ${qotdRanked.length > 1 ? '<button id="qotdAnotherBtn" class="qotd-another" style="position:relative; z-index:2;">🔀 Next</button>' : ''}
     </div>
   `;
   const btn = document.getElementById('qotdAnotherBtn');
-  if (btn) btn.addEventListener('click', () => { qotdIndex++; renderQotdCard(); });
+  if (btn) btn.addEventListener('click', (e) => { e.preventDefault(); qotdIndex++; renderQotdCard(); });
 }
 
 let qotdChapterName = '';
@@ -294,8 +296,13 @@ export function wireStudentControls(){
     document.querySelectorAll('.chapter').forEach(el => { el.style.display = el.dataset.chapter.toLowerCase().includes(q) ? '' : 'none'; });
   });
 
+  // RESTORE DOCK LOGIC ON LOAD
   const navDropdown = document.getElementById('setNavStyle');
-  if(navDropdown) navDropdown.value = localStorage.getItem('jee_tracker_nav') || 'sidebar';
+  if(navDropdown) {
+    const savedNav = localStorage.getItem('jee_tracker_nav') || 'sidebar';
+    navDropdown.value = savedNav;
+    if (savedNav === 'dock') document.body.classList.add('dock-mode');
+  }
 
   const overlay = document.getElementById('modalOverlay');
   const settingsModal = document.getElementById('settingsModal');
@@ -340,6 +347,10 @@ export function wireStudentControls(){
       const newTele = document.getElementById('setTelegram').value.trim();
       const newPub = document.getElementById('setIsPublic').checked;
 
+      const videoDropdown = document.getElementById('setVideoPlayer');
+      if (videoDropdown) localStorage.setItem('jee_tracker_player', videoDropdown.value);
+
+      // RESTORE DOCK LOGIC ON SAVE
       if (navDropdown) {
         localStorage.setItem('jee_tracker_nav', navDropdown.value);
         if (navDropdown.value === 'dock') document.body.classList.add('dock-mode'); 
@@ -423,6 +434,10 @@ export async function updateLiveOnlineCount() {
 }
 
 export function getCurrentUser(){ return currentUser; }
+
+// ==========================================
+// === THE NEW REVISION NOTES ENGINE ========
+// ==========================================
 
 export function buildNotesView() {
   const container = document.getElementById('notesContainer');
@@ -545,4 +560,96 @@ export function buildNotesView() {
 document.addEventListener('DOMContentLoaded', () => {
   const notesSearch = document.getElementById('notesSearch');
   if(notesSearch) notesSearch.addEventListener('input', () => { clearTimeout(notesSearch.timer); notesSearch.timer = setTimeout(buildNotesView, 300); });
+});
+
+// ==========================================
+// === PC FOCUS TOOLS (POMO & STICKY) =======
+// ==========================================
+
+document.addEventListener('DOMContentLoaded', () => {
+  const minimizeBtn = document.getElementById('minimizeToolsBtn');
+  const showPillBtn = document.getElementById('showToolsPill');
+  
+  // Load saved preference
+  if (localStorage.getItem('jee_tracker_tools_min') === 'true') {
+    document.body.classList.add('tools-minimized');
+  }
+
+  const toggleTools = () => {
+    document.body.classList.toggle('tools-minimized');
+    const isMin = document.body.classList.contains('tools-minimized');
+    localStorage.setItem('jee_tracker_tools_min', isMin);
+  };
+
+  if (minimizeBtn) minimizeBtn.addEventListener('click', toggleTools);
+  if (showPillBtn) showPillBtn.addEventListener('click', toggleTools);
+
+  // Sticky Note Local Save
+  const sticky = document.getElementById('m3StickyNote');
+  if (sticky) {
+    sticky.value = localStorage.getItem('jee_tracker_sticky') || '';
+    sticky.addEventListener('input', () => localStorage.setItem('jee_tracker_sticky', sticky.value));
+  }
+
+// Pomodoro Logic with Smooth Ring
+  const pomoDisplay = document.getElementById('pomoTimer');
+  const pomoStart = document.getElementById('pomoStart');
+  const pomoAdd = document.getElementById('pomoAdd');
+  const pomoReset = document.getElementById('pomoReset');
+  const pomoRing = document.getElementById('pomoRing');
+  
+  let baseTime = 25 * 60;
+  let pomoTime = baseTime; 
+  let pomoInt = null; 
+  let isPomoRunning = false;
+
+  function updatePomoDisplay() {
+    if (!pomoDisplay) return;
+    const m = String(Math.floor(pomoTime / 60)).padStart(2, '0');
+    const s = String(pomoTime % 60).padStart(2, '0');
+    pomoDisplay.textContent = `${m}:${s}`;
+    
+    if (pomoRing) {
+      const progress = pomoTime / baseTime;
+      // 283 is the circumference of the circle (2 * pi * 45)
+      pomoRing.style.strokeDashoffset = 283 - (283 * progress); 
+    }
+  }
+
+  if (pomoStart && pomoReset) {
+    pomoStart.addEventListener('click', () => {
+      if (isPomoRunning) {
+        clearInterval(pomoInt);
+        isPomoRunning = false;
+        pomoStart.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Start';
+      } else {
+        isPomoRunning = true;
+        pomoStart.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg> Pause';
+        pomoInt = setInterval(() => {
+          if (pomoTime > 0) { pomoTime--; updatePomoDisplay(); } 
+          else { clearInterval(pomoInt); isPomoRunning = false; pomoStart.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Start'; }
+        }, 1000);
+      }
+    });
+
+    if (pomoAdd) {
+      pomoAdd.addEventListener('click', () => {
+        pomoTime += 10;
+        if (pomoTime > baseTime) baseTime = pomoTime; // Readjust max so ring doesn't glitch
+        updatePomoDisplay();
+      });
+    }
+
+    pomoReset.addEventListener('click', () => {
+      clearInterval(pomoInt);
+      isPomoRunning = false;
+      baseTime = 25 * 60;
+      pomoTime = baseTime;
+      updatePomoDisplay();
+      pomoStart.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Start';
+    });
+    
+    // Set initial ring state
+    updatePomoDisplay();
+  }
 });
