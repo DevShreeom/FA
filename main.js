@@ -12,7 +12,7 @@ import { wireStudentControls, startStudentSession, getCurrentUser, buildNotesVie
 
 // ---- Theme toggle ----
 const THEME_KEY = 'jee_tracker_theme';
-const themes = ['dark', 'forest', 'ocean', 'crimson', 'cyber', 'light'];
+const themes = ['default','forest','light','ocean','crimson','cyber','peach','sakura','gold','slate','emerald','twilight','ruby','arctic','coffee','lime','plum','copper','teal','sand','mono-light','rose-gold'];
 let currentTheme = localStorage.getItem(THEME_KEY) || 'dark';
 
 // Apply saved theme on load
