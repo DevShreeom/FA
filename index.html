@@ -196,48 +196,100 @@
   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
   My Profile
 </button>
-
 <div id="modalOverlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
   
-  <div id="settingsModal" style="display: none; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; width: 90%; max-width: 400px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-      <h3 style="margin: 0; font-family: var(--font-display);">⚙️ Settings</h3>
-      <button class="close-modal" style="background:none; border:none; color:var(--text); font-size:1.5rem; cursor:pointer;">&times;</button>
+  <div id="settingsModal" style="display: none; background: var(--panel-2); border: 1px solid var(--border); border-radius: 24px; width: 90%; max-width: 420px; padding: 32px; box-shadow: 0 16px 40px rgba(0,0,0,0.5);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+      <h3 style="margin: 0; font-family: var(--font-display); font-size: 1.2rem; color: var(--text);">Profile Settings</h3>
+      <button class="close-modal" style="background:none; border:none; color:var(--muted); font-size:1.5rem; cursor:pointer; transition: 0.2s;">&times;</button>
     </div>
-    <div style="display: flex; flex-direction: column; gap: 14px;">
-      <div><label style="font-size:0.8rem; color:var(--muted);">Display Name</label><br><input type="text" id="setDisplayName" placeholder="e.g. Aarav" style="width:100%; box-sizing:border-box; padding: 10px; border-radius: 8px; background: var(--panel); border: 1px solid var(--border); color: var(--text); margin-top:4px;"></div>
-      <div><label style="font-size:0.8rem; color:var(--muted);">Target Grade</label><br><select id="setGrade" style="width:100%; box-sizing:border-box; padding: 10px; border-radius: 8px; background: var(--panel); border: 1px solid var(--border); color: var(--text); margin-top:4px;">
-        <option value="">Select...</option>
-        <option value="11th Grade">11th Grade</option>
-        <option value="12th Grade">12th Grade</option>
-        <option value="Dropper">Dropper</option>
-      </select></div>
-      <div><label style="font-size:0.8rem; color:var(--muted);">Telegram Handle (Optional)</label><br><input type="text" id="setTelegram" placeholder="@username" style="width:100%; box-sizing:border-box; padding: 10px; border-radius: 8px; background: var(--panel); border: 1px solid var(--border); color: var(--text); margin-top:4px;"></div>
+    <div style="display: flex; flex-direction: column; gap: 16px;">
       
-
-      <div><label style="font-size:0.8rem; color:var(--muted);">PC Navigation Style</label><br><select id="setNavStyle" style="width:100%; box-sizing:border-box; padding: 10px; border-radius: 8px; background: var(--panel); border: 1px solid var(--border); color: var(--text); margin-top:4px;">
-        <option value="sidebar">Classic Sidebar</option>
-        <option value="dock">Dock</option>
-      </select></div>
+      <div>
+        <label style="font-size:0.85rem; font-weight: 500; color:var(--muted);">Display Name</label>
+        <input type="text" id="setDisplayName" placeholder="e.g. Aarav" style="width:100%; box-sizing:border-box; padding: 12px 16px; border-radius: 12px; background: var(--panel); border: 1px solid transparent; color: var(--text); margin-top:6px; outline: none; font-family: var(--font-body); transition: 0.3s;">
+      </div>
+      
+      <div>
+        <label style="font-size:0.85rem; font-weight: 500; color:var(--muted);">Target Grade</label>
+        <select id="setGrade" style="width:100%; box-sizing:border-box; padding: 12px 16px; border-radius: 12px; background: var(--panel); border: 1px solid transparent; color: var(--text); margin-top:6px; outline: none; font-family: var(--font-body); transition: 0.3s;">
+          <option value="">Select...</option>
+          <option value="11th Grade">11th Grade</option>
+          <option value="12th Grade">12th Grade</option>
+          <option value="Dropper">Dropper</option>
+        </select>
+      </div>
+      
+      <div>
+        <label style="font-size:0.85rem; font-weight: 500; color:var(--muted);">Telegram Handle (Optional)</label>
+        <input type="text" id="setTelegram" placeholder="@username" style="width:100%; box-sizing:border-box; padding: 12px 16px; border-radius: 12px; background: var(--panel); border: 1px solid transparent; color: var(--text); margin-top:6px; outline: none; font-family: var(--font-body); transition: 0.3s;">
+      </div>
+      
+      <div>
+        <label style="font-size:0.85rem; font-weight: 500; color:var(--muted);">PC Navigation Style</label>
+        <select id="setNavStyle" style="width:100%; box-sizing:border-box; padding: 12px 16px; border-radius: 12px; background: var(--panel); border: 1px solid transparent; color: var(--text); margin-top:6px; outline: none; font-family: var(--font-body); transition: 0.3s;">
+          <option value="sidebar">Classic Sidebar</option>
+          <option value="dock">Dock Mode</option>
+        </select>
+      </div>
         
-      <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--text); cursor: pointer; background: var(--panel-2); padding: 10px; border-radius: 8px; border: 1px solid var(--border);">
-        <input type="checkbox" id="setIsPublic"> Allow others to see my profile & Telegram
+      <label style="display: flex; align-items: center; gap: 12px; font-size: 0.9rem; font-weight: 500; color: var(--text); cursor: pointer; background: var(--panel); padding: 16px; border-radius: 12px; border: 1px solid transparent; margin-top: 4px;">
+        <input type="checkbox" id="setIsPublic" style="width: 18px; height: 18px; accent-color: var(--accent);"> Allow others to see my profile & Telegram
       </label>
-      <button id="saveSettingsBtn" style="background: var(--accent); color: #000; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 700; margin-top: 10px; transition: 0.2s;">Save Profile</button>
+      
+      <button id="saveSettingsBtn" style="background: var(--accent); color: var(--accent-on); border: none; padding: 14px; border-radius: 999px; cursor: pointer; font-weight: 700; margin-top: 12px; font-family: var(--font-body); font-size: 0.95rem; transition: transform 0.2s;">Save Profile</button>
     </div>
   </div>
 
-  <div id="studentCardModal" style="display: none; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; width: 90%; max-width: 400px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-      <h3 id="scTitle" style="margin: 0; font-family: var(--font-display);">Profile</h3>
-      <button class="close-modal" style="background:none; border:none; color:var(--text); font-size:1.5rem; cursor:pointer;">&times;</button>
-    </div>
-    <div id="scBody" style="font-size: 0.95rem; color: var(--text);">
-    </div>
-  </div>
+</div> <!-- <--- MODAL OVERLAY ENDS HERE SAFELY -->
 
-</div>
+
+<!-- M3 FLOATING PILL (Hidden until minimized) -->
+<button id="showToolsPill">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+  Focus Tools
+</button>
+
+<!-- M3 NATIVE RIGHT SIDEBAR -->
+<div id="m3RightTools">
+  
+  <!-- Clean M3 Pomodoro -->
+  <div class="tool-card pomo-card">
+    <div class="focus-header">
+      <span class="focus-title">Focus Zone</span>
+      <button id="minimizeToolsBtn" class="minimize-btn" title="Minimize to pill">✕</button>
+    </div>
     
+    <!-- Smooth Standard Progress Ring -->
+    <div class="pomo-circle-wrap">
+      <svg viewBox="0 0 100 100" class="clean-ring">
+        <circle cx="50" cy="50" r="45" class="ring-bg"></circle>
+        <circle cx="50" cy="50" r="45" class="ring-progress" id="pomoRing"></circle>
+      </svg>
+      <div id="pomoTimer" class="pomo-time-text">25:00</div>
+    </div>
+
+    <!-- M3 Pill Buttons -->
+    <div class="pomo-btn-row">
+      <button id="pomoStart" class="pomo-btn blue-pill">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Start
+      </button>
+      <button id="pomoAdd" class="pomo-btn green-pill">+ 10s</button>
+    </div>
+    <button id="pomoReset" class="pomo-btn outline-pill">✕ Cancel</button>
+  </div>
+  
+  <!-- Sticky Note -->
+  <div class="tool-card sticky-card">
+    <div class="focus-header" style="margin-bottom: 12px;">
+      <span class="focus-title" style="color: var(--pyq);">Quick Note</span>
+    </div>
+    <textarea id="m3StickyNote" class="sticky-note" placeholder="Jot down quick thoughts..."></textarea>
+  </div>
+</div>
+
+
 <script type="module" src="main.js"></script>
 </body>
 </html>
+
