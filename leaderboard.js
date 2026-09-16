@@ -31,9 +31,11 @@ function buildEntry(s, data, total, tTheory, tPyq) {
   const pyqDone = studentPyqDone(data);
   const overallDone = theoryDone + pyqDone;
 
-  // Backfill all 3 ranking fields so this student becomes queryable on every tab,
-  // not just overall. (Firestore orderBy skips docs missing the field entirely.)
-  if (data.totalDone === undefined || data.theoryDone === undefined || data.pyqDone === undefined) {
+  // Always overwrite with the freshly-computed truth - not just when missing.
+  // These fields are client-writable, so a tampered value (e.g. someone setting
+  // totalDone directly via devtools to fake a leaderboard rank) needs correcting
+  // every time, not just backfilling when absent.
+  if (data.totalDone !== overallDone || data.theoryDone !== theoryDone || data.pyqDone !== pyqDone) {
     updateDoc(doc(db, 'students', s.id), { totalDone: overallDone, theoryDone, pyqDone }).catch(() => {});
   }
 
