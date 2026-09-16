@@ -7,6 +7,7 @@ import { ORDER, CHAPTER_DATA } from './data.js';
 
 const TOP_N = 20;
 const FETCH_BUFFER = 30; // fetch a few extra in case some are flagged, then trim to TOP_N
+const TAB_FIELD = { overall: 'totalDone', theory: 'theoryDone', pyq: 'pyqDone' };
 
 function findVideoTitle(searchId) {
   for (let ch of ORDER) {
@@ -30,8 +31,10 @@ function buildEntry(s, data, total, tTheory, tPyq) {
   const pyqDone = studentPyqDone(data);
   const overallDone = theoryDone + pyqDone;
 
-  if (data.totalDone === undefined) {
-    updateDoc(doc(db, 'students', s.id), { totalDone: overallDone }).catch(() => {});
+  // Backfill all 3 ranking fields so this student becomes queryable on every tab,
+  // not just overall. (Firestore orderBy skips docs missing the field entirely.)
+  if (data.totalDone === undefined || data.theoryDone === undefined || data.pyqDone === undefined) {
+    updateDoc(doc(db, 'students', s.id), { totalDone: overallDone, theoryDone, pyqDone }).catch(() => {});
   }
 
   return {
@@ -47,15 +50,17 @@ function buildEntry(s, data, total, tTheory, tPyq) {
   };
 }
 
-// Cheap: only reads the top ~30 student docs (ordered by totalDone), not the whole collection.
-export async function fetchTopStudents() {
+// Queries by the tab's own field, so Theory/PYQ leaders show up correctly
+// instead of being sorted only within the Overall top-30.
+async function fetchTab(tab) {
   const total = computeTotalAll();
   const tTheory = totalTheory();
   const tPyq = totalPyq();
+  const field = TAB_FIELD[tab];
 
   const [flagMap, snaps] = await Promise.all([
     getFlagMap(),
-    getDocs(query(collection(db, 'students'), orderBy('totalDone', 'desc'), limit(FETCH_BUFFER)))
+    getDocs(query(collection(db, 'students'), orderBy(field, 'desc'), limit(FETCH_BUFFER)))
   ]);
 
   const entries = [];
@@ -65,14 +70,9 @@ export async function fetchTopStudents() {
     entries.push(buildEntry(s, data, total, tTheory, tPyq));
   });
 
-  const byOverall = entries.slice(0, TOP_N);
-  const byTheory = [...entries].sort((a,b) => b.theoryDone - a.theoryDone).slice(0, TOP_N);
-  const byPyq = [...entries].sort((a,b) => b.pyqDone - a.pyqDone).slice(0, TOP_N);
-
-  return { byOverall, byTheory, byPyq, total, tTheory, tPyq };
+  return { list: entries.slice(0, TOP_N), total, tTheory, tPyq };
 }
 
-// Cheap: only reads docs whose displayName matches the prefix, capped at 10.
 export async function searchStudents(qStr) {
   const q = qStr.trim();
   if (!q) return [];
@@ -101,7 +101,7 @@ export function medal(rank) {
   return null;
 }
 
-function renderRow(r, rank) {
+function renderRow(r, rank, pctKey, doneKey, tot) {
   const m = medal(rank);
   const gradeBadge = (r.rawData.isPublic && r.rawData.grade) ? `<span style="font-size:0.7rem; color:var(--muted); font-weight:400; margin-left:6px;">(${r.rawData.grade})</span>` : '';
   return `
@@ -110,51 +110,8 @@ function renderRow(r, rank) {
       <div class="lb-name user-link" data-id="${r.id}" style="cursor:pointer; font-weight:600; text-decoration:underline; text-decoration-color:var(--border); text-underline-offset:3px;">
         ${r.name}${gradeBadge}
       </div>
-      <div class="lb-bar"><div style="width:${r.overallPct}%"></div></div>
-      <div class="lb-count">${r.overallDone}/${r.total !== undefined ? r.total : ''}</div>
-    </div>
-  `;
-}
-
-function renderLeaderboardHTML(rankings, activeTab) {
-  const lists = { overall: rankings.byOverall, theory: rankings.byTheory, pyq: rankings.byPyq };
-  const pctKeys = { overall: 'overallPct', theory: 'theoryPct', pyq: 'pyqPct' };
-  const doneKeys = { overall: 'overallDone', theory: 'theoryDone', pyq: 'pyqDone' };
-  const totals = { overall: rankings.total, theory: rankings.tTheory, pyq: rankings.tPyq };
-
-  const list = lists[activeTab];
-  const pctKey = pctKeys[activeTab];
-  const doneKey = doneKeys[activeTab];
-  const tot = totals[activeTab];
-
-  const rowsHtml = list.map((r, i) => {
-    const rank = i + 1;
-    const m = medal(rank);
-    const gradeBadge = (r.rawData.isPublic && r.rawData.grade) ? `<span style="font-size:0.7rem; color:var(--muted); font-weight:400; margin-left:6px;">(${r.rawData.grade})</span>` : '';
-    return `
-      <div class="lb-row">
-        <div class="lb-rank">${m || '#' + rank}</div>
-        <div class="lb-name user-link" data-id="${r.id}" style="cursor:pointer; font-weight:600; text-decoration:underline; text-decoration-color:var(--border); text-underline-offset:3px;">
-          ${r.name}${gradeBadge}
-        </div>
-        <div class="lb-bar"><div style="width:${r[pctKey]}%"></div></div>
-        <div class="lb-count">${r[doneKey]}/${tot}</div>
-      </div>
-    `;
-  }).join('') || '<div class="empty-note">No rankings yet.</div>';
-
-  return `
-    <div class="leaderboard-search">
-      <input id="lbSearchInput" class="search-input" placeholder="Search any student..." style="width:100%; max-width:400px; box-sizing:border-box;">
-    </div>
-    <div id="lbSearchResults"></div>
-    <div id="lbMainView">
-      <div class="leaderboard-tabs">
-        <button data-lb="overall" class="${activeTab === 'overall' ? 'active' : ''}">Overall</button>
-        <button data-lb="theory" class="${activeTab === 'theory' ? 'active' : ''}">Theory</button>
-        <button data-lb="pyq" class="${activeTab === 'pyq' ? 'active' : ''}">PYQ</button>
-      </div>
-      <div class="leaderboard-list">${rowsHtml}</div>
+      <div class="lb-bar"><div style="width:${r[pctKey]}%"></div></div>
+      <div class="lb-count">${r[doneKey]}/${tot}</div>
     </div>
   `;
 }
@@ -203,32 +160,56 @@ export function showStudentCard(entry, rank) {
   document.getElementById('studentCardModal').style.display = 'block';
 }
 
-export function mountLeaderboard(containerEl, rankings) {
+export function mountLeaderboard(containerEl) {
   let tab = 'overall';
   let debounceTimer = null;
 
-  function findEntry(list, id) { return list.find(e => e.id === id); }
-
-  function wireRowClicks(el, list, rankOffset) {
+  function wireRowClicks(el, list, isRanked) {
     el.querySelectorAll('.user-link').forEach(link => {
       link.addEventListener('click', () => {
         const id = link.dataset.id;
         const idx = list.findIndex(e => e.id === id);
-        const entry = list[idx];
-        showStudentCard(entry, rankOffset != null ? idx + 1 : null);
+        showStudentCard(list[idx], isRanked ? idx + 1 : null);
       });
     });
   }
 
-  function render() {
-    containerEl.innerHTML = renderLeaderboardHTML(rankings, tab);
+  async function render() {
+    containerEl.innerHTML = '<div class="loading">Loading leaderboard...</div>';
+    let data;
+    try {
+      data = await fetchTab(tab);
+    } catch (e) {
+      containerEl.innerHTML = '<div class="empty-note">Could not load leaderboard.</div>';
+      return;
+    }
+
+    const pctKey = tab === 'overall' ? 'overallPct' : tab === 'theory' ? 'theoryPct' : 'pyqPct';
+    const doneKey = tab === 'overall' ? 'overallDone' : tab === 'theory' ? 'theoryDone' : 'pyqDone';
+    const tot = tab === 'overall' ? data.total : tab === 'theory' ? data.tTheory : data.tPyq;
+
+    const rowsHtml = data.list.map((r, i) => renderRow(r, i + 1, pctKey, doneKey, tot)).join('')
+      || '<div class="empty-note">No rankings yet.</div>';
+
+    containerEl.innerHTML = `
+      <div class="leaderboard-search">
+        <input id="lbSearchInput" class="search-input" placeholder="Search any student..." style="width:100%; max-width:400px; box-sizing:border-box;">
+      </div>
+      <div id="lbSearchResults"></div>
+      <div id="lbMainView">
+        <div class="leaderboard-tabs">
+          <button data-lb="overall" class="${tab === 'overall' ? 'active' : ''}">Overall</button>
+          <button data-lb="theory" class="${tab === 'theory' ? 'active' : ''}">Theory</button>
+          <button data-lb="pyq" class="${tab === 'pyq' ? 'active' : ''}">PYQ</button>
+        </div>
+        <div class="leaderboard-list">${rowsHtml}</div>
+      </div>
+    `;
 
     containerEl.querySelectorAll('.leaderboard-tabs button').forEach(btn => {
       btn.addEventListener('click', () => { tab = btn.dataset.lb; render(); });
     });
-
-    const list = tab === 'overall' ? rankings.byOverall : tab === 'theory' ? rankings.byTheory : rankings.byPyq;
-    wireRowClicks(containerEl, list, true);
+    wireRowClicks(containerEl, data.list, true);
 
     const searchInput = containerEl.querySelector('#lbSearchInput');
     const resultsEl = containerEl.querySelector('#lbSearchResults');
@@ -248,9 +229,9 @@ export function mountLeaderboard(containerEl, rankings) {
         try {
           const found = await searchStudents(val);
           resultsEl.innerHTML = found.length
-            ? found.map(r => renderRow(r, null)).join('')
+            ? found.map(r => renderRow(r, null, 'overallPct', 'overallDone', found[0] ? computeTotalAll() : '')).join('')
             : '<div class="empty-note">No student found.</div>';
-          wireRowClicks(resultsEl, found, null);
+          wireRowClicks(resultsEl, found, false);
         } catch (e) {
           resultsEl.innerHTML = '<div class="empty-note">Search failed - check your connection.</div>';
         }

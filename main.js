@@ -4,11 +4,12 @@ import { auth } from './firebase.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { initAuthForm, showAuthOverlay, hideAuthOverlay } from './auth.js';
 import { loadTeacherView } from './teacherView.js';
-import { fetchTopStudents, mountLeaderboard } from './leaderboard.js';
+import { mountLeaderboard } from './leaderboard.js';
 import { loadUpdatesPage, loadLatestUpdatePreview } from './updates.js';
 import { loadAndMergeCustomLectures } from './customLectures.js';
 import { loadQotdView } from './qotdView.js';
 import { wireStudentControls, startStudentSession, getCurrentUser, buildNotesView } from './studentView.js';
+import { checkIsAdmin } from './adminCheck.js';
 
 // ---- Theme toggle ----
 const THEME_KEY = 'jee_tracker_theme';
@@ -50,7 +51,12 @@ const SECTION_IDS = {
   updates: 'sectionUpdates'
 };
 
+let isAdminUser = false; // set once per session after login, see onAuthStateChanged below
+
 function showSection(name){
+  // Extra guard: even if someone forces the button/URL, students can't open Class View.
+  if (name === 'classview' && !isAdminUser) return;
+
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.section === name));
   document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
   
@@ -66,9 +72,7 @@ function showSection(name){
 
   if (name === 'leaderboard'){
     const el = document.getElementById('leaderboardPage');
-    if(el) el.innerHTML = '<div class="loading">Loading leaderboard...</div>';
-    fetchTopStudents().then(rankings => mountLeaderboard(el, rankings))
-      .catch(() => { if(el) el.innerHTML = '<div class="empty-note">Could not load leaderboard.</div>'; });
+    if (el) mountLeaderboard(el);
   }
   if (name === 'classview') loadTeacherView();
   if (name === 'updates') loadUpdatesPage();
@@ -92,6 +96,10 @@ onAuthStateChanged(auth, async (user) => {
   if (user){
     await startStudentSession(user);
     loadLatestUpdatePreview();
+
+    isAdminUser = await checkIsAdmin(user.uid);
+    const classViewBtn = document.querySelector('.nav-btn[data-section="classview"]');
+    if (classViewBtn) classViewBtn.style.display = isAdminUser ? '' : 'none';
   } else {
     document.getElementById('appShell').style.display = 'none';
     document.getElementById('whoamiBar').style.display = 'none';
