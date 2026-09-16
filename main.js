@@ -4,7 +4,7 @@ import { auth } from './firebase.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { initAuthForm, showAuthOverlay, hideAuthOverlay } from './auth.js';
 import { loadTeacherView } from './teacherView.js';
-import { computeRankings, mountLeaderboard } from './leaderboard.js';
+import { fetchTopStudents, mountLeaderboard } from './leaderboard.js';
 import { loadUpdatesPage, loadLatestUpdatePreview } from './updates.js';
 import { loadAndMergeCustomLectures } from './customLectures.js';
 import { loadQotdView } from './qotdView.js';
@@ -67,7 +67,7 @@ function showSection(name){
   if (name === 'leaderboard'){
     const el = document.getElementById('leaderboardPage');
     if(el) el.innerHTML = '<div class="loading">Loading leaderboard...</div>';
-    computeRankings().then(rankings => mountLeaderboard(el, rankings, 'overall', 20))
+    fetchTopStudents().then(rankings => mountLeaderboard(el, rankings))
       .catch(() => { if(el) el.innerHTML = '<div class="empty-note">Could not load leaderboard.</div>'; });
   }
   if (name === 'classview') loadTeacherView();
