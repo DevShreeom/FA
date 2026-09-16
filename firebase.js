@@ -5,6 +5,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/fireba
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 // FIX: Import initializeFirestore and persistentLocalCache instead of getFirestore
 import { initializeFirestore, persistentLocalCache } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getFunctions } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-functions.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCZmPc61LRxkgYalLyRyT-rRdkMswcAclg",
@@ -23,4 +24,5 @@ export const db = initializeFirestore(app, {
 });
 
 export const auth = getAuth(app);
+export const functions = getFunctions(app);
 export const FAKE_EMAIL_DOMAIN = "jee-tracker.local";
