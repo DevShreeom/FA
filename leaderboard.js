@@ -1,11 +1,13 @@
 // leaderboard.js
 
 import { db } from './firebase.js';
-import { collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { collection, getDocs, doc, updateDoc, query, orderBy, limit, startAt, endAt } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { computeTotalAll, totalTheory, totalPyq, studentTheoryDone, studentPyqDone, idFor } from './metrics.js';
 import { ORDER, CHAPTER_DATA } from './data.js';
 
-// Helper to find titles for progressing topics
+const TOP_N = 20;
+const FETCH_BUFFER = 30; // fetch a few extra in case some are flagged, then trim to TOP_N
+
 function findVideoTitle(searchId) {
   for (let ch of ORDER) {
     for (let it of CHAPTER_DATA[ch].fs) if (idFor(it.url) === searchId) return it.title;
@@ -14,51 +16,82 @@ function findVideoTitle(searchId) {
   return 'A Video Topic';
 }
 
-export async function computeRankings() {
-  let flagMap = {};
+async function getFlagMap() {
+  const flagMap = {};
   try {
     const flagSnaps = await getDocs(collection(db, 'flags'));
     flagSnaps.forEach(f => { flagMap[f.id] = f.data(); });
   } catch(e) {}
+  return flagMap;
+}
 
+function buildEntry(s, data, total, tTheory, tPyq) {
+  const theoryDone = studentTheoryDone(data);
+  const pyqDone = studentPyqDone(data);
+  const overallDone = theoryDone + pyqDone;
+
+  if (data.totalDone === undefined) {
+    updateDoc(doc(db, 'students', s.id), { totalDone: overallDone }).catch(() => {});
+  }
+
+  return {
+    id: s.id,
+    rawData: data,
+    name: data.displayName || data.username || '(unknown)',
+    theoryDone,
+    theoryPct: tTheory ? Math.round(theoryDone / tTheory * 100) : 0,
+    pyqDone,
+    pyqPct: tPyq ? Math.round(pyqDone / tPyq * 100) : 0,
+    overallDone,
+    overallPct: total ? Math.round(overallDone / total * 100) : 0
+  };
+}
+
+// Cheap: only reads the top ~30 student docs (ordered by totalDone), not the whole collection.
+export async function fetchTopStudents() {
   const total = computeTotalAll();
   const tTheory = totalTheory();
   const tPyq = totalPyq();
 
-  const snaps = await getDocs(collection(db, 'students'));
-  const entries = [];
+  const [flagMap, snaps] = await Promise.all([
+    getFlagMap(),
+    getDocs(query(collection(db, 'students'), orderBy('totalDone', 'desc'), limit(FETCH_BUFFER)))
+  ]);
 
+  const entries = [];
   snaps.forEach(s => {
     const data = s.data();
-    const flagged = !!(flagMap[s.id] && flagMap[s.id].flagged);
-    if (flagged) return;
-
-    const theoryDone = studentTheoryDone(data);
-    const pyqDone = studentPyqDone(data);
-    const calculatedTotal = theoryDone + pyqDone;
-
-    if (data.totalDone === undefined) {
-      updateDoc(doc(db, 'students', s.id), { totalDone: calculatedTotal }).catch(() => {});
-    }
-
-    entries.push({
-      id: s.id,
-      rawData: data, // Keep raw data for the modal card!
-      name: data.displayName || data.username || '(unknown)',
-      theoryDone, 
-      theoryPct: tTheory ? Math.round(theoryDone / tTheory * 100) : 0,
-      pyqDone, 
-      pyqPct: tPyq ? Math.round(pyqDone / tPyq * 100) : 0,
-      overallDone: calculatedTotal, 
-      overallPct: total ? Math.round(calculatedTotal / total * 100) : 0
-    });
+    if (flagMap[s.id] && flagMap[s.id].flagged) return;
+    entries.push(buildEntry(s, data, total, tTheory, tPyq));
   });
 
-  const byOverall = [...entries].sort((a,b) => b.overallDone - a.overallDone);
-  const byTheory = [...entries].sort((a,b) => b.theoryDone - a.theoryDone);
-  const byPyq = [...entries].sort((a,b) => b.pyqDone - a.pyqDone);
+  const byOverall = entries.slice(0, TOP_N);
+  const byTheory = [...entries].sort((a,b) => b.theoryDone - a.theoryDone).slice(0, TOP_N);
+  const byPyq = [...entries].sort((a,b) => b.pyqDone - a.pyqDone).slice(0, TOP_N);
 
   return { byOverall, byTheory, byPyq, total, tTheory, tPyq };
+}
+
+// Cheap: only reads docs whose displayName matches the prefix, capped at 10.
+export async function searchStudents(qStr) {
+  const q = qStr.trim();
+  if (!q) return [];
+  const total = computeTotalAll();
+  const tTheory = totalTheory();
+  const tPyq = totalPyq();
+
+  const [flagMap, snaps] = await Promise.all([
+    getFlagMap(),
+    getDocs(query(collection(db, 'students'), orderBy('displayName'), startAt(q), endAt(q + '\uf8ff'), limit(10)))
+  ]);
+
+  const results = [];
+  snaps.forEach(s => {
+    const data = s.data();
+    if (flagMap[s.id] && flagMap[s.id].flagged) return;
+    results.push(buildEntry(s, data, total, tTheory, tPyq));
+  });
+  return results;
 }
 
 export function medal(rank) {
@@ -68,13 +101,28 @@ export function medal(rank) {
   return null;
 }
 
-export function renderLeaderboardHTML(rankings, activeTab, limitCount) {
+function renderRow(r, rank) {
+  const m = medal(rank);
+  const gradeBadge = (r.rawData.isPublic && r.rawData.grade) ? `<span style="font-size:0.7rem; color:var(--muted); font-weight:400; margin-left:6px;">(${r.rawData.grade})</span>` : '';
+  return `
+    <div class="lb-row">
+      <div class="lb-rank">${m || (rank ? '#' + rank : '🔍')}</div>
+      <div class="lb-name user-link" data-id="${r.id}" style="cursor:pointer; font-weight:600; text-decoration:underline; text-decoration-color:var(--border); text-underline-offset:3px;">
+        ${r.name}${gradeBadge}
+      </div>
+      <div class="lb-bar"><div style="width:${r.overallPct}%"></div></div>
+      <div class="lb-count">${r.overallDone}/${r.total !== undefined ? r.total : ''}</div>
+    </div>
+  `;
+}
+
+function renderLeaderboardHTML(rankings, activeTab) {
   const lists = { overall: rankings.byOverall, theory: rankings.byTheory, pyq: rankings.byPyq };
   const pctKeys = { overall: 'overallPct', theory: 'theoryPct', pyq: 'pyqPct' };
   const doneKeys = { overall: 'overallDone', theory: 'theoryDone', pyq: 'pyqDone' };
   const totals = { overall: rankings.total, theory: rankings.tTheory, pyq: rankings.tPyq };
 
-  const list = lists[activeTab].slice(0, limitCount || 10);
+  const list = lists[activeTab];
   const pctKey = pctKeys[activeTab];
   const doneKey = doneKeys[activeTab];
   const tot = totals[activeTab];
@@ -83,11 +131,10 @@ export function renderLeaderboardHTML(rankings, activeTab, limitCount) {
     const rank = i + 1;
     const m = medal(rank);
     const gradeBadge = (r.rawData.isPublic && r.rawData.grade) ? `<span style="font-size:0.7rem; color:var(--muted); font-weight:400; margin-left:6px;">(${r.rawData.grade})</span>` : '';
-    
     return `
       <div class="lb-row">
         <div class="lb-rank">${m || '#' + rank}</div>
-        <div class="lb-name user-link" data-idx="${i}" style="cursor:pointer; font-weight:600; text-decoration:underline; text-decoration-color:var(--border); text-underline-offset:3px;">
+        <div class="lb-name user-link" data-id="${r.id}" style="cursor:pointer; font-weight:600; text-decoration:underline; text-decoration-color:var(--border); text-underline-offset:3px;">
           ${r.name}${gradeBadge}
         </div>
         <div class="lb-bar"><div style="width:${r[pctKey]}%"></div></div>
@@ -97,19 +144,24 @@ export function renderLeaderboardHTML(rankings, activeTab, limitCount) {
   }).join('') || '<div class="empty-note">No rankings yet.</div>';
 
   return `
-    <div class="leaderboard-tabs">
-      <button data-lb="overall" class="${activeTab === 'overall' ? 'active' : ''}">Overall</button>
-      <button data-lb="theory" class="${activeTab === 'theory' ? 'active' : ''}">Theory</button>
-      <button data-lb="pyq" class="${activeTab === 'pyq' ? 'active' : ''}">PYQ</button>
+    <div class="leaderboard-search">
+      <input id="lbSearchInput" class="search-input" placeholder="Search any student..." style="width:100%; max-width:400px; box-sizing:border-box;">
     </div>
-    <div class="leaderboard-list">${rowsHtml}</div>
+    <div id="lbSearchResults"></div>
+    <div id="lbMainView">
+      <div class="leaderboard-tabs">
+        <button data-lb="overall" class="${activeTab === 'overall' ? 'active' : ''}">Overall</button>
+        <button data-lb="theory" class="${activeTab === 'theory' ? 'active' : ''}">Theory</button>
+        <button data-lb="pyq" class="${activeTab === 'pyq' ? 'active' : ''}">PYQ</button>
+      </div>
+      <div class="leaderboard-list">${rowsHtml}</div>
+    </div>
   `;
 }
 
-// Function to populate and show the User Card
-export function showStudentCard(entry, rank, totals) {
+export function showStudentCard(entry, rank) {
   const d = entry.rawData;
-  const m = medal(rank) || `#${rank}`;
+  const m = rank ? (medal(rank) || `#${rank}`) : '🔍';
   const titleStr = `${m} &bull; ${entry.name} ${d.isPublic && d.grade ? `(${d.grade})` : ''}`;
   document.getElementById('scTitle').innerHTML = titleStr;
 
@@ -118,7 +170,7 @@ export function showStudentCard(entry, rank, totals) {
     const allProg = [];
     if (d.theory) Object.keys(d.theory).forEach(k => { if(d.theory[k] === 'progressing') allProg.push(k); });
     if (d.pyq) Object.keys(d.pyq).forEach(k => { if(d.pyq[k] === 'progressing') allProg.push(k); });
-    
+
     if (allProg.length > 0) {
       progressingHtml = `<div style="margin-top: 15px; margin-bottom: 5px; font-weight:600; color:var(--accent);">🔥 Currently Progressing:</div><ul style="margin:0; padding-left:20px; color:var(--muted); font-size:0.85rem;">`;
       allProg.forEach(id => { progressingHtml += `<li>${findVideoTitle(id)}</li>`; });
@@ -151,24 +203,58 @@ export function showStudentCard(entry, rank, totals) {
   document.getElementById('studentCardModal').style.display = 'block';
 }
 
-export function mountLeaderboard(containerEl, rankings, initialTab, limitCount) {
-  let tab = initialTab || 'overall';
+export function mountLeaderboard(containerEl, rankings) {
+  let tab = 'overall';
+  let debounceTimer = null;
+
+  function findEntry(list, id) { return list.find(e => e.id === id); }
+
+  function wireRowClicks(el, list, rankOffset) {
+    el.querySelectorAll('.user-link').forEach(link => {
+      link.addEventListener('click', () => {
+        const id = link.dataset.id;
+        const idx = list.findIndex(e => e.id === id);
+        const entry = list[idx];
+        showStudentCard(entry, rankOffset != null ? idx + 1 : null);
+      });
+    });
+  }
+
   function render() {
-    containerEl.innerHTML = renderLeaderboardHTML(rankings, tab, limitCount);
-    
-    // Wire up tab buttons
+    containerEl.innerHTML = renderLeaderboardHTML(rankings, tab);
+
     containerEl.querySelectorAll('.leaderboard-tabs button').forEach(btn => {
       btn.addEventListener('click', () => { tab = btn.dataset.lb; render(); });
     });
 
-    // Wire up clicking student names!
-    const list = rankings[tab === 'overall' ? 'byOverall' : tab === 'theory' ? 'byTheory' : 'byPyq'];
-    containerEl.querySelectorAll('.user-link').forEach(link => {
-      link.addEventListener('click', (e) => {
-         const idx = parseInt(e.currentTarget.dataset.idx);
-         const userEntry = list[idx];
-         showStudentCard(userEntry, idx + 1, rankings);
-      });
+    const list = tab === 'overall' ? rankings.byOverall : tab === 'theory' ? rankings.byTheory : rankings.byPyq;
+    wireRowClicks(containerEl, list, true);
+
+    const searchInput = containerEl.querySelector('#lbSearchInput');
+    const resultsEl = containerEl.querySelector('#lbSearchResults');
+    const mainViewEl = containerEl.querySelector('#lbMainView');
+
+    searchInput.addEventListener('input', (e) => {
+      const val = e.target.value;
+      clearTimeout(debounceTimer);
+      if (!val.trim()) {
+        resultsEl.innerHTML = '';
+        mainViewEl.style.display = '';
+        return;
+      }
+      debounceTimer = setTimeout(async () => {
+        mainViewEl.style.display = 'none';
+        resultsEl.innerHTML = '<div class="loading">Searching...</div>';
+        try {
+          const found = await searchStudents(val);
+          resultsEl.innerHTML = found.length
+            ? found.map(r => renderRow(r, null)).join('')
+            : '<div class="empty-note">No student found.</div>';
+          wireRowClicks(resultsEl, found, null);
+        } catch (e) {
+          resultsEl.innerHTML = '<div class="empty-note">Search failed - check your connection.</div>';
+        }
+      }, 350);
     });
   }
   render();
