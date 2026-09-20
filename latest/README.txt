@@ -1,7 +1,7 @@
 FACTORIAL ACADEMY — JEE MATHS TRACKER
 =====================================
 
-FACTORIAL ACADEMY TRACKER — version 4.0
+FACTORIAL ACADEMY TRACKER — version 4.1 (matte black theme, softer light theme, Inter typeface)
 
 The headline change: lessons now play inside the tracker. You no longer
 lose your place by jumping out to another tab, and the things that used
@@ -14,11 +14,14 @@ WHAT'S IN THIS FOLDER
   manifest.webmanifest  App install details + home-screen shortcuts.
   sw.js                 Offline service worker.
   icons/                App icons.
+  fonts/                Inter typeface (SIL OFL) and its licence. Keep with index.html.
   robots.txt            Search-engine rules.
   sitemap.xml           Sitemap template.
   humans.txt            The people behind it. Linked from the footer.
   CREDITS.md            Full credits and licences. Keep this with the code.
   og-image.png          The link-preview image. Keep it next to index.html.
+  404.html              Shown by most static hosts for a missing address.
+  offline.html          Shown when nothing has been saved for offline use yet.
 
 
 HOW TO PUT IT ONLINE
@@ -30,7 +33,7 @@ HOW TO PUT IT ONLINE
   After hosting:
    1. Open robots.txt and sitemap.xml and replace YOUR-DOMAIN with your
       real address. Uncomment the Sitemap line in robots.txt.
-   2. Bump VERSION in sw.js (it is on v7 now) whenever you change
+   2. Bump VERSION in sw.js (it is on v10 now) whenever you change
       index.html, so visitors get the new version instead of the
       cached one.
 
@@ -175,7 +178,7 @@ UPGRADING FROM 3.2
 CREDITS
   Lessons and teaching        Factorial Academy
   Design and engineering      suryansh1807
-  Typefaces                   Bricolage Grotesque, Instrument Sans
+  Typefaces                   Inter (self-hosted in fonts/)
                               (SIL Open Font Licence 1.1)
   Brand marks                 Simple Icons (CC0 1.0); the marks stay
                               trademarks of their owners
