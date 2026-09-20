@@ -644,3 +644,89 @@ body.tools-minimized #showToolsPill { right: 32px; } /* Slides in when minimized
   #m3RightTools, #showToolsPill { display: none !important; }
   .main-content { padding-right: 56px !important; margin-right: auto; }
 }
+/* The floating notification container */
+.crazy-notification-btn {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999; /* Forces it above all other elements and modals */
+  
+  /* Vibrant shifting gradient background */
+  background: linear-gradient(90deg, #ff0055, #9d00ff, #00f0ff, #ff0055);
+  background-size: 300% 100%;
+  
+  color: #ffffff;
+  font-family: var(--font-display, sans-serif);
+  font-weight: 800;
+  font-size: 1.1rem;
+  padding: 12px 28px;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  border-radius: 50px;
+  cursor: pointer;
+  
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  
+  /* The Animations */
+  animation: 
+    crazyGradient 3s linear infinite, 
+    pulseGlow 1.5s ease-in-out infinite alternate,
+    floatFloat 3s ease-in-out infinite;
+}
+
+/* Make the icon match the crazy energy */
+.crazy-notification-btn .nav-icon {
+  display: flex;
+  align-items: center;
+  color: #fff;
+  width: 24px;
+  height: 24px;
+  animation: shake 0.5s infinite alternate;
+}
+
+/* 1. Shifting Background Colors */
+@keyframes crazyGradient {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
+}
+
+/* 2. Intense Pulsing Neon Glow */
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 
+      0 0 10px rgba(255, 0, 85, 0.8),
+      0 0 20px rgba(157, 0, 255, 0.8),
+      0 0 30px rgba(0, 240, 255, 0.6);
+    transform: translateX(-50%) scale(1);
+  }
+  100% {
+    box-shadow: 
+      0 0 20px rgba(255, 0, 85, 1),
+      0 0 40px rgba(157, 0, 255, 1),
+      0 0 60px rgba(0, 240, 255, 1),
+      0 0 80px rgba(255, 255, 255, 0.5);
+    transform: translateX(-50%) scale(1.05);
+  }
+}
+
+/* 3. Mild vertical hovering */
+@keyframes floatFloat {
+  0%, 100% { top: 20px; }
+  50% { top: 25px; }
+}
+
+/* 4. Icon shaking */
+@keyframes shake {
+  0% { transform: rotate(-10deg) scale(1); }
+  100% { transform: rotate(10deg) scale(1.2); }
+}
+
+/* Optional hover state to make it even brighter when hovered */
+.crazy-notification-btn:hover {
+  filter: brightness(1.2);
+  border-color: #fff;
+}
