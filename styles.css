@@ -643,37 +643,4 @@ body.tools-minimized #showToolsPill { right: 32px; } /* Slides in when minimized
 @media (max-width: 1200px) {
   #m3RightTools, #showToolsPill { display: none !important; }
   .main-content { padding-right: 56px !important; margin-right: auto; }
-}.global-announcement {
-  background-color: var(--panel-2, #1a1a1a);
-  color: var(--text, #ffffff);
-  text-align: center;
-  padding: 12px 20px;
-  font-family: var(--font-body, sans-serif);
-  font-size: 0.9rem;
-  border-bottom: 1px solid var(--border, #333);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  width: 100%;
-}
-
-.announcement-badge {
-  background: var(--accent, #3b82f6);
-  color: #fff;
-  font-size: 0.7rem;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 4px;
-  letter-spacing: 1px;
-}
-
-.announcement-link {
-  color: var(--accent, #3b82f6);
-  text-decoration: none;
-  font-weight: 600;
-}
-
-.announcement-link:hover {
-  text-decoration: underline;
 }
