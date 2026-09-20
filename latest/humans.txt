@@ -29,9 +29,8 @@
     Cookies: none
     Storage: browser local storage only, never uploaded
 
-    Typefaces: Bricolage Grotesque by Mathieu Triay
-               Instrument Sans by Rodrigo Fuenzalida & Jordan Egstad
-               Both under the SIL Open Font Licence 1.1, via Google Fonts
+    Typefaces: Inter by Rasmus Andersson and the Inter Project Authors
+               SIL Open Font Licence 1.1, hosted with the site
 
     Brand marks: Simple Icons (CC0 1.0). The marks themselves remain
                  trademarks of their respective owners.

@@ -36,10 +36,9 @@ framework, no build step and no bundler.
 
 | Family | Designer | Licence |
 | --- | --- | --- |
-| Bricolage Grotesque | Mathieu Triay | SIL Open Font Licence 1.1 |
-| Instrument Sans | Rodrigo Fuenzalida, Jordan Egstad | SIL Open Font Licence 1.1 |
+| Inter | Rasmus Andersson and the Inter Project Authors | SIL Open Font Licence 1.1 |
 
-Both are served through Google Fonts. The SIL OFL permits use,
+It is hosted with the site (fonts/), so no request goes to Google Fonts. The SIL OFL permits use,
 modification and redistribution; it does not permit selling the fonts on
 their own. Full text: https://scripts.sil.org/OFL
 
