@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Crawl the app shell only; there is nothing else to index.
+Disallow: /icons/
+
+# Replace YOUR-DOMAIN with your live address after hosting:
+# Sitemap: https://YOUR-DOMAIN/sitemap.xml

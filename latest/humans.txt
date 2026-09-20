@@ -1,0 +1,58 @@
+/* TEAM */
+
+    Teaching & lessons: Factorial Academy
+    Site: https://factorialacademy.com
+    Channel: https://www.youtube.com/channel/UCeSAnGvh_0SXg53on-NQDzQ
+    Telegram: https://t.me/academyfactorial
+    Contact: Academy.factorial [at] gmail.com
+    Location: India
+
+    Design & engineering: suryansh1807
+    Role: interface, chapter logic, revision scheduling,
+          offline mode, accessibility, this file
+
+
+/* THANKS */
+
+    To every JEE aspirant who reported a mis-tagged chapter,
+    asked for a feature, or just kept showing up on a bad day.
+    The streak counter exists because of you.
+
+
+/* TECHNOLOGY */
+
+    Languages: HTML5, CSS3, JavaScript (ES2020)
+    Frameworks: none
+    Build step: none
+    Dependencies: zero
+    Analytics: none
+    Cookies: none
+    Storage: browser local storage only, never uploaded
+
+    Typefaces: Bricolage Grotesque by Mathieu Triay
+               Instrument Sans by Rodrigo Fuenzalida & Jordan Egstad
+               Both under the SIL Open Font Licence 1.1, via Google Fonts
+
+    Brand marks: Simple Icons (CC0 1.0). The marks themselves remain
+                 trademarks of their respective owners.
+
+    Video hosting: YouTube (Google LLC)
+    Video metadata: YouTube Data API v3, using the visitor's own key
+
+    Standards: Progressive Web App, service worker, Web Share API,
+               schema.org structured data, WCAG-minded contrast and
+               focus handling, prefers-reduced-motion, prefers-color-scheme
+
+
+/* SITE */
+
+    Version: 3.0
+    Updated: 2026-09-20
+    Language: English
+    Doctype: HTML5
+    Components: one self-contained index.html
+
+    Not affiliated with, endorsed by or operated by Google LLC,
+    YouTube, Telegram, Meta or X Corp.
+
+  Bugs and ideas: suryanshgnc@gmail.com
