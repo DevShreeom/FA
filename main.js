@@ -10,6 +10,7 @@ import { loadAndMergeCustomLectures } from './customLectures.js';
 import { loadQotdView } from './qotdView.js';
 import { wireStudentControls, startStudentSession, getCurrentUser, buildNotesView } from './studentView.js';
 import { checkIsAdmin } from './adminCheck.js';
+import { initPortalPromo, playPortalIntro } from './portalPromo.js';
 
 // ---- Theme toggle ----
 const THEME_KEY = 'jee_tracker_theme';
@@ -48,7 +49,8 @@ const SECTION_IDS = {
   qotd: 'sectionQotd',
   leaderboard: 'sectionLeaderboard',
   classview: 'sectionClassView',
-  updates: 'sectionUpdates'
+  updates: 'sectionUpdates',
+  portal: 'sectionPortal'
 };
 
 let isAdminUser = false; // set once per session after login, see onAuthStateChanged below
@@ -76,6 +78,7 @@ function showSection(name){
   }
   if (name === 'classview') loadTeacherView();
   if (name === 'updates') loadUpdatesPage();
+  if (name === 'portal') playPortalIntro();
 }
 
 // FIXED: Only route if the button has a data-section (prevents Settings bug)
@@ -88,6 +91,7 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
 });
 
 // ---- Boot ----
+initPortalPromo();
 initAuthForm();
 wireStudentControls();
 await loadAndMergeCustomLectures(); 

@@ -21,6 +21,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="portalPromo.css">
 </head>
 <body>
 
@@ -55,6 +56,7 @@
     </div>
     
     <div id="authError" style="color: var(--danger); font-size: 0.8rem; margin-top: 10px;"></div>
+    <div class="pp-auth-teaser">Just want the lectures? <a href="https://www.factorialacademy.com/latest" target="_blank" rel="noopener">Try the new portal</a>. No login needed.</div>
   </div>
 
 <div id="appShell" style="display:none;">
@@ -75,7 +77,7 @@
         <button class="nav-btn" data-section="leaderboard"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg></span> Leaderboard</button>
         <button class="nav-btn" data-section="classview"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span> Class View</button>
         <button class="nav-btn" data-section="updates"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg></span> Updates</button>
-        <button class="nav-btn" onclick="window.open('https://www.factorialacademy.com/latest','_blank')"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M13 3 4 14h6l-1 7 9-11h-6l1-7z"/></svg></span> New Version</button>
+        <button class="nav-btn" data-section="portal" title="The new distraction-free video portal"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M13 3 4 14h6l-1 7 9-11h-6l1-7z"/></svg></span> New Portal</button>
         <button class="nav-btn" id="dockSettingsBtn" title="Settings"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></span> Settings</button>
      </div>
   </nav>
@@ -104,6 +106,19 @@
 
 
     <section id="sectionDashboard" class="content-section active">
+      <div id="ppBanner" class="pp-banner" hidden>
+        <img src="logot.png" class="pp-banner-logo" alt="">
+        <div class="pp-banner-copy">
+          <b>Want a quieter place to study?</b>
+          <span>The new portal is just the lectures: 715 videos in order, with no leaderboard, no feed and no login.</span>
+        </div>
+        <div class="pp-banner-actions">
+          <a class="pp-btn small" href="https://www.factorialacademy.com/latest" target="_blank" rel="noopener">Open the new portal</a>
+          <button type="button" class="pp-link" data-pp-goto="portal">See how it works</button>
+        </div>
+        <button type="button" class="pp-close" id="ppBannerClose" aria-label="Dismiss this message">&times;</button>
+      </div>
+
       <div class="stat-grid">
         <div class="stat-box"><div class="num" id="statOverallNum">0%</div><div class="lbl">Overall complete</div></div>
         <div class="stat-box"><div class="num" id="statTheoryNum">0/0</div><div class="lbl">Theory watched</div></div>
@@ -189,6 +204,147 @@
         <div id="updatesContent" class="loading">Loading updates...</div>
       </div>
     </section>
+
+    <section id="sectionPortal" class="content-section pp-section">
+
+      <div class="card pp-hero">
+        <div class="pp-hero-copy">
+          <div class="section-label">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 3 4 14h6l-1 7 9-11h-6l1-7z"/></svg> New portal
+          </div>
+          <h2 class="pp-h">Just the lectures. Nothing else.</h2>
+          <p class="pp-lead">The new Factorial Academy video portal. 715 videos in chapter order, one tick for every lecture you finish, and nothing competing for your attention.</p>
+          <div class="pp-cta-row">
+            <a class="pp-btn" href="https://www.factorialacademy.com/latest" target="_blank" rel="noopener">Open the new portal</a>
+            <button type="button" class="pp-btn ghost" data-pp-goto="dashboard">Stay on this dashboard</button>
+          </div>
+        </div>
+
+        <div class="pp-stage-wrap">
+          <div class="pp-switch-row">
+            <label id="ppNoiseLabel" for="ppNoiseSwitch">Distractions on</label>
+            <button type="button" class="pp-switch" id="ppNoiseSwitch" role="switch" aria-checked="true"></button>
+          </div>
+
+          <div class="pp-stage quiet" id="ppStage">
+            <div class="pp-chip" style="top:1%; left:1%; --r:-4deg; --i:0; --dx:-30px; --dy:-24px" aria-hidden="true"><i></i>Your streak ends tonight</div>
+            <div class="pp-chip" style="top:9%; right:-1%; --r:3deg; --i:1; --dx:40px; --dy:-20px" aria-hidden="true"><i></i>You slid to #348 on the leaderboard</div>
+            <div class="pp-chip" style="top:36%; left:-2%; --r:-2deg; --i:2; --dx:-40px; --dy:0px" aria-hidden="true"><i></i>5 new videos picked for you</div>
+            <div class="pp-chip" style="top:54%; right:-2%; --r:4deg; --i:3; --dx:44px; --dy:10px" aria-hidden="true"><i></i>Aarav just finished 3 chapters</div>
+            <div class="pp-chip" style="bottom:12%; left:3%; --r:2deg; --i:4; --dx:-34px; --dy:24px" aria-hidden="true"><i></i>Trending: 12 JEE hacks</div>
+            <div class="pp-chip" style="bottom:-1%; right:9%; --r:-3deg; --i:5; --dx:24px; --dy:34px" aria-hidden="true"><i></i>3 new notifications</div>
+            <div class="pp-chip" style="top:22%; left:34%; --r:2deg; --i:6; --dx:0px; --dy:-40px" aria-hidden="true"><i></i>Badge unlocked: 7-day warrior</div>
+
+            <div class="pp-mock" aria-label="Portal preview. Try the buttons.">
+              <div class="pp-m-head">
+                <div class="pp-m-brand">
+                  <img src="logot.png" alt="" width="22" height="32">
+                  <div><b>Factorial Academy</b><span>JEE Maths video tracker</span></div>
+                </div>
+                <div class="pp-m-total"><b id="ppTotW">0</b>of 715 watched</div>
+              </div>
+
+              <div class="pp-filters" role="group" aria-label="Filter videos">
+                <button type="button" data-f="all" aria-pressed="true">All</button>
+                <button type="button" data-f="todo" aria-pressed="false">To watch</button>
+                <button type="button" data-f="watched" aria-pressed="false">Watched</button>
+                <button type="button" data-f="revise" aria-pressed="false">Revise</button>
+              </div>
+
+              <div class="pp-chap">
+                <h3>Sets, Relations &amp; Functions</h3>
+                <small><span id="ppChapW">0</span> of 44 watched &nbsp; 13 h 44 m</small>
+                <span class="pp-pill" id="ppNextPill">Next up: #1</span>
+              </div>
+              <div class="pp-squares" id="ppSquares" aria-hidden="true"></div>
+
+              <ul class="pp-rows" id="ppRows">
+                <li class="pp-row"><img src="assets/portal/t1.jpg" width="138" height="79" alt=""><p>Graph transformation in 59 secs || Graph of |y| = f(x)</p><div class="pp-acts"><button type="button" class="pp-watch" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Watched</button><button type="button" class="pp-star" aria-pressed="false" aria-label="Star to revise later"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m12 2.5 2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z"/></svg></button></div></li>
+                <li class="pp-row"><img src="assets/portal/t2.jpg" width="138" height="79" alt=""><p>Graph transformation in 59 secs || y = f(-x)</p><div class="pp-acts"><button type="button" class="pp-watch" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Watched</button><button type="button" class="pp-star" aria-pressed="false" aria-label="Star to revise later"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m12 2.5 2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z"/></svg></button></div></li>
+                <li class="pp-row"><img src="assets/portal/t3.jpg" width="138" height="79" alt=""><p>Graphs Zero to Hero: The Ultimate Guide to JEE Advanced Graphs | Episode 1</p><div class="pp-acts"><button type="button" class="pp-watch" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Watched</button><button type="button" class="pp-star" aria-pressed="false" aria-label="Star to revise later"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m12 2.5 2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z"/></svg></button></div></li>
+                <li class="pp-row"><img src="assets/portal/t4.jpg" width="138" height="79" alt=""><p>Graphs Zero to Hero: The Ultimate Guide to JEE Advanced Graphs | Episode 2</p><div class="pp-acts"><button type="button" class="pp-watch" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Watched</button><button type="button" class="pp-star" aria-pressed="false" aria-label="Star to revise later"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m12 2.5 2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z"/></svg></button></div></li>
+              </ul>
+              <div class="pp-empty" id="ppEmpty" hidden></div>
+              <div class="pp-m-foot">Progress is saved in this browser only.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pp-compare">
+        <div class="pp-col old">
+          <h3>This dashboard</h3>
+          <p class="for">For tracking, competing and staying in the loop.</p>
+          <ul>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>128 lectures across 27 chapters</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>Leaderboard, question of the day and updates feed</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>Notes with timestamps, Focus Zone timer and 20+ themes</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>Log in to keep progress across devices</span></li>
+          </ul>
+        </div>
+        <div class="pp-col new">
+          <h3>The new portal</h3>
+          <p class="for">For days when you just want to watch and finish.</p>
+          <ul>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>715 videos in chapter order</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>No leaderboard, no feed, no daily question</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>Next up, filters, search and a finish-by goal</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>No login. Progress stays in your browser, with export for backup</span></li>
+          </ul>
+          <a class="pp-btn" href="https://www.factorialacademy.com/latest" target="_blank" rel="noopener">Open the new portal</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-label" style="color: var(--accent);">Small tools that get you to the next video</div>
+        <div class="pp-feats">
+          <div class="pp-feat"><h4>Next up, always</h4><p>Each chapter marks the first video you haven't watched yet, so you never scroll to remember where you stopped.</p></div>
+          <div class="pp-feat"><h4>Jump to anything</h4><p>Search videos and chapters, or press <kbd>Ctrl</kbd> <kbd>K</kbd> (<kbd>&#8984;</kbd> <kbd>K</kbd> on Mac) to go straight to a lecture.</p></div>
+          <div class="pp-feat"><h4>To watch, watched, revise</h4><p>Filter the list to what's left, what's done, or what you starred. Add a note to any video.</p></div>
+          <div class="pp-feat"><h4>A finish line you set</h4><p>Choose a daily goal or a finish-by date and see how much time is left.</p></div>
+          <div class="pp-feat"><h4>Your own videos too</h4><p>Add videos to the list yourself, so everything you study sits in one place.</p></div>
+          <div class="pp-feat"><h4>Stays on your device</h4><p>Progress is saved in your browser and there's no account to make. Export a copy whenever you want a backup.</p></div>
+        </div>
+      </div>
+
+      <div class="pp-band">
+        <div>
+          <h3>Pick a finish line.</h3>
+          <p>Drag to see the daily pace that clears every video.</p>
+          <div class="pp-range-label"><label for="ppDays">I want to finish in</label><output id="ppDaysOut" for="ppDays">120 days</output></div>
+          <input type="range" id="ppDays" min="30" max="365" step="5" value="120">
+          <div class="pp-answers" aria-live="polite">
+            <div class="pp-answer"><b id="ppAnsTime">2 h 2 min</b><span>of lectures a day</span></div>
+            <div class="pp-answer"><b id="ppAnsVids">6 videos</b><span>a day</span></div>
+            <div class="pp-answer"><b id="ppAnsDate">-</b><span>finish date</span></div>
+          </div>
+          <p class="pp-fine">An estimate from 715 videos and 245+ hours of lectures.</p>
+        </div>
+        <div>
+          <h3>Chapter by chapter, in order.</h3>
+          <p>Every chapter shows how much is left before you open it.</p>
+          <ul class="pp-bars">
+            <li><div class="n"><span>Sets, Relations &amp; Functions</span><em>44</em></div><div class="b"><i style="--w:100%"></i></div></li>
+            <li><div class="n"><span>Logarithms</span><em>4</em></div><div class="b"><i style="--w:9%"></i></div></li>
+            <li><div class="n"><span>Quadratic Equations &amp; Inequalities</span><em>38</em></div><div class="b"><i style="--w:86%"></i></div></li>
+            <li><div class="n"><span>Complex Numbers</span><em>29</em></div><div class="b"><i style="--w:66%"></i></div></li>
+            <li><div class="n"><span>Sequences &amp; Series</span><em>42</em></div><div class="b"><i style="--w:95%"></i></div></li>
+            <li><div class="n"><span>Permutations &amp; Combinations</span><em>31</em></div><div class="b"><i style="--w:70%"></i></div></li>
+            <li class="rest">and the rest of the syllabus, 715 videos in all.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card pp-final">
+        <div>
+          <h2>Not won yet, not done yet!</h2>
+          <p>Open the portal, watch the next lecture, tick it off. That's the whole plan.</p>
+        </div>
+        <a class="pp-btn" href="https://www.factorialacademy.com/latest" target="_blank" rel="noopener">Open the new portal</a>
+      </div>
+
+    </section>
+
 
   </div>
 </div>
