@@ -28,8 +28,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
-<link rel="stylesheet" href="device-ui.css">
-<link rel="stylesheet" href="minimal-ui.css">
+<link rel="stylesheet" href="motion-ui.css">
+<link rel="stylesheet" href="prototype-inspired.css">
 </head>
 <body>
 
@@ -84,41 +84,6 @@
       <div id="authError" style="color: var(--danger); font-size: 0.8rem; margin-top: 10px;"></div>
     </div>
 
-  </div>
-</div>
-
-<!-- Device preference gate: presentation-only, no backend changes. -->
-<div id="deviceGate" class="device-gate" aria-modal="true" role="dialog" aria-labelledby="deviceGateTitle">
-  <div class="device-gate-card">
-    <div class="device-gate-kicker">FACTORIAL ACADEMY</div>
-    <h2 id="deviceGateTitle">How are you using Factorial today?</h2>
-    <p>Pick your device so the layout can be tuned for your screen. You can change this later.</p>
-    <div class="device-choice-grid">
-      <button class="device-choice" data-device="phone" type="button">
-        <span class="device-choice-icon" aria-hidden="true">📱</span>
-        <span><strong>Phone</strong><small>Touch-first, compact layout</small></span>
-      </button>
-      <button class="device-choice" data-device="desktop" type="button">
-        <span class="device-choice-icon" aria-hidden="true">🖥️</span>
-        <span><strong>Desktop</strong><small>Full navigation and workspace</small></span>
-      </button>
-      <button class="device-choice" data-device="tablet" type="button">
-        <span class="device-choice-icon" aria-hidden="true">▣</span>
-        <span><strong>Tablet</strong><small>Balanced touch + workspace</small></span>
-      </button>
-      <button class="device-choice" data-device="auto" type="button">
-        <span class="device-choice-icon" aria-hidden="true">✦</span>
-        <span><strong>Auto</strong><small>Use the browser's screen size</small></span>
-      </button>
-    </div>
-  </div>
-</div>
-
-<div id="mobileNavDrawer" class="mobile-nav-drawer" aria-hidden="true">
-  <button class="mobile-nav-backdrop" type="button" aria-label="Close menu"></button>
-  <div class="mobile-nav-sheet" role="dialog" aria-label="All navigation options">
-    <div class="mobile-nav-sheet-head"><div><b>All options</b><span>Everything in one place</span></div><button id="mobileNavClose" type="button" aria-label="Close">×</button></div>
-    <div id="mobileNavOptions" class="mobile-nav-options"></div>
   </div>
 </div>
 
@@ -633,8 +598,6 @@
 </div>
 
 <script src="motion-ui.js" defer></script>
-<script src="minimal-ui.js"></script>
-<script src="device-ui.js"></script>
 <script type="module" src="main.js"></script>
 
 </body>
