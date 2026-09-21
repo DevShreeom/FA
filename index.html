@@ -455,83 +455,16 @@
         <!-- Stats strip — real numbers, real product feel -->
         <div class="about-stats">
           <div class="about-stat"><div class="about-stat-num">700+</div><div class="about-stat-lbl">Lectures</div></div>
-          <div class="about-stat"><div class="about-stat-num">2</div><div class="about-stat-lbl">Core Developers</div></div>
+          
           <div class="about-stat"><div class="about-stat-num">14</div><div class="about-stat-lbl">Themes</div></div>
           <div class="about-stat"><div class="about-stat-num">24/7</div><div class="about-stat-lbl">Auto-Synced</div></div>
         </div>
       </div>
 
-      <!-- Credits Section: Equal billing for both core contributors -->
-      <div class="about-card credits-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 24px; padding: 32px; margin-bottom: 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
-        <h3 style="font-family: var(--font-display); font-size: 1rem; font-weight: 700; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; letter-spacing: 0.05em; display: flex; align-items: center; gap: 8px;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Team &amp; Credits
-        </h3>
-        <p style="font-size: 0.9rem; color: var(--muted); margin: 0 0 28px;">The two people behind everything you're using right now.</p>
-
-        <!-- Story timeline -->
-        <div class="credits-timeline">
-          <div class="ct-node">
-            <div class="ct-dot ct-dot-start"></div>
-            <div class="ct-label">
-              <div class="ct-label-title">Platform launches</div>
-              <div class="ct-label-sub">Built from zero by Shree</div>
-            </div>
-          </div>
-          <div class="ct-line"></div>
-          <div class="ct-node">
-            <div class="ct-dot ct-dot-mid"></div>
-            <div class="ct-label">
-              <div class="ct-label-title">September 2026</div>
-              <div class="ct-label-sub">suryansh1807 joins the team</div>
-            </div>
-          </div>
-          <div class="ct-line"></div>
-          <div class="ct-node">
-            <div class="ct-dot ct-dot-end"></div>
-            <div class="ct-label">
-              <div class="ct-label-title">Today</div>
-              <div class="ct-label-sub">Built &amp; run by both, equally</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="credits-grid">
-          <!-- Shree -->
-          <div class="credit-person">
-            <div class="credit-avatar" style="background: linear-gradient(135deg, var(--pyq), var(--accent));">S</div>
-            <div class="credit-info">
-              <div class="credit-name">Shree</div>
-              <div class="credit-role">Founder &amp; Lead Developer</div>
-              <div class="credit-timeframe">🚀 Since day one</div>
-              <p class="credit-desc">Designed and built the platform from scratch — the core architecture, the database, the tracking system, and the Material&nbsp;3 interface — and has maintained it end to end ever since.</p>
-              <div class="credit-tags">
-                <span class="credit-tag">Architecture</span>
-                <span class="credit-tag">Database</span>
-                <span class="credit-tag">UI System</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- suryansh1807 -->
-          <div class="credit-person">
-            <div class="credit-avatar" style="background: linear-gradient(135deg, var(--accent), var(--pyq));">Su</div>
-            <div class="credit-info">
-              <div class="credit-name">suryansh1807</div>
-              <div class="credit-role">Core Developer</div>
-              <div class="credit-timeframe">🌱 Joined September 2026</div>
-              <p class="credit-desc">Joined the team in September 2026 and shipped the Video Portal, Playlistic, and automatic syncing — the features that keep the video library and progress data staying up to date on their own.</p>
-              <div class="credit-tags">
-                <span class="credit-tag">Video Portal</span>
-                <span class="credit-tag">Playlistic</span>
-                <span class="credit-tag">Auto-Sync</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <p style="font-size: 0.85rem; color: var(--muted); margin: 24px 0 0; text-align: center; border-top: 1px solid var(--border); padding-top: 16px;">
-          Factorial Academy is built and maintained equally by both contributors above.
-        </p>
+      <!-- Team credit intentionally kept compact; full product focus stays on Factorial Academy. -->
+      <div class="team-credit-note" aria-label="Development credits">
+        <span class="team-credit-label">Built &amp; maintained by</span>
+        <span class="team-credit-name">Shree &amp; suryansh1807</span>
       </div>
 
       <!-- Roadmap Section -->
@@ -609,9 +542,10 @@
       <a href="#" style="color: var(--text); text-decoration: none;">What's new</a>
       <a href="#" style="color: var(--text); text-decoration: none;">Roadmap</a>
       <a href="#" style="color: var(--text); text-decoration: none;">Report a bug</a>
-      <a href="#" id="footerCreditsBtn" style="color: var(--accent); text-decoration: none; font-weight: 500;">Credits &amp; licences</a>
+
     </div>
-    <div class="footer-copy" style="font-size: 0.75rem; color: var(--muted); line-height: 1.5;">Factorial Academy Tracker V7 &middot; Built &amp; maintained by Shree &amp; suryansh1807 &middot; Lessons &copy; Factorial Academy &middot; Lessons are streamed from YouTube, a trademark of Google LLC.</div>
+    <div class="footer-copy" style="font-size: 0.75rem; color: var(--muted); line-height: 1.5;">Factorial Academy Tracker V7 &middot; Lessons &copy; Factorial Academy &middot; Lessons are streamed from YouTube, a trademark of Google LLC.</div>
+    <div class="footer-dev-credit">Built with care by <strong>Shree</strong> &amp; <strong>suryansh1807</strong></div>
   </footer>
 
 <div class="tour-overlay" id="tourOverlay" style="display:none;" aria-live="polite">
