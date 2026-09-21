@@ -16,7 +16,14 @@
 <meta property="og:description" content="The ultimate tracking and preparation dashboard for JEE aspirants.">
 <meta property="og:image" content="https://www.factorialacademy.com/logot.png">
 
-<link rel="icon" type="image/png" href="logot.png">
+<link rel="icon" type="image/png" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#141218">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Factorial">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -283,6 +290,7 @@
           <h2 style="margin: 0; font-family: var(--font-display); color: var(--text);">Tracking as <strong id="whoamiName"></strong></h2>
           <div style="margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap;">
             <button id="editNameBtn" class="pomo-btn outline-pill" style="padding: 6px 12px; font-size: 0.85rem; width: auto;">Edit Name</button>
+            <button id="certBtn" class="pomo-btn outline-pill" style="padding: 6px 12px; font-size: 0.85rem; width: auto;">Get Certificate</button>
             <button id="downloadStatsBtn" class="pomo-btn outline-pill" style="padding: 6px 12px; font-size: 0.85rem; width: auto; background: var(--accent-dim); color: var(--accent);">Download Stats</button>
             <button id="logoutBtn" class="pomo-btn primary" style="padding: 6px 12px; font-size: 0.85rem; width: auto; background: var(--danger); color: #000;">Log Out</button>
           </div>
@@ -347,6 +355,7 @@
       </label>
       
       <button id="saveSettingsBtn" style="background: var(--accent); color: var(--accent-on); border: none; padding: 14px; border-radius: 999px; cursor: pointer; font-weight: 700; margin-top: 12px; font-family: var(--font-body); font-size: 0.95rem; transition: transform 0.2s;">Save Profile</button>
+      <button id="retakeTourBtn" type="button" style="background:none; border:none; color:var(--muted); font-size:0.8rem; cursor:pointer; padding:4px; font-family: var(--font-body);">Retake the welcome tour</button>
     </div>
   </div>
 
@@ -359,10 +368,24 @@
 </div>
 </div>
 
+  <div id="certModal" class="cert-modal" style="display:none;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 4px;">
+      <h3 style="margin:0; font-family: var(--font-display); font-size: 1.15rem; color: var(--text);">Your certificate</h3>
+      <button class="close-modal" id="certCloseBtn" style="background:none; border:none; color:var(--muted); font-size:1.5rem; cursor:pointer;">&times;</button>
+    </div>
+    <p style="font-size:0.85rem; color:var(--muted); margin: 6px 0 0;">Generated from your own progress on this account.</p>
+    <div style="margin-top:16px;">
+      <label style="font-size:0.85rem; font-weight:500; color:var(--muted);">Name on the certificate</label>
+      <input type="text" id="certName" placeholder="Your name" style="width:100%; box-sizing:border-box; padding: 12px 16px; border-radius: 12px; background: var(--panel); border: 1px solid var(--border); color: var(--text); margin-top:6px; outline: none; font-family: var(--font-body);">
+    </div>
+    <div class="cert-canvas-wrap"><canvas id="certCanvas" width="1400" height="990"></canvas></div>
+    <div class="cert-actions">
+      <button id="certPrintBtn" class="pomo-btn outline-pill" style="width:auto; padding: 10px 20px;">Print / Save as PDF</button>
+      <button id="certPngBtn" class="pomo-btn primary" style="width:auto; padding: 10px 20px;">Download PNG</button>
+    </div>
+  </div>
+
 </div>
-
-</div> <!-- <--- MODAL OVERLAY ENDS HERE SAFELY -->
-
 
 <!-- M3 FLOATING PILL (Hidden until minimized) -->
 <button id="showToolsPill">
@@ -517,6 +540,13 @@
         </p>
       </div>
 
+      <!-- Roadmap Section -->
+      <div class="about-card" id="roadmapCard" style="background: var(--panel); border: 1px solid var(--border); border-radius: 24px; padding: 32px; margin-bottom: 32px;">
+        <h3 style="font-family: var(--font-display); font-size: 1rem; font-weight: 700; text-transform: uppercase; color: var(--text); margin-bottom: 6px; letter-spacing: 0.05em; border-bottom: 1px solid var(--border); padding-bottom: 12px;">Roadmap</h3>
+        <p style="font-size: 0.9rem; color: var(--muted); margin: 16px 0 20px;">Not promises, not a queue — just what's on the list. Nothing here has a date.</p>
+        <div id="roadmapList" style="display:flex; flex-direction:column; gap:10px;"></div>
+      </div>
+
       <!-- Privacy Policy Section -->
       <div class="about-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 24px; padding: 32px; margin-bottom: 32px;">
         <h3 style="font-family: var(--font-display); font-size: 1rem; font-weight: 700; text-transform: uppercase; color: var(--text); margin-bottom: 16px; letter-spacing: 0.05em; border-bottom: 1px solid var(--border); padding-bottom: 12px;">Privacy Policy</h3>
@@ -590,7 +620,23 @@
     <div class="footer-copy" style="font-size: 0.75rem; color: var(--muted); line-height: 1.5;">Factorial Academy Tracker V7 &middot; Built &amp; maintained by Shree &amp; suryansh1807 &middot; Lessons &copy; Factorial Academy &middot; Lessons are streamed from YouTube, a trademark of Google LLC.</div>
   </footer>
 
-</div> <!-- End of .main-content -->
+<div class="tour-overlay" id="tourOverlay" style="display:none;" aria-live="polite">
+  <div class="tour-dim" id="tourDim"></div>
+  <div class="tour-arrow" id="tourArrow" style="display:none;"></div>
+  <div class="tour-card" id="tourCard" role="dialog" aria-label="Guided tour">
+    <div class="tour-badge" id="tourBadge"></div>
+    <b id="tourTitle"></b>
+    <p id="tourText"></p>
+    <input type="text" id="tourNameInput" class="tour-name" placeholder="Your name" maxlength="40" autocomplete="off" spellcheck="false" style="display:none;">
+    <div class="tour-foot">
+      <div class="tour-dots" id="tourDots"></div>
+      <div class="tour-btns">
+        <button class="tour-skip" type="button" id="tourSkip">Skip</button>
+        <button class="pomo-btn primary" type="button" id="tourNext">Next</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script type="module" src="main.js"></script>
 

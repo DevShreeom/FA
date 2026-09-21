@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>You're offline · Factorial Academy</title>
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#141218;color:#E6E1E5;font-family:'Inter',system-ui,-apple-system,sans-serif;text-align:center;padding:24px}
+.card{max-width:440px}
+.icon{width:56px;height:56px;margin:0 auto 22px;color:#D0BCFF}
+h2{font-family:'Sora',sans-serif;font-size:22px;margin:0 0 10px;font-weight:700}
+p{color:#CAC4D0;line-height:1.6;margin:0 0 28px;font-size:14.5px}
+button.btn{display:inline-flex;align-items:center;gap:8px;background:#D0BCFF;color:#381E72;font-weight:700;padding:12px 22px;border-radius:999px;font-size:14.5px;font-family:'Sora',sans-serif;border:0;cursor:pointer}
+button.btn:hover{filter:brightness(1.06)}
+.foot{margin-top:32px;font-size:12.5px;color:#938F99}
+</style>
+</head>
+<body>
+  <div class="card">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 9a16 16 0 0 1 22 0M5 12.5a11 11 0 0 1 14 0M8.5 16a6 6 0 0 1 7 0"/><line x1="1" y1="1" x2="23" y2="23"/><circle cx="12" cy="20" r="1" fill="currentColor" stroke="none"/></svg>
+    <h2>You&rsquo;re offline</h2>
+    <p>This page hasn&rsquo;t been saved for offline use, and lectures, QOTD and the leaderboard all need a connection. Reconnect and try again &mdash; anything you&rsquo;d already opened this session should still work.</p>
+    <button class="btn" onclick="location.reload()">Try again</button>
+    <div class="foot">Factorial Academy &middot; Not won yet, not done yet.</div>
+  </div>
+</body>
+</html>

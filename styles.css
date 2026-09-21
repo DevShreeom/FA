@@ -2034,3 +2034,49 @@ header { justify-content: space-between; }
   .auth-brand-features { display: none; }
   .auth-form-panel { padding: 40px 20px; }
 }
+
+/* ========================================= */
+/* ONBOARDING: welcome + guided tour          */
+/* ========================================= */
+.tour-overlay{position:fixed;inset:0;z-index:5000;pointer-events:none}
+.tour-dim{position:absolute;inset:0;background:rgba(6,6,8,.7);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);pointer-events:auto;opacity:0;transition:opacity .3s var(--m3-ease)}
+.tour-overlay.on .tour-dim{opacity:1}
+.tour-card{position:fixed;width:min(320px,88vw);background:var(--panel-2);border:1px solid var(--border);border-radius:20px;padding:22px;box-shadow:0 24px 60px rgba(0,0,0,.5);pointer-events:auto;opacity:0;transform:translateY(6px) scale(.98);transition:opacity .22s var(--m3-ease),transform .22s var(--m3-ease),top .32s var(--m3-ease),left .32s var(--m3-ease)}
+.tour-card.in{opacity:1;transform:none}
+.tour-card.welcome{width:min(400px,90vw);padding:36px 30px;text-align:center}
+.tour-arrow{position:fixed;width:14px;height:14px;background:var(--panel-2);border:1px solid var(--border);transform:rotate(45deg);pointer-events:none;transition:top .32s var(--m3-ease),left .32s var(--m3-ease)}
+.tour-arrow.top{border-right:0;border-bottom:0}
+.tour-arrow.bottom{border-left:0;border-top:0}
+.tour-badge{width:40px;height:40px;border-radius:12px;background:var(--accent-dim);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--accent);margin-bottom:14px;flex:none}
+.tour-card.welcome .tour-badge{margin:0 auto 16px;width:58px;height:58px;border-radius:16px;padding:10px}
+.tour-card.welcome .tour-badge img{width:100%;height:100%;object-fit:contain}
+.tour-card b{display:block;font-family:var(--font-display);font-size:16px;margin-bottom:8px;letter-spacing:-.01em;color:var(--text)}
+.tour-card.welcome b{font-size:20px}
+.tour-card p{margin:0 0 16px;font-size:13.5px;color:var(--muted);line-height:1.55}
+.tour-name{width:100%;box-sizing:border-box;border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:12px;padding:12px 14px;font:inherit;font-size:15px;margin-bottom:16px;text-align:center;font-family:var(--font-body)}
+.tour-name:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+.tour-foot{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.tour-card.welcome .tour-foot{flex-direction:column-reverse;gap:12px}
+.tour-dots{display:flex;gap:6px;align-items:center}
+.tour-dot{width:6px;height:6px;border-radius:99px;background:var(--border);transition:background .2s,width .2s}
+.tour-dot.on{background:var(--accent);width:16px}
+.tour-btns{display:flex;gap:8px;align-items:center}
+.tour-btns .pomo-btn{width:auto;padding:9px 18px;font-size:13.5px}
+.tour-skip{background:transparent;border:0;color:var(--muted);font:inherit;font-size:13px;cursor:pointer;padding:6px 4px;font-family:var(--font-body)}
+.tour-skip:hover{color:var(--text)}
+.tour-target{position:relative;z-index:5001;border-radius:16px;animation:tourPulse 1.8s ease-in-out infinite}
+.tour-target::after{content:'';position:absolute;inset:-6px;border-radius:inherit;border:2px solid var(--accent);pointer-events:none}
+@keyframes tourPulse{0%,100%{box-shadow:0 0 0 0 var(--accent-dim)}50%{box-shadow:0 0 0 8px transparent}}
+@media (prefers-reduced-motion: reduce){.tour-target{animation:none}.tour-card,.tour-dim{transition:none}}
+
+/* Roadmap list (About page) */
+.road-item{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border:1px solid var(--border);border-radius:14px;background:var(--panel-2)}
+.road-item b{display:block;font-size:14.5px;color:var(--text);font-family:var(--font-body);font-weight:600}
+.road-item span{display:block;font-size:13px;color:var(--muted);margin-top:3px;line-height:1.45}
+.road-tag{flex:none;font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:4px 10px;border-radius:99px;background:var(--accent-dim);color:var(--accent);white-space:nowrap}
+
+/* Certificate modal */
+.cert-modal{background:var(--panel-2);border:1px solid var(--border);border-radius:24px;width:92%;max-width:640px;padding:28px;box-shadow:0 16px 40px rgba(0,0,0,.5)}
+.cert-canvas-wrap{display:flex;justify-content:center;margin:16px 0}
+.cert-canvas-wrap canvas{width:100%;max-width:560px;height:auto;border-radius:12px;border:1px solid var(--border)}
+.cert-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;margin-top:8px}

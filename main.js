@@ -15,6 +15,8 @@ import { mountClassAnalytics } from './classAnalytics.js';
 
 import { initYtFeed } from './ytFeed.js';
 import { initAllVideosGrid } from './allVideos.js';
+import { initOnboarding, openRoadmap } from './onboarding.js';
+window.openRoadmap = openRoadmap;
 
 // ---- Theme toggle ----
 const THEME_KEY = 'jee_tracker_theme';
@@ -138,10 +140,10 @@ document.getElementById('aboutBtn')?.addEventListener('click', () => showSection
 document.querySelectorAll('.footer-links a').forEach(a => {
   a.addEventListener('click', (e) => {
     e.preventDefault();
-    if (a.textContent.trim().toLowerCase().includes('report a bug')) {
-      openBugReportEmail();
-      return;
-    }
+    const label = a.textContent.trim().toLowerCase();
+    if (label.includes('report a bug')) { openBugReportEmail(); return; }
+    if (label.includes("what's new")) { showSection('updates'); return; }
+    if (label.includes('roadmap')) { window.openRoadmap ? window.openRoadmap() : showSection('about'); return; }
     showSection('about');
   });
 });
@@ -199,6 +201,7 @@ onAuthStateChanged(auth, async (user) => {
     loadLatestUpdatePreview();
 
     isAdminUser = await checkIsAdmin(user.uid);
+    initOnboarding();
   } else {
     document.getElementById('appShell').style.display = 'none';
     if(document.getElementById('whoamiBar')) document.getElementById('whoamiBar').style.display = 'none';
@@ -206,3 +209,10 @@ onAuthStateChanged(auth, async (user) => {
     showAuthOverlay();
   }
 });
+
+// ---- Install as an app (Android + desktop) ----
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
