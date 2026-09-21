@@ -2,595 +2,252 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Factorial Academy | JEE Preparation & Tracking</title>
-<meta name="title" content="Factorial Academy | JEE Preparation & Tracking">
-<meta name="description" content="The ultimate tracking and preparation dashboard for JEE aspirants. Track one-shots, PYQs, and compete on the live leaderboard. Not won yet, not done yet!">
-<meta name="keywords" content="JEE, IIT JEE, JEE Mains, JEE Advanced, Study Tracker, Factorial Academy, PYQ tracker">
-<meta name="robots" content="index, follow">
-
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://www.factorialacademy.com/">
-<meta property="og:title" content="Factorial Academy | JEE Preparation">
-<meta property="og:description" content="The ultimate tracking and preparation dashboard for JEE aspirants.">
-<meta property="og:image" content="https://www.factorialacademy.com/logot.png">
-
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Factorial Academy — Business Prototype</title>
 <link rel="icon" type="image/png" href="logot.png">
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#141218">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Factorial">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
 <div id="cursor"></div>
+<div class="proto">PROTOTYPE · CLIENT PREVIEW</div>
 
-<!-- ==================== EDITORIAL LANDING VIEW (PROTOTYPE) ==================== -->
-<div id="landingView">
-  <nav class="proto-nav">
-    <div class="proto-logo">
-      <span class="proto-logo-mark">F</span>
-      FACTORIAL ACADEMY
-    </div>
-    <div class="proto-navlinks">
-      <button onclick="scrollToLandingSection('home')">Home</button>
-      <button onclick="scrollToLandingSection('courses')">Courses</button>
-      <button onclick="scrollToLandingSection('library')">Free Library</button>
-      <button onclick="scrollToLandingSection('practice')">Practice</button>
-      <button onclick="scrollToLandingSection('pricing')">Plans</button>
-    </div>
-    <div class="proto-nav-grow"></div>
-    <input class="proto-navsearch" id="protoSearch" placeholder="Search chapters & videos…">
-    <button class="proto-account-btn" id="landingLoginBtn">Student Login</button>
-  </nav>
+<nav>
+ <div class="logo"><span class="logoMark">F</span>FACTORIAL ACADEMY</div>
+ <div class="navlinks">
+   <button onclick="scrollToId('home')">Home</button>
+   <button onclick="scrollToId('courses')">Courses</button>
+   <button onclick="scrollToId('library')">Free Library</button>
+   <button onclick="scrollToId('practice')">Practice</button>
+   <button onclick="scrollToId('pricing')">Plans</button>
+ </div>
+ <div class="grow"></div>
+ <input class="navsearch" id="protoSearch" placeholder="Search…">
+ <button class="account" id="loginNavBtn">Student Login</button>
+</nav>
 
-  <main class="proto-main">
-    <section class="proto-wrap proto-hero" id="home">
-      <div>
-        <div class="proto-eyebrow">FACTORIAL ACADEMY · JEE MATHEMATICS</div>
-        <h1 class="proto-h1"><span>Learn.</span> <span>Practice.</span> <span>Master.</span></h1>
-        <p class="proto-p">A premium digital home for Factorial Academy — bringing courses, revision, assignments, live learning and the complete Factorial video library into one focused student experience.</p>
-        <div class="proto-actions">
-          <button class="proto-btn black" onclick="scrollToLandingSection('courses')">Explore the Academy →</button>
-          <button class="proto-btn white" onclick="scrollToLandingSection('library')">Watch free library</button>
-        </div>
-      </div>
-      <div class="proto-heroVisual">
-        <div class="proto-gridlines"></div>
-        <div class="proto-orbit"></div>
-        <div class="proto-formula">∫</div>
-        <div style="position:absolute;top:27px;left:27px;font-size:9px;color:#999;letter-spacing:1.5px">STUDENT DASHBOARD</div>
-        <div class="proto-liveCard">
-          <div class="proto-liveTop">
-            <span id="heroCardStatusLabel">CONTINUE LEARNING</span>
-            <span id="heroCardStatNum">71%</span>
-          </div>
-          <h3 id="heroCardTitle" style="font-size: 20px; margin: 15px 0 4px;">Application of Derivatives</h3>
-          <p id="heroCardSub" style="font-size: 10px; color: #999; margin: 0;">Advanced Calculus · Tracked Real-time</p>
-          <div class="proto-progress"><i id="heroCardBar" style="width: 71%;"></i></div>
-        </div>
-      </div>
-    </section>
-
-    <div class="proto-ticker">
-      <div class="proto-tickerTrack">POCKET COURSES ✦ JEE MAIN ✦ JEE ADVANCED ✦ FACTORIAL ORIGINALS ✦ REVISION LAB ✦ 700+ FREE VIDEOS ✦ ASSIGNMENTS ✦ LIVE CLASSES ✦ POCKET COURSES ✦ JEE MAIN ✦ JEE ADVANCED ✦ FACTORIAL ORIGINALS ✦ REVISION LAB ✦</div>
-    </div>
-
-    <section class="proto-wrap proto-section" id="courses">
-      <div class="proto-sectionHead">
-        <div>
-          <div class="proto-eyebrow">THE ACADEMY</div>
-          <h2>Courses that feel like products.</h2>
-          <p>Premium course cards, demo lessons, clear outcomes and structured tracks designed for JEE Main & Advanced.</p>
-        </div>
-      </div>
-      <div class="proto-line"></div>
-      <div class="proto-courses" id="courseGrid"></div>
-    </section>
-
-    <section class="proto-wrap proto-section" id="library">
-      <div class="proto-sectionHead">
-        <div>
-          <div class="proto-eyebrow">FREE · DISTRACTION-FREE</div>
-          <h2>The Factorial Library.</h2>
-          <p>Your complete catalogue of 700+ videos: searchable, chapter-wise, and free from the usual YouTube recommendation rabbit hole.</p>
-        </div>
-      </div>
-      <div class="proto-library">
-        <div class="proto-chapters" id="chapterList"></div>
-        <div class="proto-player">
-          <div class="proto-screen" id="protoScreen">
-            <span class="proto-screenLabel">YOUTUBE · EMBEDDED PLAYER</span>
-            <button class="proto-play" id="protoPlayBtn">▶</button>
-            <iframe id="protoIframe" style="display:none; width:100%; height:100%; border:none;" allowfullscreen allow="autoplay; encrypted-media"></iframe>
-          </div>
-          <div class="proto-videoInfo">
-            <h3 id="videoTitle" style="font-size:19px; margin:0 0 5px;">Limits — Complete Concept Revision</h3>
-            <p id="videoSubInfo" style="font-size:10px; color:#888; margin:0;">Factorial Academy · Free video · Select any chapter on the left</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="proto-wrap proto-section">
-      <div class="proto-dashboard">
-        <div class="proto-panel">
-          <div class="proto-eyebrow">STUDENT DASHBOARD</div>
-          <h3>Everything important, one screen.</h3>
-          <p>Progress, study streaks, assigned tasks, and complete heatmap statistics live here after login.</p>
-          <div class="proto-stats">
-            <div class="proto-stat"><b id="protoStatTheory">27</b><span>Chapters</span></div>
-            <div class="proto-stat"><b id="protoStatLectures">700+</b><span>Total Lectures</span></div>
-            <div class="proto-stat"><b id="protoStatFree">100%</b><span>Free Access</span></div>
-          </div>
-        </div>
-        <div class="proto-panel dark">
-          <div class="proto-eyebrow" style="color:#777">SYLLABUS FOCUS</div>
-          <div class="proto-checkrow"><i class="proto-dot"></i>Calculus · Complete Modules</div>
-          <div class="proto-checkrow"><i class="proto-dot"></i>Vectors & 3D Geometry PYQs</div>
-          <div class="proto-checkrow"><i class="proto-dot"></i>Matrices, Adjoint & Determinants</div>
-          <div class="proto-checkrow"><i class="proto-dot"></i>Permutations & Combinations (PnC)</div>
-        </div>
-      </div>
-    </section>
-
-    <section class="proto-wrap proto-section" id="practice">
-      <div class="proto-sectionHead">
-        <div>
-          <div class="proto-eyebrow">PRACTICE ENGINE</div>
-          <h2>Four different ways to practice.</h2>
-        </div>
-      </div>
-      <div class="proto-practice">
-        <div class="proto-practiceCard"><div class="proto-bigletter">M</div><h3>JEE Main</h3><p>Chapter-wise, timed and exam-focused practice sets.</p></div>
-        <div class="proto-practiceCard"><div class="proto-bigletter">A</div><h3>JEE Advanced</h3><p>Higher-difficulty multi-concept problem solving.</p></div>
-        <div class="proto-practiceCard"><div class="proto-bigletter">F</div><h3>Factorial Originals</h3><p>Original problems built for the Factorial ecosystem.</p></div>
-        <div class="proto-practiceCard"><div class="proto-bigletter">R</div><h3>Revision Sets</h3><p>Short selected sets for rapid consolidation.</p></div>
-      </div>
-    </section>
-
-    <section class="proto-wrap proto-section" id="pricing">
-      <div class="proto-sectionHead">
-        <div>
-          <div class="proto-eyebrow">PLANS · SIMULATION</div>
-          <h2>Simple checkout. Clear value.</h2>
-          <p>Prototype pricing and payment preview — ready to connect to payment gateways.</p>
-        </div>
-      </div>
-      <div class="proto-pricing">
-        <div class="proto-priceCard">
-          <div class="proto-eyebrow">POCKET</div>
-          <h3>Single Module</h3>
-          <div class="proto-amount">₹199</div>
-          <ul>
-            <li>Focused concept module</li>
-            <li>Demo lessons</li>
-            <li>Practice assignment</li>
-            <li>Progress tracking</li>
-          </ul>
-          <button class="proto-buy" onclick="openProtoCheckout('Pocket Module','₹199')">Buy module →</button>
-        </div>
-        <div class="proto-priceCard featured">
-          <div class="proto-eyebrow" style="color:#777">POPULAR</div>
-          <h3>Revision Lab</h3>
-          <div class="proto-amount">₹399</div>
-          <ul>
-            <li>Complete revision pathway</li>
-            <li>Selected practice</li>
-            <li>Revision checklist</li>
-            <li>Lifetime access concept</li>
-          </ul>
-          <button class="proto-buy" onclick="openProtoCheckout('Revision Lab','₹399')">Continue to payment →</button>
-        </div>
-        <div class="proto-priceCard">
-          <div class="proto-eyebrow">ADVANCED</div>
-          <h3>Problem Vault</h3>
-          <div class="proto-amount">₹799</div>
-          <ul>
-            <li>Advanced problem sets</li>
-            <li>Video solutions</li>
-            <li>Factorial originals</li>
-            <li>Progress dashboard</li>
-          </ul>
-          <button class="proto-buy" onclick="openProtoCheckout('Advanced Problem Vault','₹799')">Buy course →</button>
-        </div>
-      </div>
-    </section>
-
-    <footer class="proto-wrap proto-footer">
-      <span>FACTORIAL ACADEMY · NOT WON YET, NOT DONE YET!</span>
-      <span>Lessons streamed via YouTube API integrations · Built with clean editorial standards</span>
-    </footer>
-  </main>
-</div>
-
-<!-- ==================== AUTH OVERLAY MODAL ==================== -->
-<div id="authOverlay" style="display:none; position: fixed; inset: 0; z-index: 10000; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); overflow-y: auto;">
-  <button id="closeAuthBtn" style="position: absolute; top: 20px; right: 24px; background: none; border: none; color: #fff; font-size: 2rem; cursor: pointer; z-index: 10001;">&times;</button>
-  <div class="auth-shell">
-
-    <div class="auth-brand-panel">
-      <div class="auth-brand-inner">
-        <img src="logot.png" alt="Factorial Academy" class="auth-brand-logo">
-        <h1 class="auth-brand-title">Factorial Academy</h1>
-        <p class="auth-brand-tagline">NOT WON YET, NOT DONE YET!</p>
-        <ul class="auth-brand-features">
-          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> 700+ JEE-focused video lectures</li>
-          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Automatic progress &amp; video syncing</li>
-          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Daily Question of the Day &amp; leaderboard</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="auth-form-panel">
-      <div class="auth-tabs" style="display:flex; justify-content:center; gap: 6px; margin-bottom: 18px;">
-        <button id="tabLogin" class="active">Log in</button>
-        <button id="tabSignup">Create account</button>
-      </div>
-      <h2 id="authTitle" style="font-family: var(--font-display);">Log in</h2>
-      <p id="authSub" style="color: var(--muted); font-size: 0.85rem; margin-bottom: 18px;">Enter your username and password to continue tracking.</p>
-
-      <div class="auth-form" style="display:flex; flex-direction: column; gap: 10px; width: 100%; max-width: 320px;">
-        <input type="text" id="authUsername" placeholder="Username" style="padding: 12px; border-radius: 8px; background: var(--panel-2); border: 1px solid var(--border); color: var(--text);">
-        <input type="password" id="authPassword" placeholder="Password (min 6 characters)" style="padding: 12px; border-radius: 8px; background: var(--panel-2); border: 1px solid var(--border); color: var(--text);">
-        <button id="authSubmit" style="background: var(--accent); color: var(--accent-on); border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 700;">Log in</button>
-
-        <div style="display: flex; align-items: center; width: 100%; margin: 6px 0;">
-           <hr style="flex: 1; border: none; border-top: 1px solid var(--border);">
-           <span style="padding: 0 10px; color: var(--muted); font-size: 0.75rem;">OR</span>
-           <hr style="flex: 1; border: none; border-top: 1px solid var(--border);">
-        </div>
-
-        <button id="authGoogleBtn" style="display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--panel-2); color: var(--text); border: 1px solid var(--border); padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 600; width: 100%; transition: background 0.2s;">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="18px" height="18px">
-            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-          </svg>
-          Continue with Google
-        </button>
-      </div>
-
-      <div id="authError" style="color: var(--danger); font-size: 0.8rem; margin-top: 10px;"></div>
-    </div>
-
+<main>
+<section class="wrap hero" id="home">
+ <div>
+  <div class="eyebrow">FACTORIAL ACADEMY · JEE MATHEMATICS</div>
+  <h1><span>Learn.</span> <span>Practice.</span> <span>Master.</span></h1>
+  <p>A premium digital home for Factorial Academy — bringing courses, revision, assignments, live learning and the complete Factorial video library into one focused student experience.</p>
+  <div class="actions">
+    <button class="btn black" onclick="scrollToId('courses')">Explore the Academy →</button>
+    <button class="btn white" onclick="scrollToId('library')">Watch free library</button>
   </div>
+ </div>
+ <div class="heroVisual">
+   <div class="gridlines"></div>
+   <div class="orbit"></div>
+   <div class="formula">∫</div>
+   <div style="position:absolute;top:27px;left:27px;font-size:9px;color:#999;letter-spacing:1.5px">STUDENT DASHBOARD</div>
+   <div class="liveCard">
+     <div class="liveTop">
+       <span id="heroCardStatus">CONTINUE LEARNING</span>
+       <span id="heroCardPct">71%</span>
+     </div>
+     <h3 id="heroCardTitle">Application of Derivatives</h3>
+     <p id="heroCardSub">Advanced Calculus · Lesson 14 of 20</p>
+     <div class="progress"><i id="heroCardBar" style="width: 71%;"></i></div>
+   </div>
+ </div>
+</section>
+
+<div class="ticker">
+  <div class="tickerTrack">POCKET COURSES ✦ JEE MAIN ✦ JEE ADVANCED ✦ FACTORIAL ORIGINALS ✦ REVISION LAB ✦ 700+ FREE VIDEOS ✦ ASSIGNMENTS ✦ LIVE CLASSES ✦ POCKET COURSES ✦ JEE MAIN ✦ JEE ADVANCED ✦ FACTORIAL ORIGINALS ✦ REVISION LAB ✦</div>
 </div>
 
-<!-- ==================== PROTOTYPE CHECKOUT MODAL ==================== -->
-<div class="proto-modalBg" id="protoCheckoutModal">
- <div class="proto-modal">
-  <div class="proto-modalTop">
-    <div class="proto-eyebrow">SECURE CHECKOUT · SIMULATION</div>
-    <button class="proto-x" onclick="closeProtoCheckout()">×</button>
+<section class="wrap section" id="courses">
+ <div class="sectionHead">
+   <div>
+     <div class="eyebrow">THE ACADEMY</div>
+     <h2>Courses that feel like products.</h2>
+     <p>Premium course cards, demo lessons, clear outcomes and a simulated purchase flow — designed for a real education business.</p>
+   </div>
+ </div>
+ <div class="line"></div>
+ <div class="courses" id="courseGrid"></div>
+</section>
+
+<section class="wrap section" id="library">
+ <div class="sectionHead">
+   <div>
+     <div class="eyebrow">FREE · DISTRACTION-FREE</div>
+     <h2>The Factorial Library.</h2>
+     <p>Your existing YouTube catalogue can become a proper study product: searchable, chapter-wise and free from the normal YouTube rabbit hole.</p>
+   </div>
+ </div>
+ <div class="library">
+   <div class="chapters" id="chapterList"></div>
+   <div class="player">
+     <div class="screen" id="playerScreen">
+       <span class="screenLabel" id="screenLabelText">YOUTUBE · EMBEDDED PLAYER</span>
+       <button class="play" id="mainPlayBtn">▶</button>
+       <iframe id="videoIframe" style="display:none; width:100%; height:100%; border:0; position:absolute; inset:0; z-index:10;" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+     </div>
+     <div class="videoInfo">
+       <h3 id="videoTitle">Limits — Complete Concept Revision</h3>
+       <p id="videoSub">Factorial Academy · Free video · Continue watching · No unrelated recommendations</p>
+     </div>
+   </div>
+ </div>
+</section>
+
+<section class="wrap section">
+ <div class="dashboard">
+   <div class="panel">
+     <div class="eyebrow">STUDENT DASHBOARD</div>
+     <h3>Everything important, one screen.</h3>
+     <p>Progress, active courses, assignments and upcoming learning can live here after login.</p>
+     <div class="stats">
+       <div class="stat"><b id="statChapters">27</b><span>Active chapters</span></div>
+       <div class="stat"><b id="statProgress">72%</b><span>Curriculum covered</span></div>
+       <div class="stat"><b id="statVideos">714</b><span>Videos synced</span></div>
+     </div>
+   </div>
+   <div class="panel dark">
+     <div class="eyebrow" style="color:#777">TODAY</div>
+     <div class="checkrow"><i class="dot"></i>Limits · Revision</div>
+     <div class="checkrow"><i class="dot"></i>JEE Main · Set 04</div>
+     <div class="checkrow"><i class="dot"></i>Live class · 7:00 PM</div>
+     <div class="checkrow"><i class="dot"></i>Advanced assignment</div>
+   </div>
+ </div>
+</section>
+
+<section class="wrap section" id="practice">
+ <div class="sectionHead">
+   <div>
+     <div class="eyebrow">PRACTICE ENGINE</div>
+     <h2>Four different ways to practice.</h2>
+   </div>
+ </div>
+ <div class="practice">
+  <div class="practiceCard"><div class="bigletter">M</div><h3>JEE Main</h3><p>Chapter-wise, timed and exam-focused practice sets.</p></div>
+  <div class="practiceCard"><div class="bigletter">A</div><h3>JEE Advanced</h3><p>Higher-difficulty multi-concept problem solving.</p></div>
+  <div class="practiceCard"><div class="bigletter">F</div><h3>Factorial Originals</h3><p>Original problems built for the Factorial ecosystem.</p></div>
+  <div class="practiceCard"><div class="bigletter">R</div><h3>Revision Sets</h3><p>Short selected sets for rapid consolidation.</p></div>
+ </div>
+</section>
+
+<section class="wrap section" id="pricing">
+ <div class="sectionHead">
+   <div>
+     <div class="eyebrow">PLANS · SIMULATION</div>
+     <h2>Simple checkout. Clear value.</h2>
+     <p>Prototype pricing and payment flow — ready to be connected to a real gateway later.</p>
+   </div>
+ </div>
+ <div class="pricing">
+  <div class="priceCard">
+    <div class="eyebrow">POCKET</div>
+    <h3>Single Module</h3>
+    <div class="amount">₹199</div>
+    <ul>
+      <li>Focused concept module</li>
+      <li>Demo lessons</li>
+      <li>Practice assignment</li>
+      <li>Progress tracking</li>
+    </ul>
+    <button class="buy" onclick="checkout('Pocket Module','₹199')">Buy module →</button>
+  </div>
+  <div class="priceCard featured">
+    <div class="eyebrow" style="color:#777">POPULAR</div>
+    <h3>Revision Lab</h3>
+    <div class="amount">₹399</div>
+    <ul>
+      <li>Complete revision pathway</li>
+      <li>Selected practice</li>
+      <li>Revision checklist</li>
+      <li>Lifetime access concept</li>
+    </ul>
+    <button class="buy" onclick="checkout('Revision Lab','₹399')">Continue to payment →</button>
+  </div>
+  <div class="priceCard">
+    <div class="eyebrow">ADVANCED</div>
+    <h3>Problem Vault</h3>
+    <div class="amount">₹799</div>
+    <ul>
+      <li>Advanced problem sets</li>
+      <li>Video solutions</li>
+      <li>Factorial originals</li>
+      <li>Progress dashboard</li>
+    </ul>
+    <button class="buy" onclick="checkout('Advanced Problem Vault','₹799')">Buy course →</button>
+  </div>
+ </div>
+</section>
+
+<footer class="wrap">
+  <span>FACTORIAL ACADEMY · BUSINESS PROTOTYPE</span>
+  <span>Prototype only · Payment, authentication and course delivery are simulated.</span>
+</footer>
+</main>
+
+<!-- Checkout Modal (From Prototype) -->
+<div class="modalBg" id="modal">
+ <div class="modal">
+  <div class="modalTop">
+    <div class="eyebrow">SECURE CHECKOUT · PROTOTYPE</div>
+    <button class="x" onclick="closeModal()">×</button>
   </div>
   <div id="checkoutContent">
-    <h2 id="buyTitle" style="font-size:28px; letter-spacing:-1px; margin:24px 0 7px;">Revision Lab</h2>
-    <p id="buyPrice" style="color:#888; font-size:12px; margin:0 0 16px;">₹399 · One-time access</p>
-    <div class="proto-checkout">
-      <div class="proto-field">Full name</div>
-      <div class="proto-field">Email address</div>
-      <div class="proto-paymentOption selected">◉ UPI</div>
-      <div class="proto-paymentOption">○ Card</div>
-      <div class="proto-paymentOption">○ Net Banking</div>
-      <div class="proto-paymentOption">○ Wallet</div>
-      <button class="proto-payNow" onclick="processProtoPay()">Proceed to UPI payment · <span id="payAmount">₹399</span></button>
+    <h2 id="buyTitle">Revision Lab</h2>
+    <p id="buyPrice">₹399 · One-time payment</p>
+    <div class="checkout">
+      <div class="field">Student name</div>
+      <div class="field">Email / mobile</div>
+      <div class="paymentOption selected">◉ UPI</div>
+      <div class="paymentOption">○ Card</div>
+      <div class="paymentOption">○ Net Banking</div>
+      <div class="paymentOption">○ Wallet</div>
+      <button class="payNow" onclick="pay()">Proceed to UPI payment · <span id="payAmount">₹399</span></button>
     </div>
   </div>
-  <div class="proto-success" id="checkoutSuccess">
-    <div class="proto-successIcon">✓</div>
-    <h2>Enrollment confirmed</h2>
-    <p>This is a simulated transaction. In production, this trigger connects directly to Razorpay or Cashfree to unlock your modules.</p>
-    <button class="proto-btn black" onclick="closeProtoCheckout()">Return to Academy</button>
+  <div class="success" id="success">
+    <div class="successIcon">✓</div>
+    <h2>Payment successful</h2>
+    <p>This is a simulated transaction. In production, this button would hand off to Razorpay/Cashfree and unlock the purchased course automatically.</p>
+    <button class="btn black" onclick="closeModal()">Return to Academy</button>
   </div>
  </div>
 </div>
 
-<!-- ==================== AUTHENTICATED WORKSPACE SHELL ==================== -->
-<div id="appShell" style="display:none;">
-  
-  <nav class="sidebar">
-      <div class="brand">
-        <img src="logot.png" alt="FA Logo" class="brand-icon">
-        <div>
-          <h1>Factorial Academy</h1>
-          <div class="sub">NOT WON YET, NOT DONE YET!</div>
-        </div>
-      </div>
+<!-- Real Firebase Auth Overlay (Preserved behind prototype) -->
+<div id="authOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); z-index:2000; align-items:center; justify-content:center;">
+  <div style="background:#fff; border-radius:18px; width:min(440px, 92vw); padding:32px; position:relative; box-shadow:0 35px 100px rgba(0,0,0,0.25);">
+    <button id="closeAuthModalBtn" style="position:absolute; top:20px; right:20px; border:0; background:#f0f0ed; border-radius:50%; width:30px; height:30px; cursor:pointer; font-size:16px;">×</button>
+    
+    <div style="display:flex; justify-content:center; gap:8px; margin-bottom:20px;">
+      <button id="tabLogin" class="btn black" style="padding:8px 18px; font-size:11px;">Log in</button>
+      <button id="tabSignup" class="btn white" style="padding:8px 18px; font-size:11px;">Create account</button>
+    </div>
+
+    <h2 id="authTitle" style="font-size:22px; margin:0 0 6px; letter-spacing:-0.5px;">Log in</h2>
+    <p id="authSub" style="color:#777; font-size:11px; margin:0 0 20px;">Enter your username and password to continue tracking.</p>
+
+    <div style="display:flex; flex-direction:column; gap:10px;">
+      <input type="text" id="authUsername" placeholder="Username" style="border:1px solid #e4e4e0; padding:12px; border-radius:8px; font-size:12px; outline:none;">
+      <input type="password" id="authPassword" placeholder="Password (min 6 characters)" style="border:1px solid #e4e4e0; padding:12px; border-radius:8px; font-size:12px; outline:none;">
+      <button id="authSubmit" class="btn black" style="width:100%; padding:13px; font-size:11px; margin-top:4px;">Log in</button>
       
-      <div class="nav-rail">
-        <button class="nav-btn active" data-section="dashboard"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span> Dashboard</button>
-        <button class="nav-btn" data-section="library"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg></span> Library</button>
-        <button class="nav-btn" data-section="allvideos"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg></span> All YT Videos</button>
-        <button class="nav-btn" data-section="notes"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></span> Notes</button>
-        <button class="nav-btn" data-section="qotd"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span> QOTD</button>
-        <button class="nav-btn" data-section="leaderboard"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg></span> Leaderboard</button>
-        <button class="nav-btn" data-section="updates"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg></span> Updates</button>
-        <button class="nav-btn" data-section="profile"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> My Profile</button>
-        <button class="nav-btn" id="dockSettingsBtn" title="Settings"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></span> Settings</button>
-        <button class="nav-btn" id="protoHomeBtn"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span> Portal Home</button>
-     </div>
-     <button class="nav-btn" data-section="about" id="aboutBtn">
-      <span class="nav-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="12" y1="16" x2="12" y2="12"></line>
-          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      <div style="display:flex; align-items:center; margin:6px 0;">
+        <div style="flex:1; height:1px; background:#e4e4e0;"></div>
+        <span style="padding:0 10px; font-size:9px; color:#999; font-weight:800;">OR</span>
+        <div style="flex:1; height:1px; background:#e4e4e0;"></div>
+      </div>
+
+      <button id="authGoogleBtn" class="btn white" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px; padding:11px; font-size:11px;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="16px" height="16px">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
         </svg>
-      </span> 
-      About & Credits
-    </button>
-  </nav>
-
-  <div class="main-content content">
-    <header>
-      <div class="header-titlebar">
-        <h2 id="pageTitle" class="header-title">Dashboard</h2>
-        <p id="pageSubtitle" class="header-subtitle">Welcome back — here's where you left off.</p>
-      </div>
-      <div style="display: flex; align-items: center; gap: 12px;">
-        <div class="whoami" id="whoamiBar" style="display: flex;">
-          <div class="avatar" id="avatarIcon">S</div>
-          <span id="whoamiBarText">Tracking as <strong id="whoamiBarName">Student</strong></span>
-        </div>
-        <button id="themeToggle" class="theme-toggle" title="Switch Theme">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
-        </button>
-      </div>
-    </header>
-
-    <section id="sectionDashboard" class="content-section active">
-      <div class="focus-strip">
-        <div class="focus-stat">
-          <span class="focus-stat-num" id="statOverallNum">0%</span>
-          <span class="focus-stat-lbl">Overall</span>
-        </div>
-        <div class="focus-strip-sep"></div>
-        <div class="focus-stat">
-          <span class="focus-stat-num" id="statTheoryNum">0/0</span>
-          <span class="focus-stat-lbl" style="color:var(--accent);">Theory</span>
-        </div>
-        <div class="focus-strip-sep"></div>
-        <div class="focus-stat">
-          <span class="focus-stat-num" id="statPyqNum">0/0</span>
-          <span class="focus-stat-lbl" style="color:var(--pyq);">PYQ</span>
-        </div>
-      </div>
-
-      <div class="hero-card card">
-        <div class="hero-card-label">
-          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-          Continue Watching
-        </div>
-        <div id="continueWatchingWidget" class="widget-inner">
-          <div class="loading">Finding video...</div>
-        </div>
-      </div>
-
-      <div class="dashboard-top-row">
-        <div class="card elevated-qotd">
-          <div class="section-label pyq">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-            Question of the Day
-          </div>
-          <div id="qotdWidget" class="widget-inner"></div>
-        </div>
-        <div class="card elevated-update">
-          <div class="section-label" style="color:var(--accent);">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
-            Latest Update
-          </div>
-          <div id="latestUpdatePreview" class="widget-inner">Loading...</div>
-        </div>
-      </div>
-
-      <div class="card yt-feed-card">
-        <div class="yt-feed-header">
-          <div class="section-label" style="margin:0; color:var(--text);">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.96-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>
-            New from Channel
-          </div>
-          <button id="ytSyncBtn" class="yt-sync-btn" title="Fetch latest videos">
-            <svg id="ytSyncIcon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
-            <span id="ytSyncLabel">Sync</span>
-          </button>
-        </div>
-        <div id="ytFeedContainer" class="yt-feed-row">
-          <p class="yt-feed-empty">Press Sync to load latest uploads from the channel.</p>
-        </div>
-        <div id="ytSyncStatus" class="yt-sync-status"></div>
-      </div>
-
-      <div class="active-study-hub" style="margin-bottom: 24px;">
-        <div class="section-label" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-          <span style="font-family: var(--font-display); font-size: 1.1rem; color: var(--text); font-weight: 700; display: flex; align-items: center; gap: 8px;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-            Active Focus
-          </span>
-          <span style="font-size: 0.8rem; color: var(--muted); font-weight: 500;">Max 2 chapters</span>
-        </div>
-        <div id="dashboardChapters" class="chapter-grid">
-           <p class="yt-feed-empty" id="noPinnedMsg">No chapters pinned. Go to the Library tab to pin up to 2 chapters here!</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- ==================== ALL LECTURES LIBRARY ==================== -->
-    <section id="sectionLibrary" class="content-section">
-      <div class="profile-page-header">
-        <h2 class="profile-heading">Lectures Library</h2>
-        <p class="profile-sub">Browse, search, and track the complete curriculum of 700+ videos.</p>
-      </div>
-      
-      <div class="overall-bar-wrap">
-        <div class="count" id="overallCount">0 / 0</div>
-        <div class="bar"><div id="overallBar"></div></div>
-      </div>
-
-      <div class="controls">
-        <button id="expandAll">Expand all</button>
-        <button id="collapseAll">Collapse all</button>
-        <input class="search-input" id="chapterSearch" placeholder="Search chapters…">
-        <span class="status-msg" id="statusMsg"></span>
-      </div>
-
-      <div id="chapters" class="chapter-grid"></div>
-    </section>
-
-    <section id="sectionAllVideos" class="content-section">
-      <div class="profile-page-header">
-        <h2 class="profile-heading">Latest YouTube Uploads</h2>
-        <p class="profile-sub">A clean grid of all recent videos fetched directly from the channel.</p>
-      </div>
-      <div id="allVideosGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; margin-top: 24px;"></div>
-    </section>
-
-    <section id="sectionNotes" class="content-section">
-      <div class="card">
-        <div class="section-label" style="margin-top:0;">📝 Revision Notes & Timestamps</div>
-        <div class="controls" style="margin-bottom: 20px;">
-          <input class="search-input" id="notesSearch" placeholder="Search footnotes & videos..." style="width: 100%; max-width: 400px;">
-        </div>
-        <div id="notesContainer" class="chapter-grid"></div>
-      </div>
-    </section>
-
-    <section id="sectionQotd" class="content-section">
-      <div class="card">
-        <div class="section-label" style="margin-top:0;">💡 QOTD Library</div>
-        <div class="controls" style="margin-bottom: 20px;">
-          <input class="search-input" id="qotdSearch" placeholder="Search calculus, algebra, or video titles..." style="width: 100%; max-width: 400px;">
-        </div>
-        <div id="qotdContainer"></div>
-      </div>
-    </section>
-
-    <section id="sectionLeaderboard" class="content-section">
-      <div class="card">
-        <div class="section-label" style="margin-top:0;">🏆 Leaderboard</div>
-        <div id="leaderboardPage"></div>
-      </div>
-    </section>
-
-    <section id="sectionUpdates" class="content-section">
-      <div class="card">
-        <div class="section-label" style="margin-top:0;">📣 Updates</div>
-        <div id="updatesContent" class="loading">Loading updates...</div>
-      </div>
-    </section>
-
-    <section id="sectionProfile" class="content-section">
-      <div class="card" style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px;">
-        <div class="avatar" id="avatarLetter" style="width: 64px; height: 64px; font-size: 1.5rem;">S</div>
-        <div style="flex: 1;">
-          <h2 style="margin: 0; font-family: var(--font-display); color: var(--text);">Tracking as <strong id="whoamiName"></strong></h2>
-          <div style="margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap;">
-            <button id="editNameBtn" class="pomo-btn outline-pill" style="padding: 6px 12px; font-size: 0.85rem; width: auto;">Edit Name</button>
-            <button id="certBtn" class="pomo-btn outline-pill" style="padding: 6px 12px; font-size: 0.85rem; width: auto;">Get Certificate</button>
-            <button id="downloadStatsBtn" class="pomo-btn outline-pill" style="padding: 6px 12px; font-size: 0.85rem; width: auto; background: var(--accent-dim); color: var(--accent);">Download Stats</button>
-            <button id="logoutBtn" class="pomo-btn primary" style="padding: 6px 12px; font-size: 0.85rem; width: auto; background: var(--danger); color: #000;">Log Out</button>
-          </div>
-        </div>
-      </div>
-      
-      <div class="profile-page-header">
-        <h2 class="profile-heading">My Study Profile</h2>
-        <p class="profile-sub">Your daily study activity over the last 12 months.</p>
-      </div>
-      <div class="card profile-heatmap-card">
-        <div class="section-label" style="margin-top:0;">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          Study Heatmap
-        </div>
-        <div id="heatmapContainer"></div>
-      </div>
-    </section>
-
-    <section id="sectionAbout" class="content-section" style="max-width: 800px; margin: 0 auto; padding: 40px 20px;">
-      <div style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 48px;">
-        <img src="logot.png" alt="Factorial Academy Logo" style="width: 80px; height: 80px; object-fit: contain; margin-bottom: 16px;">
-        <h2 style="font-family: var(--font-display); font-size: 2.5rem; font-weight: 800; color: var(--text); margin: 0;">Factorial Academy</h2>
-        <div style="font-size: 1.1rem; color: var(--muted); margin-top: 8px;">Legal, Privacy, and Credits</div>
-      </div>
-    </section>
-
-    <footer class="app-footer" style="padding: 24px; text-align: center; border-top: 1px solid var(--border); margin-top: auto; font-family: var(--font-body);">
-      <div class="footer-links" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; margin-bottom: 12px; font-size: 0.85rem;">
-        <a href="#" style="color: var(--text); text-decoration: none;">Privacy</a>
-        <a href="#" style="color: var(--text); text-decoration: none;">Terms &amp; disclaimer</a>
-        <a href="#" id="footerCreditsBtn" style="color: var(--accent); text-decoration: none; font-weight: 500;">Credits &amp; licences</a>
-      </div>
-      <div class="footer-copy" style="font-size: 0.75rem; color: var(--muted);">Factorial Academy Tracker &middot; Lessons are streamed from YouTube, a trademark of Google LLC.</div>
-    </footer>
-  </div>
-</div>
-
-<div id="modalOverlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
-  <div id="settingsModal" style="display: none; background: var(--panel-2); border: 1px solid var(--border); border-radius: 24px; width: 90%; max-width: 420px; padding: 32px; box-shadow: 0 16px 40px rgba(0,0,0,0.5);">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-      <h3 style="margin: 0; font-family: var(--font-display); font-size: 1.2rem; color: var(--text);">Profile Settings</h3>
-      <button class="close-modal" style="background:none; border:none; color:var(--muted); font-size:1.5rem; cursor:pointer;">&times;</button>
-    </div>
-    <div style="display: flex; flex-direction: column; gap: 16px;">
-      <div>
-        <label style="font-size:0.85rem; font-weight: 500; color:var(--muted);">Display Name</label>
-        <input type="text" id="setDisplayName" placeholder="e.g. Aarav" style="width:100%; box-sizing:border-box; padding: 12px 16px; border-radius: 12px; background: var(--panel); border: 1px solid transparent; color: var(--text); margin-top:6px; outline: none; font-family: var(--font-body);">
-      </div>
-      <div>
-        <label style="font-size:0.85rem; font-weight: 500; color:var(--muted);">Target Grade</label>
-        <select id="setGrade" style="width:100%; box-sizing:border-box; padding: 12px 16px; border-radius: 12px; background: var(--panel); border: 1px solid transparent; color: var(--text); margin-top:6px; outline: none; font-family: var(--font-body);">
-          <option value="">Select...</option>
-          <option value="11th Grade">11th Grade</option>
-          <option value="12th Grade">12th Grade</option>
-          <option value="Dropper">Dropper</option>
-        </select>
-      </div>
-      <button id="saveSettingsBtn" style="background: var(--accent); color: var(--accent-on); border: none; padding: 14px; border-radius: 999px; cursor: pointer; font-weight: 700; margin-top: 12px; font-family: var(--font-body);">Save Profile</button>
-    </div>
-  </div>
-</div>
-
-<button id="showToolsPill">
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-  Timer
-</button>
-
-<div id="m3RightTools">
-  <div class="tool-card pomo-card">
-    <div class="focus-header">
-      <span class="focus-title">Timer</span>
-      <button id="minimizeToolsBtn" class="minimize-btn" title="Minimize to pill">✕</button>
-    </div>
-    <div class="pomo-circle-wrap">
-      <svg viewBox="0 0 100 100" class="clean-ring">
-        <circle cx="50" cy="50" r="45" class="ring-bg"></circle>
-        <circle cx="50" cy="50" r="45" class="ring-progress" id="pomoRing"></circle>
-      </svg>
-      <div id="pomoTimer" class="pomo-time-text">25:00</div>
-    </div>
-    <div class="pomo-btn-row">
-      <button id="pomoStart" class="pomo-btn blue-pill">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Start
+        Continue with Google
       </button>
-      <button id="pomoAdd" class="pomo-btn green-pill">+ 10s</button>
     </div>
-    <button id="pomoReset" class="pomo-btn outline-pill">✕ Cancel</button>
-  </div>
-  
-  <div class="tool-card sticky-card">
-    <div class="focus-header" style="margin-bottom: 12px;">
-      <span class="focus-title" style="color: var(--pyq);">Quick Note</span>
-    </div>
-    <textarea id="m3StickyNote" class="sticky-note" placeholder="Jot down quick thoughts..."></textarea>
+    <div id="authError" style="color:#d93025; font-size:11px; margin-top:10px; min-height:16px;"></div>
   </div>
 </div>
 
