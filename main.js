@@ -1,9 +1,8 @@
-// main.js - entry point. Routes the nav rail, boots auth, wires theme toggle.
+// main.js - entry point. Routes the editorial landing view and dashboard app shell.
 
 import { auth } from './firebase.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { initAuthForm, showAuthOverlay, hideAuthOverlay } from './auth.js';
-// Class View removed (Pillar 6)
 import { mountLeaderboard } from './leaderboard.js';
 import { loadUpdatesPage, loadLatestUpdatePreview } from './updates.js';
 import { loadAndMergeCustomLectures } from './customLectures.js';
@@ -12,24 +11,23 @@ import { wireStudentControls, startStudentSession, getCurrentUser, buildNotesVie
 import { checkIsAdmin } from './adminCheck.js';
 import { renderHeatmap } from './heatmap.js';
 import { mountClassAnalytics } from './classAnalytics.js';
-
 import { initYtFeed } from './ytFeed.js';
 import { initAllVideosGrid } from './allVideos.js';
 import { initOnboarding, openRoadmap } from './onboarding.js';
+import { ORDER, CHAPTER_DATA } from './data.js';
+
 window.openRoadmap = openRoadmap;
 
-// ---- Theme toggle ----
+// ---- Theme Management ----
 const THEME_KEY = 'jee_tracker_theme';
 const themes = ['default','forest','light','ocean','crimson','cyber','peach','sakura','gold','slate','emerald','twilight','ruby','arctic','coffee','lime','plum','copper','teal','sand','mono-light','rose-gold'];
 let currentTheme = localStorage.getItem(THEME_KEY) || 'dark';
 
-// Apply saved theme on load
 if (currentTheme !== 'dark') {
   document.documentElement.setAttribute('data-theme', currentTheme);
 }
 
-// Cycle through all themes on click with native fluid transition
-document.getElementById('themeToggle').addEventListener('click', () => {
+document.getElementById('themeToggle')?.addEventListener('click', () => {
   let idx = themes.indexOf(currentTheme);
   idx = (idx + 1) % themes.length; 
   currentTheme = themes[idx];
@@ -40,7 +38,6 @@ document.getElementById('themeToggle').addEventListener('click', () => {
     localStorage.setItem(THEME_KEY, currentTheme);
   };
 
-  // Fluid crossfade using native View Transitions API
   if (document.startViewTransition) {
     document.startViewTransition(applyTheme);
   } else {
@@ -48,28 +45,19 @@ document.getElementById('themeToggle').addEventListener('click', () => {
   }
 });
 
-// ---- Navigation style memory ----
-const NAV_KEY = 'jee_tracker_nav';
-if (localStorage.getItem(NAV_KEY) === 'dock') {
-  document.body.classList.add('dock-mode');
-}
-
-// ---- Nav rail routing ----
+// ---- Nav routing inside app shell ----
 const SECTION_IDS = {
-  dashboard:  'sectionDashboard',
-  library:    'sectionLibrary',
-  allvideos:  'sectionAllVideos',
-  notes:      'sectionNotes',
-  qotd:       'sectionQotd',
-  leaderboard:'sectionLeaderboard',
-  updates:    'sectionUpdates',
-  profile:    'sectionProfile',
-  about:      'sectionAbout'
+  dashboard:   'sectionDashboard',
+  library:     'sectionLibrary',
+  allvideos:   'sectionAllVideos',
+  notes:       'sectionNotes',
+  qotd:        'sectionQotd',
+  leaderboard: 'sectionLeaderboard',
+  updates:     'sectionUpdates',
+  profile:     'sectionProfile',
+  about:       'sectionAbout'
 };
 
-let isAdminUser = false; // set once per session after login, see onAuthStateChanged below
-
-// Professional titlebar copy per section — gives every page a clear identity
 const SECTION_META = {
   dashboard:   { title: 'Dashboard',            subtitle: "Welcome back — here's where you left off." },
   library:     { title: 'Lectures Library',     subtitle: 'Browse and track the complete curriculum.' },
@@ -91,97 +79,201 @@ function updateHeaderTitle(name) {
   if (subEl) subEl.textContent = meta.subtitle;
 }
 
-function showSection(name){
+export function showSection(name) {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.section === name));
   document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
   updateHeaderTitle(name);
   
   const targetSection = document.getElementById(SECTION_IDS[name]);
-  if (targetSection) {
-    targetSection.classList.add('active');
-  } else {
-    console.error("Missing HTML section for:", name);
-  }
+  if (targetSection) targetSection.classList.add('active');
   
-  if (name === 'qotd')        loadQotdView();
-  if (name === 'notes')       buildNotesView();
+  if (name === 'qotd') loadQotdView();
+  if (name === 'notes') buildNotesView();
   if (name === 'leaderboard') {
     const el = document.getElementById('leaderboardPage');
     if (el) mountLeaderboard(el);
   }
-  if (name === 'updates')     loadUpdatesPage();
-
+  if (name === 'updates') loadUpdatesPage();
   if (name === 'profile') {
     const myData = getMyData();
-    const hmEl   = document.getElementById('heatmapContainer');
+    const hmEl = document.getElementById('heatmapContainer');
     if (hmEl) renderHeatmap(hmEl, myData.studyLog || {});
-    
-    // Mount the "You vs. Class" analytics (Pillar 2) — 1 Firestore read
     const profileSection = document.getElementById('sectionProfile');
     if (profileSection) mountClassAnalytics(profileSection, myData);
+  }
+}
+window.showSection = showSection;
 
-    // Close sidebar on mobile after navigating
-    if (window.innerWidth <= 768) {
-      const sidebar = document.querySelector('.sidebar');
-      if (sidebar) sidebar.classList.remove('open');
-      const overlay = document.getElementById('mobileMenuOverlay');
-      if (overlay) overlay.style.display = 'none';
-    }
-  } // Closes if (name === 'profile')
-} // Closes function showSection
-
-// Bind side navigation
 document.querySelectorAll('.nav-btn[data-section]').forEach(btn => {
   btn.addEventListener('click', () => showSection(btn.dataset.section));
 });
-
-// Bind footer and about buttons
 document.getElementById('aboutBtn')?.addEventListener('click', () => showSection('about'));
-document.querySelectorAll('.footer-links a').forEach(a => {
-  a.addEventListener('click', (e) => {
-    e.preventDefault();
-    const label = a.textContent.trim().toLowerCase();
-    if (label.includes('report a bug')) { openBugReportEmail(); return; }
-    if (label.includes("what's new")) { showSection('updates'); return; }
-    if (label.includes('roadmap')) { window.openRoadmap ? window.openRoadmap() : showSection('about'); return; }
-    showSection('about');
+
+// Switch between landing and workspace
+document.getElementById('protoHomeBtn')?.addEventListener('click', () => {
+  document.getElementById('appShell').style.display = 'none';
+  document.getElementById('landingView').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+// =========================================================
+// === EDITORIAL LANDING PAGE LOGIC & DATA POPULATION    ===
+// =========================================================
+
+const PROTOTYPE_COURSES = [
+  ["Limits Mastery", "POCKET", "₹249", "8 lessons · 1h 42m", "∫"],
+  ["Matrices: Core → Advanced", "ADVANCED", "₹699", "24 lessons · 7h 10m", "Σ"],
+  ["JEE Main Maths Sprint", "MAIN", "₹299", "12 lessons · 3h 20m", "M"],
+  ["Calculus Revision Lab", "REVISION", "₹399", "10 lessons · 2h 40m", "R"],
+  ["Advanced Problem Vault", "ADVANCED", "₹799", "18 lessons · 5h 35m", "A"],
+  ["Coordinate Geometry Bootcamp", "MAIN", "₹599", "21 lessons · 6h 05m", "C"],
+  ["Factorial Originals · Vol. 01", "ORIGINAL", "₹349", "50 problems · solutions", "F"],
+  ["Homework Accelerator", "POCKET", "₹199", "30-day guided practice", "H"]
+];
+
+function renderPrototypeCourses() {
+  const grid = document.getElementById("courseGrid");
+  if (!grid) return;
+  grid.innerHTML = PROTOTYPE_COURSES.map((c, i) => `
+    <article class="proto-course">
+      <div class="proto-cover ${i % 3 === 1 ? 'light' : ''}">
+        <span class="proto-tag">${c[1]}</span>
+        <span style="font:48px Georgia; opacity:.85">${c[4]}</span>
+      </div>
+      <div class="proto-courseBody">
+        <h3>${c[0]}</h3>
+        <div class="proto-meta"><span>${c[3]}</span><span>Demo</span></div>
+        <div class="proto-price">${c[2]}</div>
+        <button onclick="openProtoCheckout('${c[0]}','${c[2]}')">View course & checkout →</button>
+      </div>
+    </article>
+  `).join("");
+}
+
+function renderLandingLibrary() {
+  const list = document.getElementById("chapterList");
+  if (!list) return;
+
+  list.innerHTML = ORDER.map((ch, i) => {
+    const data = CHAPTER_DATA[ch];
+    const totalCount = (data?.fs?.length || 0) + (data?.pyq?.length || 0);
+    return `
+      <div class="proto-chapter ${i === 0 ? 'active' : ''}" data-ch="${ch}">
+        <span>${ch}</span>
+        <span>${totalCount}</span>
+      </div>
+    `;
+  }).join("");
+
+  list.querySelectorAll('.proto-chapter').forEach(el => {
+    el.addEventListener('click', () => {
+      list.querySelectorAll('.proto-chapter').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      selectLandingChapter(el.getAttribute('data-ch'));
+    });
+  });
+
+  if (ORDER.length > 0) selectLandingChapter(ORDER[0]);
+}
+
+function selectLandingChapter(chName) {
+  const titleEl = document.getElementById("videoTitle");
+  const subEl = document.getElementById("videoSubInfo");
+  const iframe = document.getElementById("protoIframe");
+  const playBtn = document.getElementById("protoPlayBtn");
+
+  if (titleEl) titleEl.textContent = `${chName} — Concept Masterclass`;
+
+  const data = CHAPTER_DATA[chName];
+  const firstVideo = (data?.fs && data.fs[0]) || (data?.pyq && data.pyq[0]);
+
+  if (firstVideo && firstVideo.url) {
+    const match = firstVideo.url.match(/(?:v=|\/embed\/|youtu\.be\/)([^&?]+)/);
+    const videoId = match ? match[1] : null;
+
+    if (subEl) subEl.textContent = `${firstVideo.title} · ${firstVideo.duration || 'Watch Lecture'}`;
+
+    if (videoId && playBtn && iframe) {
+      playBtn.style.display = 'grid';
+      iframe.style.display = 'none';
+      iframe.src = '';
+
+      playBtn.onclick = () => {
+        playBtn.style.display = 'none';
+        iframe.style.display = 'block';
+        iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+      };
+    }
+  } else {
+    if (subEl) subEl.textContent = "Explore complete curriculum in the student workspace.";
+    if (playBtn) playBtn.style.display = 'grid';
+    if (iframe) iframe.style.display = 'none';
+  }
+}
+
+// Global helpers for inline prototypes
+window.scrollToLandingSection = function(id) {
+  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+};
+
+window.openProtoCheckout = function(name, price) {
+  document.getElementById("buyTitle").textContent = name;
+  document.getElementById("buyPrice").textContent = `${price} · One-time payment`;
+  document.getElementById("payAmount").textContent = price;
+  document.getElementById("checkoutContent").style.display = "block";
+  document.getElementById("checkoutSuccess").classList.remove("show");
+  document.getElementById("protoCheckoutModal").classList.add("open");
+};
+
+window.closeProtoCheckout = function() {
+  document.getElementById("protoCheckoutModal").classList.remove("open");
+};
+
+window.processProtoPay = function() {
+  document.getElementById("checkoutContent").style.display = "none";
+  document.getElementById("checkoutSuccess").classList.add("show");
+};
+
+// Smooth cursor
+const cursor = document.getElementById("cursor");
+if (cursor) {
+  document.addEventListener("mousemove", e => {
+    cursor.style.left = `${e.clientX - 7}px`;
+    cursor.style.top = `${e.clientY - 7}px`;
+  });
+}
+
+// Search filter in prototype
+document.getElementById("protoSearch")?.addEventListener("input", (e) => {
+  const query = e.target.value.toLowerCase();
+  document.querySelectorAll(".proto-chapter").forEach(ch => {
+    const match = ch.textContent.toLowerCase().includes(query);
+    ch.style.display = match ? "flex" : "none";
   });
 });
 
-// ---- Automatic bug report email ----
-// Builds a mailto link with diagnostic info (page, browser, screen size, time)
-// filled in automatically, so the developer team gets useful context every time.
-function openBugReportEmail() {
-  const currentSection = document.querySelector('.content-section.active')?.id?.replace('section', '') || 'unknown';
-  const subject = `Factorial Academy — Bug Report (${currentSection})`;
-  const body =
-`Describe the issue:
-
-
----
-Automatically attached diagnostics (please keep for the dev team):
-Page/section: ${currentSection}
-URL: ${window.location.href}
-Time: ${new Date().toISOString()}
-Browser: ${navigator.userAgent}
-Screen: ${window.innerWidth}x${window.innerHeight}
-Theme: ${document.documentElement.getAttribute('data-theme') || 'default'}`;
-
-  window.location.href = `mailto:support@factorialacademy.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-}
-document.getElementById('reportBugBtn')?.addEventListener('click', openBugReportEmail);
-window.openBugReportEmail = openBugReportEmail;
-
-// Export functions to window
-window.showSection = showSection;
-
-
-
-// ---- Boot ----
+// ---- Boot Sequence & Auth Management ----
 (async function boot() {
   initAuthForm();
   wireStudentControls();
   await loadAndMergeCustomLectures();
+
+  renderPrototypeCourses();
+  renderLandingLibrary();
+
+  const landingLoginBtn = document.getElementById('landingLoginBtn');
+  landingLoginBtn?.addEventListener('click', () => {
+    const user = auth.currentUser;
+    if (user) {
+      document.getElementById('landingView').style.display = 'none';
+      document.getElementById('appShell').style.display = 'block';
+      showSection('dashboard');
+    } else {
+      showAuthOverlay();
+    }
+  });
+
+  document.getElementById('closeAuthBtn')?.addEventListener('click', hideAuthOverlay);
 
   if ('requestIdleCallback' in window) {
     requestIdleCallback(initAllVideosGrid);
@@ -190,29 +282,30 @@ window.showSection = showSection;
   }
 })();
 
-
-
-// ---- YouTube feed ----
 initYtFeed();
 
 onAuthStateChanged(auth, async (user) => {
-  if (user){
+  const landingLoginBtn = document.getElementById('landingLoginBtn');
+  if (user) {
+    if (landingLoginBtn) landingLoginBtn.textContent = 'Open Dashboard';
+    
+    // Switch to active workspace
+    document.getElementById('landingView').style.display = 'none';
+    document.getElementById('appShell').style.display = 'block';
+    hideAuthOverlay();
+
     await startStudentSession(user);
     loadLatestUpdatePreview();
-
-    isAdminUser = await checkIsAdmin(user.uid);
+    checkIsAdmin(user.uid);
     initOnboarding();
+
+    // Sync live card in landing hero
+    const myData = getMyData();
+    const whoamiName = document.getElementById('whoamiBarName');
+    if (whoamiName) whoamiName.textContent = myData.displayName || user.email?.split('@')[0] || 'Student';
   } else {
+    if (landingLoginBtn) landingLoginBtn.textContent = 'Student Login';
     document.getElementById('appShell').style.display = 'none';
-    if(document.getElementById('whoamiBar')) document.getElementById('whoamiBar').style.display = 'none';
-    if(document.getElementById('settingsCapsule')) document.getElementById('settingsCapsule').style.display = 'none';
-    showAuthOverlay();
+    document.getElementById('landingView').style.display = 'block';
   }
 });
-
-// ---- Install as an app (Android + desktop) ----
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(() => {});
-  });
-}
