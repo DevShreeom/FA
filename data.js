@@ -958,4 +958,4 @@ export const CHAPTER_DATA = {
   }
 };
 
-export const SESSIONS = ["2020 Jan", "2020 Apr", "2021 Jan", "2021 Apr", "2022 Jan", "2022 Apr", "2023 Jan", "2023 Apr", "2024 Jan", "2024 Apr", "2025 Jan", "2025 Apr", "2026 Jan", "2026 Apr"];
+export const SESSIONS = ["2022 Jan", "2022 Apr", "2023 Jan", "2023 Apr", "2024 Jan", "2024 Apr", "2025 Jan", "2025 Apr", "2026 Jan", "2026 Apr"];

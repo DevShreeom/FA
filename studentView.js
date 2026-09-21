@@ -4,6 +4,7 @@ import { doc, getDoc, setDoc, updateDoc, collection, getDocs, query, where, getC
 import { ORDER, CHAPTER_DATA, SESSIONS } from './data.js';
 import { idFor, totalForChapter, computeTotalAll, totalTheory, totalPyq } from './metrics.js';
 import { recommendQotd } from './qotdRecommend.js';
+import { writeStudyEvent } from './heatmap.js';
 
 let currentUser = null;
 let myUsername = null;
@@ -36,6 +37,7 @@ async function loadMyData(){
         pyq: d.pyq || {}, 
         selfcheck: d.selfcheck || {}, 
         notes: d.notes || {}, 
+        pinned: d.pinned || [],
         updatedAt: d.updatedAt || null, 
         username: d.username || myUsername, 
         displayName: d.displayName || null,
@@ -46,11 +48,11 @@ async function loadMyData(){
         isPublic: d.isPublic || false
       };
     } else {
-      myData = { theory: {}, pyq: {}, selfcheck: {}, updatedAt: null, username: myUsername, displayName: null, totalDone: 0 };
+      myData = { theory: {}, pyq: {}, selfcheck: {}, notes: {}, pinned: [], updatedAt: null, username: myUsername, displayName: null, totalDone: 0 };
       try { await setDoc(ref, { ...myData, totalDone: 0, updatedAt: new Date().toISOString() }); } catch(e){}
     }
   } catch(e){
-    myData = { theory: {}, pyq: {}, selfcheck: {}, updatedAt: null, username: myUsername, displayName: null };
+    myData = { theory: {}, pyq: {}, selfcheck: {}, notes: {}, pinned: [], updatedAt: null, username: myUsername, displayName: null };
   }
 }
 
@@ -117,7 +119,14 @@ function updateContinueWatching() {
   }
 
   if (target && target.item) {
-     cwEl.innerHTML = `<div class="widget-meta">${target.chapter}</div><div class="widget-title">${target.item.title}</div><a href="${target.item.url}" target="_blank" class="widget-btn" style="text-decoration:none; display:inline-block; text-align:center;">Resume Video</a>`;
+     const vidId = idFor(target.item.url);
+     cwEl.innerHTML = `<div class="widget-meta">${target.chapter}</div><div class="widget-title">${target.item.title}</div><a href="${target.item.url}" class="widget-btn cw-play-btn" data-vid="${vidId}" data-title="${(target.item.title||'').replace(/"/g, '&quot;')}" style="text-decoration:none; display:inline-block; text-align:center; cursor:pointer;">Resume Video</a>`;
+     const btn = cwEl.querySelector('.cw-play-btn');
+     btn.addEventListener('click', (e) => {
+       e.preventDefault();
+       if (window.openInlinePlayer) window.openInlinePlayer(btn.dataset.vid, btn.dataset.title);
+       else window.open(target.item.url, '_blank');
+     });
   } else {
      cwEl.innerHTML = `<div class="empty-note">You're all caught up!</div>`;
   }
@@ -137,10 +146,23 @@ function renderVideoRow(item, kind){
       <button class="status-btn done ${status === 'done' ? 'active' : ''}" title="Mark as done">✓</button>
     </div>
     <div class="video-info">
-      <a href="${item.url}" target="_blank" rel="noopener">${item.title}</a>
+      <a href="${item.url}" class="play-vid-link" data-vid="${vid}" data-title="${(item.title||'').replace(/"/g, '&quot;')}" style="cursor:pointer; color:inherit; text-decoration:none;">
+        <span style="display:inline-block; margin-right:6px; color:var(--accent);">▶</span>${item.title}
+      </a>
       <span class="video-dur">${item.duration ? '· ' + item.duration : ''}</span>
     </div>
   `;
+  
+  // Connect inline player
+  const lnk = row.querySelector('.play-vid-link');
+  lnk.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (window.openInlinePlayer) {
+      window.openInlinePlayer(lnk.dataset.vid, lnk.dataset.title);
+    } else {
+      window.open(item.url, '_blank');
+    }
+  });
 
   const fieldPath = (kind === 'fs' ? 'theory.' : 'pyq.') + vid;
 
@@ -152,7 +174,11 @@ function renderVideoRow(item, kind){
     updateChapterProgress(row.closest('.chapter'));
     updateStatStrip();
     writeField(fieldPath, newStatus);
-    updateContinueWatching(); 
+    updateContinueWatching();
+    // Fire-and-forget: feed the study heatmap on every completion
+    if (newStatus === 'done' && currentUser) {
+      writeStudyEvent(currentUser.uid, kind === 'fs' ? 'theory' : 'pyq');
+    }
   }
 
   row.querySelector('.status-btn.progressing').addEventListener('click', () => applyStatus(nextStatus(dataMap[vid] || 'none', 'progressing')));
@@ -247,6 +273,19 @@ async function updateDashboardExtras(){
       qotdChapterName = chapter;
       qotdRanked = ranked;
       qotdIndex = 0;
+      
+      // Inject automated YT QOTDs
+      try {
+        const snap = await getDoc(doc(db, 'qotd', 'feed'));
+        if (snap.exists()) {
+          const ytQotds = snap.data().items || [];
+          if (ytQotds.length > 0) {
+             qotdRanked = [...ytQotds.reverse(), ...qotdRanked];
+             qotdChapterName = 'Latest QOTD (New!)';
+          }
+        }
+      } catch(e) {}
+      
       renderQotdCard();
     } catch(e){
       qotdEl.innerHTML = '<div class="empty-note">No recommendation available.</div>';
@@ -254,37 +293,116 @@ async function updateDashboardExtras(){
   }
 }
 
+window.togglePinChapter = function(ch) {
+  if (!myData.pinned) myData.pinned = [];
+  
+  if (myData.pinned.includes(ch)) {
+    myData.pinned = myData.pinned.filter(c => c !== ch);
+  } else {
+    if (myData.pinned.length >= 2) {
+      alert("You can only pin up to 2 chapters for Active Focus. Please unpin one first.");
+      return;
+    }
+    myData.pinned.push(ch);
+  }
+  
+  writeField('pinned', myData.pinned);
+  buildChapters(); // Re-render everything to update buttons and dashboard
+};
+
+function createChapterElement(ch, i, chData, isLibrary = false) {
+  const chapterEl = document.createElement('div');
+  chapterEl.className = 'chapter';
+  chapterEl.dataset.chapter = ch;
+
+  const head = document.createElement('div');
+  head.className = 'chapter-head';
+  
+  let pinBtnHtml = '';
+  if (isLibrary) {
+    const isPinned = myData.pinned && myData.pinned.includes(ch);
+    const btnText = isPinned ? 'Pinned' : 'Pin';
+    const btnStyle = isPinned 
+      ? 'background: var(--accent); color: var(--accent-on); border: none; padding: 4px 12px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: transform 0.2s;'
+      : 'background: var(--panel-2); color: var(--muted); border: 1px solid var(--border); padding: 4px 12px; border-radius: 999px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s;';
+    pinBtnHtml = `<button class="pin-btn ${isPinned ? 'active' : ''}" title="${isPinned ? 'Click to unpin' : 'Pin to Dashboard Focus'}" style="${btnStyle}">${btnText}</button>`;
+  }
+
+  head.innerHTML = `<div class="chapter-title"><span class="chapter-num">${fmtChapterNum(i)}</span><span class="chapter-name">${ch}</span></div><div class="chapter-meta">${pinBtnHtml}<div class="mini-bar"><div></div></div><div class="chapter-count">0/0</div><div class="chevron">▶</div></div>`;
+  
+  head.addEventListener('click', (e) => {
+    if (e.target.closest('.pin-btn')) {
+      togglePinChapter(ch);
+      return;
+    }
+    chapterEl.classList.toggle('open');
+  });
+
+  const body = document.createElement('div');
+  body.className = 'chapter-body';
+
+  const fsLabel = document.createElement('div'); fsLabel.className = 'section-label fs'; fsLabel.textContent = 'One-shot lecture(s)'; body.appendChild(fsLabel);
+  if (chData.fs.length === 0){ body.insertAdjacentHTML('beforeend', '<div class="empty-note">No one-shot lecture found for this chapter - source elsewhere.</div>'); }
+  else { chData.fs.forEach(item => body.appendChild(renderVideoRow(item, 'fs'))); }
+
+  const pyqLabel = document.createElement('div'); pyqLabel.className = 'section-label pyq'; pyqLabel.textContent = 'PYQ practice'; body.appendChild(pyqLabel);
+  if (chData.pyq.length === 0){ body.insertAdjacentHTML('beforeend', '<div class="empty-note">No dedicated PYQ video for this chapter in the library.</div>'); }
+  else { chData.pyq.forEach(item => body.appendChild(renderVideoRow(item, 'pyq'))); }
+
+  body.appendChild(renderSelfCheck(ch));
+  chapterEl.appendChild(head);
+  chapterEl.appendChild(body);
+  
+  return chapterEl;
+}
+
 function buildChapters(){
-  const container = document.getElementById('chapters');
-  container.innerHTML = '';
+  const libContainer = document.getElementById('chapters');
+  const dashContainer = document.getElementById('dashboardChapters');
+  const noPinnedMsg = document.getElementById('noPinnedMsg');
+  
+  if (libContainer) {
+    libContainer.innerHTML = '<div class="col-left"></div><div class="col-right"></div>';
+  }
+  
+  // Clear dashboard chapters but keep the empty message element if it exists
+  if (dashContainer) {
+    Array.from(dashContainer.children).forEach(child => {
+      if (child.id !== 'noPinnedMsg') child.remove();
+    });
+    dashContainer.insertAdjacentHTML('beforeend', '<div class="col-left"></div><div class="col-right"></div>');
+  }
+
+  const pinned = myData.pinned || [];
+  let pinnedCount = 0;
+  let libCount = 0;
+
   ORDER.forEach((ch, i) => {
     const chData = CHAPTER_DATA[ch];
-    const chapterEl = document.createElement('div');
-    chapterEl.className = 'chapter';
-    chapterEl.dataset.chapter = ch;
-
-    const head = document.createElement('div');
-    head.className = 'chapter-head';
-    head.innerHTML = `<div class="chapter-title"><span class="chapter-num">${fmtChapterNum(i)}</span><span class="chapter-name">${ch}</span></div><div class="chapter-meta"><div class="mini-bar"><div></div></div><div class="chapter-count">0/0</div><div class="chevron">▶</div></div>`;
-    head.addEventListener('click', () => chapterEl.classList.toggle('open'));
-
-    const body = document.createElement('div');
-    body.className = 'chapter-body';
-
-    const fsLabel = document.createElement('div'); fsLabel.className = 'section-label fs'; fsLabel.textContent = 'One-shot lecture(s)'; body.appendChild(fsLabel);
-    if (chData.fs.length === 0){ body.insertAdjacentHTML('beforeend', '<div class="empty-note">No one-shot lecture found for this chapter - source elsewhere.</div>'); }
-    else { chData.fs.forEach(item => body.appendChild(renderVideoRow(item, 'fs'))); }
-
-    const pyqLabel = document.createElement('div'); pyqLabel.className = 'section-label pyq'; pyqLabel.textContent = 'PYQ practice'; body.appendChild(pyqLabel);
-    if (chData.pyq.length === 0){ body.insertAdjacentHTML('beforeend', '<div class="empty-note">No dedicated PYQ video for this chapter in the library.</div>'); }
-    else { chData.pyq.forEach(item => body.appendChild(renderVideoRow(item, 'pyq'))); }
-
-    body.appendChild(renderSelfCheck(ch));
-    chapterEl.appendChild(head);
-    chapterEl.appendChild(body);
-    container.appendChild(chapterEl);
-    updateChapterProgress(chapterEl);
+    
+    // 1. Build for Library (pass isLibrary=true to show Pin buttons)
+    if (libContainer) {
+      const libEl = createChapterElement(ch, i, chData, true);
+      const targetCol = libCount % 2 === 0 ? '.col-left' : '.col-right';
+      libContainer.querySelector(targetCol).appendChild(libEl);
+      updateChapterProgress(libEl);
+      libCount++;
+    }
+    
+    // 2. Build for Dashboard (ONLY pinned chapters)
+    if (dashContainer && pinned.includes(ch)) {
+      const dashEl = createChapterElement(ch, i, chData, false);
+      const targetCol = pinnedCount % 2 === 0 ? '.col-left' : '.col-right';
+      dashContainer.querySelector(targetCol).appendChild(dashEl);
+      updateChapterProgress(dashEl);
+      pinnedCount++;
+    }
   });
+
+  if (noPinnedMsg) {
+    noPinnedMsg.style.display = pinnedCount === 0 ? 'block' : 'none';
+  }
+
   updateStatStrip();
 }
 
@@ -295,6 +413,8 @@ export function wireStudentControls(){
     const q = e.target.value.trim().toLowerCase();
     document.querySelectorAll('.chapter').forEach(el => { el.style.display = el.dataset.chapter.toLowerCase().includes(q) ? '' : 'none'; });
   });
+
+  // Removed old dropdown filter logic
 
   // RESTORE DOCK LOGIC ON LOAD
   const navDropdown = document.getElementById('setNavStyle');
@@ -321,6 +441,22 @@ export function wireStudentControls(){
 
   const editNameBtn = document.getElementById('editNameBtn');
   if(editNameBtn) editNameBtn.addEventListener('click', openSettings);
+
+  const downloadBtn = document.getElementById('downloadStatsBtn');
+  if (downloadBtn) {
+    downloadBtn.addEventListener('click', () => {
+      const dataStr = JSON.stringify(myData, null, 2);
+      const blob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `factorial_stats_${myUsername}_${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  }
   
   const settingsCap = document.getElementById('settingsCapsule');
   if(settingsCap) settingsCap.addEventListener('click', openSettings);
@@ -347,8 +483,7 @@ export function wireStudentControls(){
       const newTele = document.getElementById('setTelegram').value.trim();
       const newPub = document.getElementById('setIsPublic').checked;
 
-      const videoDropdown = document.getElementById('setVideoPlayer');
-      if (videoDropdown) localStorage.setItem('jee_tracker_player', videoDropdown.value);
+      // Removed setVideoPlayer logic
 
       // RESTORE DOCK LOGIC ON SAVE
       if (navDropdown) {
@@ -390,8 +525,13 @@ export async function startStudentSession(user){
   myUsername = (user.email || '').split('@')[0];
   document.getElementById('authOverlay').style.display = 'none';
   document.getElementById('appShell').style.display = 'block'; 
-  document.getElementById('whoamiBar').style.display = 'flex';
-  if(document.getElementById('settingsCapsule')) document.getElementById('settingsCapsule').style.display = 'flex';
+  
+  if (document.getElementById('whoamiBar')) {
+    document.getElementById('whoamiBar').style.display = 'flex';
+  }
+  if(document.getElementById('settingsCapsule')) {
+    document.getElementById('settingsCapsule').style.display = 'flex';
+  }
   
   await loadMyData();
 
@@ -411,29 +551,15 @@ export async function startStudentSession(user){
   
   buildChapters();
   const first = document.querySelector('.chapter');
-  if (first) first.classList.add('open');
   
   updateDashboardExtras(); 
   updateContinueWatching(); 
-  updateLiveOnlineCount();
 }
 
-export async function updateLiveOnlineCount() {
-  const capsuleText = document.getElementById('onlineCountText');
-  if (!capsuleText) return;
-
-  try {
-    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-    const activeQuery = query(collection(db, 'students'), where('updatedAt', '>=', oneHourAgo));
-    const snapshot = await getCountFromServer(activeQuery);
-    const activeCount = Math.max(1, snapshot.data().count); 
-    capsuleText.textContent = `${activeCount} online`;
-  } catch (error) {
-    capsuleText.textContent = `1 online`;
-  }
-}
+// Pillar 7: Live Online counter removed to save Firebase quota.
 
 export function getCurrentUser(){ return currentUser; }
+export function getMyData(){ return myData; }
 
 // ==========================================
 // === THE NEW REVISION NOTES ENGINE ========
@@ -445,8 +571,9 @@ export function buildNotesView() {
   if(!container || !searchInput) return;
   
   const queryStr = searchInput.value.toLowerCase();
-  container.innerHTML = '';
+  container.innerHTML = '<div class="col-left"></div><div class="col-right"></div>';
 
+  let count = 0;
   ORDER.forEach((ch, i) => {
     const chData = CHAPTER_DATA[ch];
     const chapterEl = document.createElement('div');
@@ -552,7 +679,9 @@ export function buildNotesView() {
       if (queryStr !== '') chapterEl.classList.add('open');
       chapterEl.appendChild(head);
       chapterEl.appendChild(body);
-      container.appendChild(chapterEl);
+      const targetCol = count % 2 === 0 ? '.col-left' : '.col-right';
+      container.querySelector(targetCol).appendChild(chapterEl);
+      count++;
     }
   });
 }

@@ -62,7 +62,15 @@ export async function loadTeacherView(){
 
   const total = computeTotalAll();
 
-  const rows = students.map(s => {
+  // Only include students who have actually started tracking (1+ videos done)
+  const activeStudents = students.filter(s => studentDoneCount(s) > 0);
+
+  if (activeStudents.length === 0){
+    container.innerHTML = '<div class="loading">No students have completed any videos yet.</div>';
+    return;
+  }
+
+  const rows = activeStudents.map(s => {
     const done = studentDoneCount(s);
     const pct = total ? Math.round(done/total*100) : 0;
     let scCount = 0;
@@ -72,7 +80,7 @@ export async function loadTeacherView(){
 
   const avgPct = rows.length ? Math.round(rows.reduce((a,r) => a + r.pct, 0) / rows.length) : 0;
   const avgSc = rows.length ? Math.round(rows.reduce((a,r) => a + r.scCount, 0) / rows.length) : 0;
-  const heat = chapterCompletionAcrossClass(students).sort((a,b) => a.avgPct - b.avgPct);
+  const heat = chapterCompletionAcrossClass(activeStudents).sort((a,b) => a.avgPct - b.avgPct);
 
   container.innerHTML = `
     <div class="section-label" style="margin-top:0;">➕ Add a missing lecture</div>

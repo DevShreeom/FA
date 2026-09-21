@@ -1,13 +1,48 @@
 // leaderboard.js
 
 import { db } from './firebase.js';
-import { collection, getDocs, doc, updateDoc, query, orderBy, limit, startAt, endAt } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { collection, getDocs, doc, updateDoc, query, orderBy, limit, startAt, endAt, where } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { computeTotalAll, totalTheory, totalPyq, studentTheoryDone, studentPyqDone, idFor } from './metrics.js';
 import { ORDER, CHAPTER_DATA } from './data.js';
 
 const TOP_N = 20;
 const FETCH_BUFFER = 30; // fetch a few extra in case some are flagged, then trim to TOP_N
 const TAB_FIELD = { overall: 'totalDone', theory: 'theoryDone', pyq: 'pyqDone' };
+
+let statsCache = null;
+let statsCacheTime = 0;
+
+export async function fetchTopStudentsForStats() {
+  if (statsCache && (Date.now() - statsCacheTime < 60000)) return statsCache;
+  
+  try {
+    const [flagMap, snaps] = await Promise.all([
+      getFlagMap(),
+      getDocs(query(collection(db, 'students'), orderBy('totalDone', 'desc'), limit(30)))
+    ]);
+
+    let t = 0, p = 0, o = 0, valid = 0;
+    snaps.forEach(s => {
+      if (s.id === 'ENI_PWNED_1785038417') return;
+      if (flagMap[s.id] && flagMap[s.id].flagged) return;
+      
+      const d = s.data();
+      const theoryDone = studentTheoryDone(d);
+      const pyqDone = studentPyqDone(d);
+      t += theoryDone;
+      p += pyqDone;
+      o += (theoryDone + pyqDone);
+      valid++;
+    });
+
+    if (valid === 0) valid = 1;
+    statsCache = { avgTheory: t / valid, avgPyq: p / valid, avgTotal: o / valid };
+    statsCacheTime = Date.now();
+    return statsCache;
+  } catch(e) {
+    return { avgTheory: 0, avgPyq: 0, avgTotal: 0 };
+  }
+}
 
 function findVideoTitle(searchId) {
   for (let ch of ORDER) {
@@ -67,6 +102,7 @@ async function fetchTab(tab) {
 
   const entries = [];
   snaps.forEach(s => {
+    if (s.id === 'ENI_PWNED_1785038417') return;
     const data = s.data();
     if (flagMap[s.id] && flagMap[s.id].flagged) return;
     entries.push(buildEntry(s, data, total, tTheory, tPyq));
@@ -89,6 +125,7 @@ export async function searchStudents(qStr) {
 
   const results = [];
   snaps.forEach(s => {
+    if (s.id === 'ENI_PWNED_1785038417') return;
     const data = s.data();
     if (flagMap[s.id] && flagMap[s.id].flagged) return;
     results.push(buildEntry(s, data, total, tTheory, tPyq));

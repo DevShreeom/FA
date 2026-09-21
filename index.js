@@ -58,19 +58,38 @@ async function computeAndStore(){
   });
 
   const studentSnaps = await db.collection('students').get();
-  const students = [];
-  studentSnaps.forEach(s => students.push(s.data()));
+  const allStudents = [];
+  studentSnaps.forEach(s => allStudents.push(s.data()));
+
+  // Filter inactive students (0 ticks) to not water down averages
+  const students = allStudents.filter(s => studentDoneCount(s, data) > 0);
 
   if (students.length === 0){
     await db.doc('stats/summary').set({
-      studentsCount: 0, avgPct: 0, avgSc: 0, heat: [], updatedAt: new Date().toISOString()
+      studentsCount: 0, avgPct: 0, avgSc: 0, heat: [], 
+      avgTheory: 0, avgPyq: 0, avgTotal: 0,
+      updatedAt: new Date().toISOString()
     });
     return;
   }
 
   const total = computeTotalAll(data);
+  let totalTheoryDone = 0;
+  let totalPyqDone = 0;
+  let totalOverallDone = 0;
+
   const rows = students.map(s => {
-    const done = studentDoneCount(s, data);
+    let tDone = 0, pDone = 0;
+    ORDER.forEach(ch => {
+      data[ch].fs.forEach(it => { if (s.theory && isDone(s.theory[idFor(it.url)])) tDone++; });
+      data[ch].pyq.forEach(it => { if (s.pyq && isDone(s.pyq[idFor(it.url)])) pDone++; });
+    });
+    
+    totalTheoryDone += tDone;
+    totalPyqDone += pDone;
+    totalOverallDone += (tDone + pDone);
+
+    const done = tDone + pDone;
     const pct = total ? Math.round(done / total * 100) : 0;
     let scCount = 0;
     if (s.selfcheck) Object.values(s.selfcheck).forEach(v => { if (v) scCount++; });
@@ -80,10 +99,15 @@ async function computeAndStore(){
   const avgPct = Math.round(rows.reduce((a, r) => a + r.pct, 0) / rows.length);
   const avgSc = Math.round(rows.reduce((a, r) => a + r.scCount, 0) / rows.length);
   const heat = chapterCompletionAcrossClass(students, data).sort((a, b) => a.avgPct - b.avgPct);
+  
+  const avgTheory = totalTheoryDone / students.length;
+  const avgPyq = totalPyqDone / students.length;
+  const avgTotal = totalOverallDone / students.length;
 
   await db.doc('stats/summary').set({
     studentsCount: students.length,
     avgPct, avgSc, heat,
+    avgTheory, avgPyq, avgTotal,
     updatedAt: new Date().toISOString()
   });
 }
