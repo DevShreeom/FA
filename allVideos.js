@@ -273,36 +273,32 @@ function _makeCard(v, isPlaylistCard = false) {
   const card = document.createElement('div');
   card.className = 'av-card';
   card.dataset.title = (title || '').toLowerCase();
-  card.style.cssText = 'display: flex; flex-direction: column; background: var(--panel-2); border-radius: 16px; overflow: hidden; border: 1px solid var(--border); position: relative;';
 
   const esc = (s) => (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
   card.innerHTML = `
-    <div style="position: relative; aspect-ratio: 16/9; background: var(--panel); cursor: pointer;" class="av-thumb" data-id="${videoId}">
-      <img src="https://i.ytimg.com/vi/${videoId}/mqdefault.jpg" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;" alt="">
-      <div class="av-play-overlay" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0); transition: background 0.2s; opacity: 0;">
-        <svg width="48" height="48" viewBox="0 0 48 48" fill="white"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,0.6)"/><path d="M19 15l16 9-16 9z"/></svg>
+    <div class="av-thumb" data-id="${videoId}">
+      <img class="av-thumb-img" src="https://i.ytimg.com/vi/${videoId}/mqdefault.jpg" loading="lazy" alt="">
+      <div class="av-play-overlay">
+        <span class="av-play-btn">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        </span>
       </div>
     </div>
-    <div style="padding: 12px 14px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 10px;">
-      <div style="font-size: 0.88rem; font-weight: 600; color: var(--text); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${esc(title)}</div>
-      <div style="display: flex; gap: 8px;">
-        <a href="https://www.youtube.com/watch?v=${videoId}" target="_blank" rel="noopener noreferrer" style="flex: 1; text-align: center; padding: 6px 8px; background: var(--panel); border-radius: 8px; border: 1px solid var(--border); color: var(--text); text-decoration: none; font-size: 0.78rem; font-weight: 600;">↗ Open</a>
+    <div class="av-body">
+      <div class="av-title">${esc(title)}</div>
+      <div class="av-actions">
+        <a class="av-btn av-btn-open" href="https://www.youtube.com/watch?v=${videoId}" target="_blank" rel="noopener noreferrer">↗ Open</a>
         ${isPlaylistCard
-          ? `<button class="av-rm-btn" data-id="${videoId}" style="padding: 6px 8px; background: var(--panel); border-radius: 8px; border: 1px solid var(--border); color: var(--pyq); cursor: pointer; font-size: 0.78rem; font-weight: 600;">✕ Remove</button>`
-          : `<button class="av-add-btn" data-id="${videoId}" data-title="${esc(title)}" style="padding: 6px 8px; background: var(--panel); border-radius: 8px; border: 1px solid var(--border); color: var(--accent); cursor: pointer; font-size: 0.78rem; font-weight: 600;">⭐ Save</button>`
+          ? `<button class="av-btn av-btn-remove av-rm-btn" data-id="${videoId}">✕ Remove</button>`
+          : `<button class="av-btn av-btn-save av-add-btn" data-id="${videoId}" data-title="${esc(title)}">⭐ Save</button>`
         }
       </div>
     </div>
   `;
 
-  // Thumbnail hover
-  const thumb = card.querySelector('.av-thumb');
-  const overlay = card.querySelector('.av-play-overlay');
-  thumb.addEventListener('mouseenter', () => { overlay.style.opacity = '1'; overlay.style.background = 'rgba(0,0,0,0.25)'; });
-  thumb.addEventListener('mouseleave', () => { overlay.style.opacity = '0'; overlay.style.background = 'rgba(0,0,0,0)'; });
-
   // Inline player (Pillar 2)
+  const thumb = card.querySelector('.av-thumb');
   thumb.addEventListener('click', () => openInlinePlayer(videoId, title));
 
   // Save to playlist
@@ -328,42 +324,51 @@ window.openInlinePlayer = function(videoId, title) {
   if (!modal) {
     modal = document.createElement('div');
     modal.id = 'inlinePlayerModal';
-    // Overlay backdrop
-    modal.style.cssText = 'position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(8px); padding: 20px;';
+    modal.className = 'ip-modal';
 
     modal.innerHTML = `
-      <div style="width: 100%; max-width: 1000px; display: flex; flex-direction: column; gap: 12px;">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <h3 id="inlinePlayerTitle" style="margin: 0; color: white; font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 20px;"></h3>
-          <button id="closeInlinePlayerBtn" style="background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 50%; width: 36px; height: 36px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; flex-shrink: 0;">
+      <div class="ip-modal-inner">
+        <div class="ip-modal-header">
+          <h3 id="inlinePlayerTitle" class="ip-modal-title"></h3>
+          <button id="closeInlinePlayerBtn" class="ip-modal-close" title="Close (Esc)">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
           </button>
         </div>
-        <!-- 16:9 Aspect Ratio Container for Squircles -->
-        <div style="position: relative; width: 100%; padding-bottom: 56.25%; border-radius: 24px; overflow: hidden; background: #000; box-shadow: 0 20px 40px rgba(0,0,0,0.4);">
-          <iframe id="inlinePlayerIframe" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        <!-- 16:9 Aspect Ratio Container -->
+        <div class="ip-player-frame">
+          <iframe id="inlinePlayerIframe" allow="autoplay; encrypted-media" allowfullscreen></iframe>
         </div>
       </div>
     `;
 
     document.body.appendChild(modal);
 
-    modal.querySelector('#closeInlinePlayerBtn').addEventListener('click', () => {
-      modal.style.display = 'none';
-      modal.querySelector('#inlinePlayerIframe').src = ''; // Stop video
-    });
-    
+    const closePlayer = () => {
+      modal.classList.remove('open');
+      setTimeout(() => {
+        modal.style.display = 'none';
+        modal.querySelector('#inlinePlayerIframe').src = ''; // Stop video
+      }, 200);
+    };
+
+    modal.querySelector('#closeInlinePlayerBtn').addEventListener('click', closePlayer);
+
     // Close on background click
     modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        modal.style.display = 'none';
-        modal.querySelector('#inlinePlayerIframe').src = '';
-      }
+      if (e.target === modal) closePlayer();
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.classList.contains('open')) closePlayer();
     });
   }
 
   modal.querySelector('#inlinePlayerTitle').textContent = title || 'Video';
   modal.querySelector('#inlinePlayerIframe').src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
   modal.style.display = 'flex';
+  // Force reflow so the open transition plays every time
+  void modal.offsetWidth;
+  modal.classList.add('open');
 };
 
