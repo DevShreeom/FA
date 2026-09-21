@@ -230,3 +230,26 @@ button, input, select, textarea { font-family: var(--font-body); }
   *, *::before, *::after { animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; scroll-behavior:auto !important; }
   #motionPhysicsCanvas { display:none; }
 }
+
+/* Professional refinement layer */
+:root {
+  --motion-ease: cubic-bezier(.22, 1, .36, 1);
+}
+body {
+  background-image: radial-gradient(circle at var(--orb-x, 50%) var(--orb-y, 30%), color-mix(in srgb, var(--accent) 5%, transparent), transparent 28%);
+  background-attachment: fixed;
+}
+.card, .hero-card, .stat-box, .chapter-card, .about-card {
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.035);
+  transition: transform .45s var(--motion-ease), box-shadow .45s var(--motion-ease), border-color .3s ease;
+}
+.card:hover, .hero-card:hover, .stat-box:hover, .chapter-card:hover, .about-card:hover {
+  box-shadow: 0 18px 42px rgba(0,0,0,.12), inset 0 1px 0 rgba(255,255,255,.05);
+}
+button, .nav-btn, input, select, textarea {
+  transition: transform .3s var(--motion-ease), box-shadow .3s ease, border-color .25s ease, background-color .25s ease;
+}
+.nav-btn:hover { transform: translateX(4px); }
+#motionPhysicsCanvas { opacity: .55; }
+@media (prefers-reduced-motion: reduce) { #motionPhysicsCanvas { display:none; } }

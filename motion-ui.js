@@ -83,7 +83,7 @@
   new MutationObserver(() => refreshAccentRGB()).observe(root,{attributes:true,attributeFilter:['data-theme']});
 
   // Springy magnetic controls.
-  const magnetSelector = '.nav-btn, .pomo-btn, .widget-btn, .yt-sync-btn, .theme-toggle, .status-btn, .controls button';
+  const magnetSelector = '.nav-btn, .widget-btn, .yt-sync-btn, .theme-toggle, .status-btn, .controls button';
   function magnetize(el) {
     if (el.dataset.motionBound) return;
     el.dataset.motionBound='1';
