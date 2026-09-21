@@ -67,9 +67,32 @@ const SECTION_IDS = {
 
 let isAdminUser = false; // set once per session after login, see onAuthStateChanged below
 
+// Professional titlebar copy per section — gives every page a clear identity
+const SECTION_META = {
+  dashboard:   { title: 'Dashboard',            subtitle: "Welcome back — here's where you left off." },
+  library:     { title: 'Lectures Library',     subtitle: 'Browse and track the complete curriculum.' },
+  allvideos:   { title: 'All YT Videos',        subtitle: 'Every upload from the channel, freshly synced.' },
+  notes:       { title: 'Revision Notes',       subtitle: 'Your timestamped notes across every lecture.' },
+  qotd:        { title: 'Question of the Day',  subtitle: 'One sharp problem, every single day.' },
+  leaderboard: { title: 'Leaderboard',          subtitle: 'See how your progress stacks up against the class.' },
+  updates:     { title: 'Updates',              subtitle: 'Announcements and changelog from the team.' },
+  profile:     { title: 'My Profile',           subtitle: 'Your study activity, streaks, and settings.' },
+  about:       { title: 'About & Credits',      subtitle: 'The team, the legal fine print, and how to reach us.' }
+};
+
+function updateHeaderTitle(name) {
+  const meta = SECTION_META[name];
+  if (!meta) return;
+  const titleEl = document.getElementById('pageTitle');
+  const subEl = document.getElementById('pageSubtitle');
+  if (titleEl) titleEl.textContent = meta.title;
+  if (subEl) subEl.textContent = meta.subtitle;
+}
+
 function showSection(name){
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.section === name));
   document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+  updateHeaderTitle(name);
   
   const targetSection = document.getElementById(SECTION_IDS[name]);
   if (targetSection) {

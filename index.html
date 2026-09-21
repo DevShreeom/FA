@@ -24,38 +24,59 @@
 </head>
 <body>
 
-<div id="authOverlay" style="display:none; text-align:center; padding: 50px 20px; max-width: 400px; margin: 0 auto;">
-    <div class="auth-tabs" style="display:flex; justify-content:center; gap: 6px; margin-bottom: 18px;">
-      <button id="tabLogin" class="active">Log in</button>
-      <button id="tabSignup">Create account</button>
-    </div>
-    <h2 id="authTitle" style="font-family: var(--font-display);">Log in</h2>
-    <p id="authSub" style="color: var(--muted); font-size: 0.85rem; margin-bottom: 18px;">Enter your username and password to continue tracking.</p>
-    
-    <div class="auth-form" style="display:flex; flex-direction: column; gap: 10px;">
-      <input type="text" id="authUsername" placeholder="Username" style="padding: 10px; border-radius: 8px; background: var(--panel-2); border: 1px solid var(--border); color: var(--text);">
-      <input type="password" id="authPassword" placeholder="Password (min 6 characters)" style="padding: 10px; border-radius: 8px; background: var(--panel-2); border: 1px solid var(--border); color: var(--text);">
-      <button id="authSubmit" style="background: var(--accent-dim); color: var(--accent); border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: 600;">Log in</button>
-      
-      <div style="display: flex; align-items: center; width: 100%; margin: 4px 0;">
-         <hr style="flex: 1; border: none; border-top: 1px solid var(--border);">
-         <span style="padding: 0 10px; color: var(--muted); font-size: 0.75rem;">OR</span>
-         <hr style="flex: 1; border: none; border-top: 1px solid var(--border);">
+<div id="authOverlay" style="display:none;">
+  <div class="auth-shell">
+
+    <!-- Branding panel — professional product feel -->
+    <div class="auth-brand-panel">
+      <div class="auth-brand-inner">
+        <img src="logot.png" alt="Factorial Academy" class="auth-brand-logo">
+        <h1 class="auth-brand-title">Factorial Academy</h1>
+        <p class="auth-brand-tagline">NOT WON YET, NOT DONE YET!</p>
+        <ul class="auth-brand-features">
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> 700+ JEE-focused video lectures</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Automatic progress &amp; video syncing</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Daily Question of the Day &amp; leaderboard</li>
+        </ul>
       </div>
-      
-      <button id="authGoogleBtn" style="display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--panel-2); color: var(--text); border: 1px solid var(--border); padding: 10px; border-radius: 8px; cursor: pointer; font-weight: 600; width: 100%; transition: background 0.2s;">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="18px" height="18px">
-          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-        </svg>
-        Continue with Google
-      </button>
     </div>
-    
-    <div id="authError" style="color: var(--danger); font-size: 0.8rem; margin-top: 10px;"></div>
+
+    <!-- Form panel -->
+    <div class="auth-form-panel">
+      <div class="auth-tabs" style="display:flex; justify-content:center; gap: 6px; margin-bottom: 18px;">
+        <button id="tabLogin" class="active">Log in</button>
+        <button id="tabSignup">Create account</button>
+      </div>
+      <h2 id="authTitle" style="font-family: var(--font-display);">Log in</h2>
+      <p id="authSub" style="color: var(--muted); font-size: 0.85rem; margin-bottom: 18px;">Enter your username and password to continue tracking.</p>
+
+      <div class="auth-form" style="display:flex; flex-direction: column; gap: 10px;">
+        <input type="text" id="authUsername" placeholder="Username" style="padding: 10px; border-radius: 8px; background: var(--panel-2); border: 1px solid var(--border); color: var(--text);">
+        <input type="password" id="authPassword" placeholder="Password (min 6 characters)" style="padding: 10px; border-radius: 8px; background: var(--panel-2); border: 1px solid var(--border); color: var(--text);">
+        <button id="authSubmit" style="background: var(--accent-dim); color: var(--accent); border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: 600;">Log in</button>
+
+        <div style="display: flex; align-items: center; width: 100%; margin: 4px 0;">
+           <hr style="flex: 1; border: none; border-top: 1px solid var(--border);">
+           <span style="padding: 0 10px; color: var(--muted); font-size: 0.75rem;">OR</span>
+           <hr style="flex: 1; border: none; border-top: 1px solid var(--border);">
+        </div>
+
+        <button id="authGoogleBtn" style="display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--panel-2); color: var(--text); border: 1px solid var(--border); padding: 10px; border-radius: 8px; cursor: pointer; font-weight: 600; width: 100%; transition: background 0.2s;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="18px" height="18px">
+            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+          </svg>
+          Continue with Google
+        </button>
+      </div>
+
+      <div id="authError" style="color: var(--danger); font-size: 0.8rem; margin-top: 10px;"></div>
+    </div>
+
   </div>
+</div>
 
 <div id="appShell" style="display:none;">
   
@@ -94,8 +115,11 @@
   </nav>
 
   <div class="main-content content">
-    <header style="justify-content: flex-end;">
-
+    <header>
+      <div class="header-titlebar">
+        <h2 id="pageTitle" class="header-title">Dashboard</h2>
+        <p id="pageSubtitle" class="header-subtitle">Welcome back — here's where you left off.</p>
+      </div>
       <button id="themeToggle" class="theme-toggle" title="Switch Theme">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
       </button>
@@ -410,13 +434,49 @@
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
           </a>
         </div>
+
+        <!-- Stats strip — real numbers, real product feel -->
+        <div class="about-stats">
+          <div class="about-stat"><div class="about-stat-num">700+</div><div class="about-stat-lbl">Lectures</div></div>
+          <div class="about-stat"><div class="about-stat-num">2</div><div class="about-stat-lbl">Core Developers</div></div>
+          <div class="about-stat"><div class="about-stat-num">14</div><div class="about-stat-lbl">Themes</div></div>
+          <div class="about-stat"><div class="about-stat-num">24/7</div><div class="about-stat-lbl">Auto-Synced</div></div>
+        </div>
       </div>
 
       <!-- Credits Section: Equal billing for both core contributors -->
       <div class="about-card credits-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 24px; padding: 32px; margin-bottom: 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
-        <h3 style="font-family: var(--font-display); font-size: 1rem; font-weight: 700; text-transform: uppercase; color: var(--accent); margin-bottom: 24px; letter-spacing: 0.05em; display: flex; align-items: center; gap: 8px;">
+        <h3 style="font-family: var(--font-display); font-size: 1rem; font-weight: 700; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; letter-spacing: 0.05em; display: flex; align-items: center; gap: 8px;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Team &amp; Credits
         </h3>
+        <p style="font-size: 0.9rem; color: var(--muted); margin: 0 0 28px;">The two people behind everything you're using right now.</p>
+
+        <!-- Story timeline -->
+        <div class="credits-timeline">
+          <div class="ct-node">
+            <div class="ct-dot ct-dot-start"></div>
+            <div class="ct-label">
+              <div class="ct-label-title">Platform launches</div>
+              <div class="ct-label-sub">Built from zero by Shree</div>
+            </div>
+          </div>
+          <div class="ct-line"></div>
+          <div class="ct-node">
+            <div class="ct-dot ct-dot-mid"></div>
+            <div class="ct-label">
+              <div class="ct-label-title">September 2026</div>
+              <div class="ct-label-sub">suryansh1807 joins the team</div>
+            </div>
+          </div>
+          <div class="ct-line"></div>
+          <div class="ct-node">
+            <div class="ct-dot ct-dot-end"></div>
+            <div class="ct-label">
+              <div class="ct-label-title">Today</div>
+              <div class="ct-label-sub">Built &amp; run by both, equally</div>
+            </div>
+          </div>
+        </div>
 
         <div class="credits-grid">
           <!-- Shree -->
@@ -425,8 +485,13 @@
             <div class="credit-info">
               <div class="credit-name">Shree</div>
               <div class="credit-role">Founder &amp; Lead Developer</div>
-              <div class="credit-timeframe">Building &amp; managing Factorial Academy since launch</div>
+              <div class="credit-timeframe">🚀 Since day one</div>
               <p class="credit-desc">Designed and built the platform from scratch — the core architecture, the database, the tracking system, and the Material&nbsp;3 interface — and has maintained it end to end ever since.</p>
+              <div class="credit-tags">
+                <span class="credit-tag">Architecture</span>
+                <span class="credit-tag">Database</span>
+                <span class="credit-tag">UI System</span>
+              </div>
             </div>
           </div>
 
@@ -436,8 +501,13 @@
             <div class="credit-info">
               <div class="credit-name">suryansh1807</div>
               <div class="credit-role">Core Developer</div>
-              <div class="credit-timeframe">Contributing since September 2026</div>
+              <div class="credit-timeframe">🌱 Joined September 2026</div>
               <p class="credit-desc">Joined the team in September 2026 and shipped the Video Portal, Playlistic, and automatic syncing — the features that keep the video library and progress data staying up to date on their own.</p>
+              <div class="credit-tags">
+                <span class="credit-tag">Video Portal</span>
+                <span class="credit-tag">Playlistic</span>
+                <span class="credit-tag">Auto-Sync</span>
+              </div>
             </div>
           </div>
         </div>
