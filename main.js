@@ -113,8 +113,39 @@ document.querySelectorAll('.nav-btn[data-section]').forEach(btn => {
 // Bind footer and about buttons
 document.getElementById('aboutBtn')?.addEventListener('click', () => showSection('about'));
 document.querySelectorAll('.footer-links a').forEach(a => {
-  a.addEventListener('click', (e) => { e.preventDefault(); showSection('about'); });
+  a.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (a.textContent.trim().toLowerCase().includes('report a bug')) {
+      openBugReportEmail();
+      return;
+    }
+    showSection('about');
+  });
 });
+
+// ---- Automatic bug report email ----
+// Builds a mailto link with diagnostic info (page, browser, screen size, time)
+// filled in automatically, so the developer team gets useful context every time.
+function openBugReportEmail() {
+  const currentSection = document.querySelector('.content-section.active')?.id?.replace('section', '') || 'unknown';
+  const subject = `Factorial Academy — Bug Report (${currentSection})`;
+  const body =
+`Describe the issue:
+
+
+---
+Automatically attached diagnostics (please keep for the dev team):
+Page/section: ${currentSection}
+URL: ${window.location.href}
+Time: ${new Date().toISOString()}
+Browser: ${navigator.userAgent}
+Screen: ${window.innerWidth}x${window.innerHeight}
+Theme: ${document.documentElement.getAttribute('data-theme') || 'default'}`;
+
+  window.location.href = `mailto:support@factorialacademy.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+document.getElementById('reportBugBtn')?.addEventListener('click', openBugReportEmail);
+window.openBugReportEmail = openBugReportEmail;
 
 // Export functions to window
 window.showSection = showSection;

@@ -1545,3 +1545,82 @@ body.tools-minimized #showToolsPill { right: 32px; } /* Slides in when minimized
 #settingsModal {
   border-radius: 28px !important;
 }
+/* ========================================= */
+/* PROFESSIONAL POLISH — Credits & Contact    */
+/* ========================================= */
+
+.about-card {
+  transition: transform 0.25s var(--m3-ease), box-shadow 0.25s var(--m3-ease), border-color 0.25s var(--m3-ease);
+}
+.about-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.14);
+}
+
+/* Equal-billing credits grid */
+.credits-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+@media (max-width: 640px) {
+  .credits-grid { grid-template-columns: 1fr; }
+}
+.credit-person {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+  padding: 20px 16px;
+  border-radius: 20px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  transition: transform 0.25s var(--m3-ease), border-color 0.25s var(--m3-ease);
+}
+.credit-person:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent);
+}
+.credit-avatar {
+  width: 64px; height: 64px; border-radius: 50%;
+  color: #000; display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 1.6rem; font-family: var(--font-display);
+  flex-shrink: 0;
+}
+.credit-info { display: flex; flex-direction: column; align-items: center; }
+.credit-name { font-weight: 800; color: var(--text); font-size: 1.25rem; font-family: var(--font-display); }
+.credit-role { font-size: 0.8rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.04em; margin-top: 4px; }
+.credit-timeframe { font-size: 0.78rem; color: var(--muted); margin-top: 6px; font-style: italic; }
+.credit-desc { font-size: 0.9rem; color: var(--muted); line-height: 1.55; margin: 10px 0 0; }
+
+/* Contact Us row */
+.contact-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px 20px;
+}
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.95rem;
+  word-break: break-all;
+}
+.contact-item svg { color: var(--accent); flex-shrink: 0; }
+
+/* General professional micro-interactions */
+.nav-btn { transition: background 0.2s var(--m3-ease), color 0.2s var(--m3-ease), transform 0.15s var(--m3-ease); }
+.nav-btn:hover { transform: translateX(2px); }
+.card, .hero-card { transition: box-shadow 0.25s var(--m3-ease); }
+.card:hover, .hero-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.1); }
+a { transition: color 0.2s var(--m3-ease); }
+button { -webkit-tap-highlight-color: transparent; }

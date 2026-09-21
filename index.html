@@ -412,18 +412,39 @@
         </div>
       </div>
 
-      <!-- Credits Section -->
-      <div class="about-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 24px; padding: 32px; margin-bottom: 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+      <!-- Credits Section: Equal billing for both core contributors -->
+      <div class="about-card credits-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 24px; padding: 32px; margin-bottom: 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
         <h3 style="font-family: var(--font-display); font-size: 1rem; font-weight: 700; text-transform: uppercase; color: var(--accent); margin-bottom: 24px; letter-spacing: 0.05em; display: flex; align-items: center; gap: 8px;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Platform Architecture
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Team &amp; Credits
         </h3>
-        <div style="display: flex; align-items: center; gap: 20px;">
-          <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, var(--pyq), var(--accent)); color: #000; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.8rem; font-family: var(--font-display);">S</div>
-          <div>
-            <div style="font-weight: 800; color: var(--text); font-size: 1.4rem;">Shree</div>
-            <div style="font-size: 0.95rem; color: var(--muted); margin-top: 6px; line-height: 1.5;">Lead Developer, Backend Database Architect, &amp; Creator of the Material 3 Interface.</div>
+
+        <div class="credits-grid">
+          <!-- Shree -->
+          <div class="credit-person">
+            <div class="credit-avatar" style="background: linear-gradient(135deg, var(--pyq), var(--accent));">S</div>
+            <div class="credit-info">
+              <div class="credit-name">Shree</div>
+              <div class="credit-role">Founder &amp; Lead Developer</div>
+              <div class="credit-timeframe">Building &amp; managing Factorial Academy since launch</div>
+              <p class="credit-desc">Designed and built the platform from scratch — the core architecture, the database, the tracking system, and the Material&nbsp;3 interface — and has maintained it end to end ever since.</p>
+            </div>
+          </div>
+
+          <!-- suryansh1807 -->
+          <div class="credit-person">
+            <div class="credit-avatar" style="background: linear-gradient(135deg, var(--accent), var(--pyq));">Su</div>
+            <div class="credit-info">
+              <div class="credit-name">suryansh1807</div>
+              <div class="credit-role">Core Developer</div>
+              <div class="credit-timeframe">Contributing since September 2026</div>
+              <p class="credit-desc">Joined the team in September 2026 and shipped the Video Portal, Playlistic, and automatic syncing — the features that keep the video library and progress data staying up to date on their own.</p>
+            </div>
           </div>
         </div>
+
+        <p style="font-size: 0.85rem; color: var(--muted); margin: 24px 0 0; text-align: center; border-top: 1px solid var(--border); padding-top: 16px;">
+          Factorial Academy is built and maintained equally by both contributors above.
+        </p>
       </div>
 
       <!-- Privacy Policy Section -->
@@ -448,23 +469,34 @@
       </div>
 
         
-            <!-- credit -->
+      <!-- Contact Us Section -->
       <div class="about-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 24px; padding: 32px; margin-bottom: 32px;">
-        <h3 style="font-family: var(--font-display); font-size: 1rem; font-weight: 700; text-transform: uppercase; color: var(--text); margin-bottom: 16px; letter-spacing: 0.05em; border-bottom: 1px solid var(--border); padding-bottom: 12px;">Credits</h3>
-        <p style="font-size: 0.95rem; color: var(--muted); line-height: 1.6; margin-bottom: 0;">
-          Special thanks to suryansh1807 for contributing specific feature modules. 
+        <h3 style="font-family: var(--font-display); font-size: 1rem; font-weight: 700; text-transform: uppercase; color: var(--text); margin-bottom: 16px; letter-spacing: 0.05em; border-bottom: 1px solid var(--border); padding-bottom: 12px;">Contact Us</h3>
+        <p style="font-size: 0.95rem; color: var(--muted); line-height: 1.6; margin-bottom: 20px;">
+          Questions, feedback, partnership requests, or anything else — we'd love to hear from you. Reach the team directly by email and we'll get back to you as soon as we can.
         </p>
+        <div class="contact-row">
+          <div class="contact-item">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <span id="contactEmailLabel">contact@factorialacademy.com</span>
+          </div>
+          <button class="pomo-btn primary" style="width: auto; padding: 10px 24px; font-weight: 600;" onclick="window.location.href='mailto:contact@factorialacademy.com?subject=' + encodeURIComponent('Factorial Academy — Inquiry')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            Email Us
+          </button>
+        </div>
       </div>
-
-
 
       <!-- Report a Bug Section -->
       <div class="about-card" style="background: var(--panel-2); border: 1px dashed var(--border); border-radius: 24px; padding: 32px; margin-bottom: 32px; text-align: center;">
         <h3 style="font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; color: var(--text); margin-bottom: 12px;">Found an issue?</h3>
         <p style="font-size: 0.95rem; color: var(--muted); line-height: 1.6; margin-bottom: 20px;">
-          Help us keep the platform stable. If you experience crashes, broken videos, or UI glitches, please report them directly to the developer team.
+          Help us keep the platform stable. If you experience crashes, broken videos, or UI glitches, please report them directly to the developer team — every report goes straight to Shree and suryansh1807.
         </p>
-        <button class="pomo-btn outline-pill" style="margin: 0 auto; display: inline-flex; width: auto; padding: 10px 24px; font-weight: 600;" onclick="window.location.href='mailto:support@factorialacademy.com'">Report a Bug</button>
+        <button class="pomo-btn outline-pill" id="reportBugBtn" style="margin: 0 auto; display: inline-flex; width: auto; padding: 10px 24px; font-weight: 600;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><path d="M9 9V6a3 3 0 0 1 6 0v3"/><path d="M8 9h8a2 2 0 0 1 2 2v6a5 5 0 0 1-10 0v-6a2 2 0 0 1 2-2z"/><path d="M3 12h4M17 12h4M6 6l2 2M18 6l-2 2M6 20l2-2M18 20l-2-2"/></svg>
+          Report a Bug
+        </button>
       </div>
 
       <!-- Exact Legal Text Block -->
@@ -485,7 +517,7 @@
       <a href="#" style="color: var(--text); text-decoration: none;">Report a bug</a>
       <a href="#" id="footerCreditsBtn" style="color: var(--accent); text-decoration: none; font-weight: 500;">Credits &amp; licences</a>
     </div>
-    <div class="footer-copy" style="font-size: 0.75rem; color: var(--muted); line-height: 1.5;">Factorial Academy Tracker V7 &middot; Lessons &copy; Factorial Academy &middot; Lessons are streamed from YouTube, a trademark of Google LLC.</div>
+    <div class="footer-copy" style="font-size: 0.75rem; color: var(--muted); line-height: 1.5;">Factorial Academy Tracker V7 &middot; Built &amp; maintained by Shree &amp; suryansh1807 &middot; Lessons &copy; Factorial Academy &middot; Lessons are streamed from YouTube, a trademark of Google LLC.</div>
   </footer>
 
 </div> <!-- End of .main-content -->
