@@ -6,615 +6,633 @@
 
 <title>Factorial Academy | JEE Preparation & Tracking</title>
 <meta name="title" content="Factorial Academy | JEE Preparation & Tracking">
-<meta name="description" content="The ultimate tracking and preparation dashboard for JEE aspirants. Track one-shots, PYQs, and compete on the live leaderboard.">
+<meta name="description" content="The ultimate tracking and preparation dashboard for JEE aspirants. Track one-shots, PYQs, and compete on the live leaderboard. Not won yet, not done yet!">
 <meta name="keywords" content="JEE, IIT JEE, JEE Mains, JEE Advanced, Study Tracker, Factorial Academy, PYQ tracker">
 <meta name="robots" content="index, follow">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.factorialacademy.com/">
+<meta property="og:title" content="Factorial Academy | JEE Preparation">
+<meta property="og:description" content="The ultimate tracking and preparation dashboard for JEE aspirants.">
+<meta property="og:image" content="https://www.factorialacademy.com/logot.png">
 
 <link rel="icon" type="image/png" href="logot.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#ffffff">
-
+<meta name="theme-color" content="#141218">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Factorial">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
-
-<!-- Professional Theme System (Light/Dark) -->
-<style id="factorial-pro-theme">
-  :root {
-    /* Light Mode (Default) - Clean SaaS Aesthetic */
-    --bg-base: #f8fafc;
-    --bg-panel: #ffffff;
-    --bg-hover: #f1f5f9;
-    --border-color: #e2e8f0;
-    
-    --text-main: #0f172a;
-    --text-muted: #64748b;
-    
-    --brand-primary: #2563eb;
-    --brand-primary-hover: #1d4ed8;
-    --brand-primary-soft: #dbeafe;
-    --brand-primary-on: #ffffff;
-    
-    --brand-secondary: #0ea5e9;
-    --state-success: #10b981;
-    --state-warning: #f59e0b;
-    --state-danger: #ef4444;
-    
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-    
-    --radius-sm: 6px;
-    --radius-md: 10px;
-    --radius-lg: 16px;
-    
-    --transition: all 0.2s ease-in-out;
-  }
-
-  [data-theme="dark"] {
-    /* Dark Mode - Sleek IDE Aesthetic */
-    --bg-base: #0f172a;
-    --bg-panel: #1e293b;
-    --bg-hover: #334155;
-    --border-color: #334155;
-    
-    --text-main: #f8fafc;
-    --text-muted: #94a3b8;
-    
-    --brand-primary: #3b82f6;
-    --brand-primary-hover: #60a5fa;
-    --brand-primary-soft: #1e3a8a;
-    --brand-primary-on: #ffffff;
-    
-    --brand-secondary: #38bdf8;
-    
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5);
-  }
-
-  body {
-    background-color: var(--bg-base);
-    color: var(--text-main);
-    transition: background-color 0.3s ease, color 0.3s ease;
-    font-family: 'Inter', sans-serif;
-  }
-
-  h1, h2, h3, h4, .brand-title {
-    font-family: 'Sora', sans-serif;
-    color: var(--text-main);
-  }
-
-  /* Professional UI Components */
-  .pro-card {
-    background: var(--bg-panel);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-sm);
-    transition: var(--transition);
-  }
-
-  .pro-card:hover {
-    box-shadow: var(--shadow-md);
-    border-color: #cbd5e1;
-  }
-  [data-theme="dark"] .pro-card:hover { border-color: #475569; }
-
-  .pro-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 10px 18px;
-    border-radius: var(--radius-sm);
-    font-size: 0.875rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: var(--transition);
-    border: 1px solid var(--border-color);
-    background: var(--bg-panel);
-    color: var(--text-main);
-  }
-
-  .pro-btn:hover {
-    background: var(--bg-hover);
-  }
-
-  .pro-btn-primary {
-    background: var(--brand-primary);
-    color: var(--brand-primary-on);
-    border-color: var(--brand-primary);
-  }
-
-  .pro-btn-primary:hover {
-    background: var(--brand-primary-hover);
-    border-color: var(--brand-primary-hover);
-    color: var(--brand-primary-on);
-    box-shadow: var(--shadow-sm);
-  }
-
-  .pro-input {
-    width: 100%;
-    padding: 10px 14px;
-    border-radius: var(--radius-sm);
-    background: var(--bg-base);
-    border: 1px solid var(--border-color);
-    color: var(--text-main);
-    font-family: 'Inter', sans-serif;
-    font-size: 0.875rem;
-    transition: var(--transition);
-  }
-
-  .pro-input:focus {
-    outline: none;
-    border-color: var(--brand-primary);
-    box-shadow: 0 0 0 3px var(--brand-primary-soft);
-  }
-
-  /* Auth Specifics */
-  .auth-divider {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    margin: 16px 0;
-  }
-  .auth-divider hr {
-    flex: 1;
-    border: none;
-    border-top: 1px solid var(--border-color);
-  }
-  .auth-divider span {
-    padding: 0 12px;
-    color: var(--text-muted);
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-  }
-
-  /* Structural Adjustments */
-  .section-label {
-    font-size: 0.875rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--text-muted);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 16px;
-  }
-</style>
 </head>
-<body data-theme="light">
+<body>
 
-<!-- ==================== AUTHENTICATION ==================== -->
 <div id="authOverlay" style="display:none;">
-  <div class="auth-shell" style="display: flex; min-height: 100vh; background: var(--bg-base);">
-    
-    <!-- Branding Side -->
-    <div class="auth-brand-panel" style="flex: 1; display: flex; align-items: center; justify-content: center; background: var(--brand-primary-soft); padding: 40px; border-right: 1px solid var(--border-color);">
-      <div style="max-width: 400px;">
-        <img src="logot.png" alt="Factorial Academy Logo" style="width: 64px; height: 64px; margin-bottom: 24px; border-radius: 12px; box-shadow: var(--shadow-sm);">
-        <h1 style="font-size: 2.5rem; margin-bottom: 8px; color: var(--brand-primary-hover);">Factorial Academy</h1>
-        <p style="font-size: 1.1rem; color: var(--text-main); opacity: 0.8; font-weight: 500; margin-bottom: 32px;">NOT WON YET, NOT DONE YET.</p>
-        <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 16px; color: var(--text-main);">
-          <li style="display: flex; align-items: center; gap: 12px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand-primary)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> 700+ JEE-focused video lectures</li>
-          <li style="display: flex; align-items: center; gap: 12px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand-primary)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Automatic progress &amp; video syncing</li>
-          <li style="display: flex; align-items: center; gap: 12px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand-primary)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Daily Question of the Day &amp; leaderboard</li>
+  <div class="auth-shell">
+
+    <!-- Branding panel — professional product feel -->
+    <div class="auth-brand-panel">
+      <div class="auth-brand-inner">
+        <img src="logot.png" alt="Factorial Academy" class="auth-brand-logo">
+        <h1 class="auth-brand-title">Factorial Academy</h1>
+        <p class="auth-brand-tagline">NOT WON YET, NOT DONE YET!</p>
+        <ul class="auth-brand-features">
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> 700+ JEE-focused video lectures</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Automatic progress &amp; video syncing</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Daily Question of the Day &amp; leaderboard</li>
         </ul>
       </div>
     </div>
 
-    <!-- Login Form Side -->
-    <div class="auth-form-panel" style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px;">
-      <div class="pro-card" style="width: 100%; max-width: 400px; padding: 40px; box-shadow: var(--shadow-lg);">
-        <div style="display:flex; justify-content:center; gap: 8px; margin-bottom: 32px;">
-          <button id="tabLogin" class="pro-btn active" style="flex: 1; border: none; background: var(--bg-hover);">Log in</button>
-          <button id="tabSignup" class="pro-btn" style="flex: 1; border: none;">Create account</button>
-        </div>
-        
-        <h2 id="authTitle" style="margin-bottom: 8px;">Welcome back</h2>
-        <p id="authSub" style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 24px;">Enter your credentials to access your dashboard.</p>
-
-        <div style="display: flex; flex-direction: column; gap: 16px;">
-          <input type="text" id="authUsername" class="pro-input" placeholder="Username" aria-label="Username">
-          <input type="password" id="authPassword" class="pro-input" placeholder="Password (min 6 characters)" aria-label="Password">
-          <button id="authSubmit" class="pro-btn pro-btn-primary" style="width: 100%; margin-top: 8px;">Log in</button>
-
-          <div class="auth-divider">
-             <hr><span>OR CONTINUE WITH</span><hr>
-          </div>
-
-          <button id="authGoogleBtn" class="pro-btn" style="width: 100%;">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="18px" height="18px" aria-hidden="true">
-              <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-              <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-              <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-              <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-            </svg>
-            Google
-          </button>
-        </div>
-        <div id="authError" style="color: var(--state-danger); font-size: 0.85rem; margin-top: 16px; font-weight: 500;"></div>
+    <!-- Form panel -->
+    <div class="auth-form-panel">
+      <div class="auth-tabs" style="display:flex; justify-content:center; gap: 6px; margin-bottom: 18px;">
+        <button id="tabLogin" class="active">Log in</button>
+        <button id="tabSignup">Create account</button>
       </div>
+      <h2 id="authTitle" style="font-family: var(--font-display);">Log in</h2>
+      <p id="authSub" style="color: var(--muted); font-size: 0.85rem; margin-bottom: 18px;">Enter your username and password to continue tracking.</p>
+
+      <div class="auth-form" style="display:flex; flex-direction: column; gap: 10px;">
+        <input type="text" id="authUsername" placeholder="Username" style="padding: 10px; border-radius: 8px; background: var(--panel-2); border: 1px solid var(--border); color: var(--text);">
+        <input type="password" id="authPassword" placeholder="Password (min 6 characters)" style="padding: 10px; border-radius: 8px; background: var(--panel-2); border: 1px solid var(--border); color: var(--text);">
+        <button id="authSubmit" style="background: var(--accent-dim); color: var(--accent); border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: 600;">Log in</button>
+
+        <div style="display: flex; align-items: center; width: 100%; margin: 4px 0;">
+           <hr style="flex: 1; border: none; border-top: 1px solid var(--border);">
+           <span style="padding: 0 10px; color: var(--muted); font-size: 0.75rem;">OR</span>
+           <hr style="flex: 1; border: none; border-top: 1px solid var(--border);">
+        </div>
+
+        <button id="authGoogleBtn" style="display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--panel-2); color: var(--text); border: 1px solid var(--border); padding: 10px; border-radius: 8px; cursor: pointer; font-weight: 600; width: 100%; transition: background 0.2s;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="18px" height="18px">
+            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+          </svg>
+          Continue with Google
+        </button>
+      </div>
+
+      <div id="authError" style="color: var(--danger); font-size: 0.8rem; margin-top: 10px;"></div>
     </div>
+
   </div>
 </div>
 
-<!-- ==================== MAIN APPLICATION ==================== -->
-<div id="appShell" style="display:none; height: 100vh; overflow: hidden; display: flex;">
+<div id="appShell" style="display:none;">
   
-  <nav class="sidebar" aria-label="Main Navigation" style="width: 260px; background: var(--bg-panel); border-right: 1px solid var(--border-color); display: flex; flex-direction: column;">
-      <div class="brand" style="padding: 24px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border-color);">
-        <img src="logot.png" alt="FA Logo" style="width: 32px; height: 32px; border-radius: 6px;">
+  <nav class="sidebar">
+      <div class="brand">
+        <img src="logot.png" alt="FA Logo" class="brand-icon">
         <div>
-          <h1 style="font-size: 1rem; margin: 0; font-weight: 700;">Factorial Academy</h1>
+          <h1>Factorial Academy</h1>
+          <div class="sub">NOT WON YET, NOT DONE YET!</div>
         </div>
       </div>
       
-      <div class="nav-rail" style="padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; flex: 1; overflow-y: auto;">
-        <button class="pro-btn active" data-section="dashboard" style="justify-content: flex-start; width: 100%; border: none; background: var(--brand-primary-soft); color: var(--brand-primary);"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" width="18" height="18"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span> Dashboard</button>
-        <button class="pro-btn" data-section="library" style="justify-content: flex-start; width: 100%; border: none;"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" width="18" height="18"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg></span> Library</button>
-        <button class="pro-btn" data-section="allvideos" style="justify-content: flex-start; width: 100%; border: none;"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg></span> All YT Videos</button>
-        <button class="pro-btn" data-section="notes" style="justify-content: flex-start; width: 100%; border: none;"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" width="18" height="18"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></span> Notes</button>
-        <button class="pro-btn" data-section="qotd" style="justify-content: flex-start; width: 100%; border: none;"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" width="18" height="18"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span> QOTD</button>
-        <button class="pro-btn" data-section="leaderboard" style="justify-content: flex-start; width: 100%; border: none;"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" width="18" height="18"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg></span> Leaderboard</button>
-        <button class="pro-btn" data-section="updates" style="justify-content: flex-start; width: 100%; border: none;"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" width="18" height="18"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg></span> Updates</button>
-        
-        <div style="margin: 16px 0; border-top: 1px solid var(--border-color);"></div>
-        
-        <button class="pro-btn" data-section="profile" style="justify-content: flex-start; width: 100%; border: none;"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" width="18" height="18"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> My Profile</button>
-        <button class="pro-btn" id="dockSettingsBtn" style="justify-content: flex-start; width: 100%; border: none;"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" width="18" height="18"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></span> Settings</button>
-        <button class="pro-btn" onclick="window.open('https://www.factorialacademy.com/latest','_blank')" style="justify-content: flex-start; width: 100%; border: none;"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" width="18" height="18"><path d="M13 3 4 14h6l-1 7 9-11h-6l1-7z"/></svg></span> Alternate Portal</button>
+      <div class="nav-rail">
+        <button class="nav-btn active" data-section="dashboard"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span> Dashboard</button>
+        <button class="nav-btn" data-section="library"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg></span> Library</button>
+        <button class="nav-btn" data-section="allvideos"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg></span> All YT Videos</button>
+        <button class="nav-btn" data-section="notes"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></span> Notes</button>
+        <button class="nav-btn" data-section="qotd"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span> QOTD</button>
+        <button class="nav-btn" data-section="leaderboard"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg></span> Leaderboard</button>
+        <button class="nav-btn" data-section="updates"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg></span> Updates</button>
+        <button class="nav-btn" data-section="profile"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> My Profile</button>
+        <button class="nav-btn" id="dockSettingsBtn" title="Settings"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></span> Settings</button>
+        <button class="nav-btn" onclick="window.open('https://www.factorialacademy.com/latest','_blank')"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M13 3 4 14h6l-1 7 9-11h-6l1-7z"/></svg></span> Alternate Portal</button>
      </div>
-     
-     <div style="padding: 16px; border-top: 1px solid var(--border-color);">
-       <button class="pro-btn" data-section="about" id="aboutBtn" style="width: 100%; border: none;">
-        <span class="nav-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
-            <circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line>
-          </svg>
-        </span> About & Credits
-      </button>
-    </div>
+     <!-- Sidebar footer: About link -->
+     <button class="nav-btn" data-section="about" id="aboutBtn">
+  <span class="nav-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="12" y1="16" x2="12" y2="12"></line>
+      <line x1="12" y1="8" x2="12.01" y2="8"></line>
+    </svg>
+  </span> 
+  About & Credits
+</button>
   </nav>
 
-  <main style="flex: 1; overflow-y: auto; display: flex; flex-direction: column;">
-    <header style="padding: 24px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); background: var(--bg-panel); position: sticky; top: 0; z-index: 10;">
-      <div>
-        <h2 id="pageTitle" style="margin: 0; font-size: 1.5rem;">Dashboard</h2>
-        <p id="pageSubtitle" style="margin: 4px 0 0 0; color: var(--text-muted); font-size: 0.875rem;">Welcome back — here's where you left off.</p>
+  <div class="main-content content">
+    <header>
+      <div class="header-titlebar">
+        <h2 id="pageTitle" class="header-title">Dashboard</h2>
+        <p id="pageSubtitle" class="header-subtitle">Welcome back — here's where you left off.</p>
       </div>
-      <button id="themeToggle" class="pro-btn" aria-label="Toggle Theme" style="padding: 8px;" onclick="document.body.dataset.theme = document.body.dataset.theme === 'light' ? 'dark' : 'light';">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+      <button id="themeToggle" class="theme-toggle" title="Switch Theme">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
       </button>
     </header>
 
-    <div style="padding: 40px; flex: 1; max-width: 1200px; margin: 0 auto; width: 100%; box-sizing: border-box;">
-      
-      <!-- DASHBOARD -->
-      <section id="sectionDashboard" class="content-section active">
-        
-        <!-- Focus Strip -->
-        <div class="pro-card" style="display: flex; justify-content: space-between; padding: 24px 40px; margin-bottom: 24px;">
-          <div style="text-align: center;">
-            <div id="statOverallNum" style="font-size: 2rem; font-weight: 700; color: var(--text-main); font-family: 'JetBrains Mono', monospace;">0%</div>
-            <div style="font-size: 0.875rem; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">Overall Completion</div>
-          </div>
-          <div style="width: 1px; background: var(--border-color);"></div>
-          <div style="text-align: center;">
-            <div id="statTheoryNum" style="font-size: 2rem; font-weight: 700; color: var(--brand-primary); font-family: 'JetBrains Mono', monospace;">0/0</div>
-            <div style="font-size: 0.875rem; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">Theory Videos</div>
-          </div>
-          <div style="width: 1px; background: var(--border-color);"></div>
-          <div style="text-align: center;">
-            <div id="statPyqNum" style="font-size: 2rem; font-weight: 700; color: var(--brand-secondary); font-family: 'JetBrains Mono', monospace;">0/0</div>
-            <div style="font-size: 0.875rem; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">PYQ Sessions</div>
-          </div>
-        </div>
 
-        <div class="pro-card" style="padding: 24px; margin-bottom: 24px;">
-          <div class="section-label" style="color: var(--brand-primary);">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg> Continue Watching
-          </div>
-          <div id="continueWatchingWidget">
-            <div style="color: var(--text-muted); font-size: 0.875rem;">Finding your last video...</div>
-          </div>
-        </div>
+    <section id="sectionDashboard" class="content-section active">
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
-          <div class="pro-card" style="padding: 24px;">
-            <div class="section-label">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> Question of the Day
-            </div>
-            <div id="qotdWidget"></div>
-          </div>
-          <div class="pro-card" style="padding: 24px;">
-            <div class="section-label">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg> Latest Update
-            </div>
-            <div id="latestUpdatePreview" style="color: var(--text-muted); font-size: 0.875rem;">Loading...</div>
-          </div>
+      <!-- Focus Strip: compact stats, always visible -->
+      <div class="focus-strip">
+        <div class="focus-stat">
+          <span class="focus-stat-num" id="statOverallNum">0%</span>
+          <span class="focus-stat-lbl">Overall</span>
         </div>
-
-        <div class="pro-card" style="padding: 24px; margin-bottom: 24px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-            <div class="section-label" style="margin:0;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.96-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg> New from Channel
-            </div>
-            <button id="ytSyncBtn" class="pro-btn pro-btn-primary" style="padding: 6px 12px;">
-              <svg id="ytSyncIcon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg> <span id="ytSyncLabel">Sync</span>
-            </button>
-          </div>
-          <div id="ytFeedContainer" style="display: flex; gap: 16px; overflow-x: auto; padding-bottom: 8px;">
-            <p style="color: var(--text-muted); font-size: 0.875rem;">Press Sync to load latest uploads from the channel.</p>
-          </div>
-          <div id="ytSyncStatus"></div>
+        <div class="focus-strip-sep"></div>
+        <div class="focus-stat">
+          <span class="focus-stat-num" id="statTheoryNum">0/0</span>
+          <span class="focus-stat-lbl" style="color:var(--accent);">Theory</span>
         </div>
-
-        <div class="pro-card" style="padding: 24px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-            <h3 style="margin: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand-primary)" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Active Focus
-            </h3>
-            <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 500;">Max 2 chapters</span>
-          </div>
-          <div id="dashboardChapters" class="chapter-grid">
-             <p style="color: var(--text-muted); font-size: 0.875rem;" id="noPinnedMsg">No chapters pinned. Go to the Library tab to pin up to 2 chapters here.</p>
-          </div>
+        <div class="focus-strip-sep"></div>
+        <div class="focus-stat">
+          <span class="focus-stat-num" id="statPyqNum">0/0</span>
+          <span class="focus-stat-lbl" style="color:var(--pyq);">PYQ</span>
         </div>
-      </section>
-
-      <!-- LIBRARY -->
-      <section id="sectionLibrary" class="content-section">
-        <div class="pro-card" style="padding: 24px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;">
-          <div>
-            <h3 style="margin: 0 0 4px 0;">Curriculum Progress</h3>
-            <div style="font-size: 0.875rem; color: var(--text-muted);">Track your completion across all subjects.</div>
-          </div>
-          <div style="text-align: right; width: 50%;">
-            <div id="overallCount" style="font-weight: 700; margin-bottom: 8px;">0 / 0</div>
-            <div style="width: 100%; height: 8px; background: var(--border-color); border-radius: 4px; overflow: hidden;">
-              <div id="overallBar" style="height: 100%; background: var(--brand-primary); width: 0%; transition: width 0.3s ease;"></div>
-            </div>
-          </div>
-        </div>
-
-        <div style="display: flex; gap: 12px; margin-bottom: 24px;">
-          <button id="expandAll" class="pro-btn">Expand all</button>
-          <button id="collapseAll" class="pro-btn">Collapse all</button>
-          <input class="pro-input" id="chapterSearch" placeholder="Search chapters…" style="max-width: 300px;">
-          <span class="status-msg" id="statusMsg" style="align-self: center; font-size: 0.875rem; color: var(--text-muted);"></span>
-        </div>
-        <div id="chapters" class="chapter-grid"></div>
-      </section>
-
-      <!-- ALL VIDEOS -->
-      <section id="sectionAllVideos" class="content-section">
-        <h2 style="margin-bottom: 8px;">Latest YouTube Uploads</h2>
-        <p style="color: var(--text-muted); margin-bottom: 24px;">A clean grid of all the recent videos fetched from the channel.</p>
-        <div id="allVideosGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px;"></div>
-      </section>
-
-      <!-- NOTES -->
-      <section id="sectionNotes" class="content-section">
-        <div class="pro-card" style="padding: 24px;">
-          <div class="section-label">📝 Revision Notes & Timestamps</div>
-          <input class="pro-input" id="notesSearch" placeholder="Search footnotes & videos..." style="max-width: 400px; margin-bottom: 24px;">
-          <div id="notesContainer" class="chapter-grid"></div>
-        </div>
-      </section>
-
-      <!-- QOTD -->
-      <section id="sectionQotd" class="content-section">
-        <div class="pro-card" style="padding: 24px;">
-          <div class="section-label">💡 QOTD Library</div>
-          <input class="pro-input" id="qotdSearch" placeholder="Search calculus, algebra..." style="max-width: 400px; margin-bottom: 24px;">
-          <div id="qotdContainer"></div>
-        </div>
-      </section>
-
-      <!-- LEADERBOARD -->
-      <section id="sectionLeaderboard" class="content-section">
-        <div class="pro-card" style="padding: 24px;">
-          <div class="section-label">🏆 Leaderboard</div>
-          <div id="leaderboardPage"></div>
-        </div>
-      </section>
-
-      <!-- UPDATES -->
-      <section id="sectionUpdates" class="content-section">
-        <div class="pro-card" style="padding: 24px;">
-          <div class="section-label">📣 Updates</div>
-          <div id="updatesContent" style="color: var(--text-muted);">Loading updates...</div>
-        </div>
-      </section>
-
-      <!-- PROFILE -->
-      <section id="sectionProfile" class="content-section">
-        <div class="pro-card" style="padding: 32px; display: flex; align-items: center; gap: 24px; margin-bottom: 24px;">
-          <div id="avatarLetter" style="width: 80px; height: 80px; border-radius: 50%; background: var(--brand-primary-soft); color: var(--brand-primary); display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 700;">S</div>
-          <div style="flex: 1;">
-            <h2 style="margin: 0 0 16px 0;">Tracking as <strong id="whoamiName"></strong></h2>
-            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-              <button id="editNameBtn" class="pro-btn">Edit Profile</button>
-              <button id="certBtn" class="pro-btn">Get Certificate</button>
-              <button id="downloadStatsBtn" class="pro-btn">Download Data</button>
-              <button id="logoutBtn" class="pro-btn" style="color: var(--state-danger); border-color: var(--state-danger); margin-left: auto;">Log Out</button>
-            </div>
-          </div>
-        </div>
-        
-        <div class="pro-card" style="padding: 32px;">
-          <div class="section-label">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Study Heatmap
-          </div>
-          <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 24px;">Your daily study activity over the last 12 months.</p>
-          <div id="heatmapContainer"></div>
-        </div>
-      </section>
-
-      <!-- ABOUT -->
-      <section id="sectionAbout" class="content-section" style="max-width: 800px; margin: 0 auto;">
-        <div style="text-align: center; margin-bottom: 48px;">
-          <img src="logot.png" alt="Factorial Academy Logo" style="width: 80px; height: 80px; border-radius: 16px; margin-bottom: 16px; box-shadow: var(--shadow-sm);">
-          <h2 style="font-size: 2.5rem; margin: 0 0 8px 0;">Factorial Academy</h2>
-          <div style="font-size: 1.1rem; color: var(--text-muted);">Legal, Privacy, and Credits</div>
-        </div>
-
-        <div class="pro-card" style="padding: 32px; margin-bottom: 24px;">
-          <h3 style="margin-top: 0; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 16px;">Team & Credits</h3>
-          <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">
-            Factorial Academy is built and maintained equally by Shree (Architecture, Database, UI) and suryansh1807 (Video Portal, Playlistic, Auto-Sync).
-          </p>
-        </div>
-
-        <div class="pro-card" id="roadmapCard" style="padding: 32px; margin-bottom: 24px;">
-          <h3 style="margin-top: 0; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 16px;">Roadmap</h3>
-          <div id="roadmapList" style="display:flex; flex-direction:column; gap:12px;"></div>
-        </div>
-        
-        <div class="pro-card" style="padding: 32px; margin-bottom: 24px; border: 1px dashed var(--border-color); background: var(--bg-hover);">
-          <h3 style="margin-top: 0; margin-bottom: 8px;">Found an issue?</h3>
-          <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 16px;">Help us keep the platform stable. Report crashes or UI glitches directly to the developer team.</p>
-          <button class="pro-btn" id="reportBugBtn">Report a Bug</button>
-        </div>
-      </section>
-
-    </div>
-
-    <!-- FOOTER -->
-    <footer style="padding: 24px; text-align: center; border-top: 1px solid var(--border-color); background: var(--bg-panel); margin-top: auto;">
-      <div style="font-size: 0.75rem; color: var(--text-muted);">
-        Factorial Academy Tracker V7 &middot; Built by Shree &amp; suryansh1807 &middot; 
-        <button id="footerCreditsBtn" style="background:none; border:none; color:var(--brand-primary); cursor:pointer; font-weight: 600;">Credits</button>
+        <!-- Pillar 7: Live Online counter removed to save Firebase quota -->
       </div>
-    </footer>
-  </main>
 
-  <!-- M3 NATIVE RIGHT SIDEBAR -->
-  <aside id="m3RightTools" style="width: 300px; background: var(--bg-panel); border-left: 1px solid var(--border-color); padding: 24px; display: flex; flex-direction: column; gap: 24px; overflow-y: auto;">
-    
-    <div class="pro-card" style="padding: 24px; text-align: center;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-        <span style="font-weight: 600; font-size: 0.875rem;">Focus Timer</span>
-        <button id="minimizeToolsBtn" class="pro-btn" style="padding: 4px 8px; font-size: 0.75rem; border: none; background: transparent;">✕</button>
+      <!-- Hero Card: primary action -->
+      <div class="hero-card card">
+        <div class="hero-card-label">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Continue Watching
+        </div>
+        <div id="continueWatchingWidget" class="widget-inner">
+          <div class="loading">Finding video...</div>
+        </div>
+      </div>
+
+      <!-- 2-column: QOTD + Latest Update -->
+      <div class="dashboard-top-row">
+        <div class="card elevated-qotd">
+          <div class="section-label pyq">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+            Question of the Day
+          </div>
+          <div id="qotdWidget" class="widget-inner"></div>
+        </div>
+        <div class="card elevated-update">
+          <div class="section-label" style="color:var(--accent);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
+            Latest Update
+          </div>
+          <div id="latestUpdatePreview" class="widget-inner">Loading...</div>
+        </div>
+      </div>
+
+      <!-- YouTube Feed: new uploads from channel -->
+      <div class="card yt-feed-card">
+        <div class="yt-feed-header">
+          <div class="section-label" style="margin:0; color:var(--text);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.96-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>
+            New from Channel
+          </div>
+          <button id="ytSyncBtn" class="yt-sync-btn" title="Fetch latest videos">
+            <svg id="ytSyncIcon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+            <span id="ytSyncLabel">Sync</span>
+          </button>
+        </div>
+        <div id="ytFeedContainer" class="yt-feed-row">
+          <p class="yt-feed-empty">Press Sync to load latest uploads from the channel.</p>
+        </div>
+        <div id="ytSyncStatus" class="yt-sync-status"></div>
+      </div>
+
+      <!-- Active Study Hub (Pinned Chapters) -->
+      <div class="active-study-hub" style="margin-bottom: 24px;">
+        <div class="section-label" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <span style="font-family: var(--font-display); font-size: 1.1rem; color: var(--text); font-weight: 700; display: flex; align-items: center; gap: 8px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            Active Focus
+          </span>
+          <span style="font-size: 0.8rem; color: var(--muted); font-weight: 500;">Max 2 chapters</span>
+        </div>
+        <div id="dashboardChapters" class="chapter-grid">
+           <p class="yt-feed-empty" id="noPinnedMsg">No chapters pinned. Go to the Library tab to pin up to 2 chapters here!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== ALL LECTURES LIBRARY ==================== -->
+    <section id="sectionLibrary" class="content-section">
+      <div class="profile-page-header">
+        <h2 class="profile-heading"> Lectures Library</h2>
+        <p class="profile-sub">Browse, search, and filter the complete curriculum of 700+ videos.</p>
       </div>
       
-      <div style="position: relative; display: flex; justify-content: center; margin: 24px 0;">
-        <svg viewBox="0 0 100 100" style="width: 140px; height: 140px;">
-          <circle cx="50" cy="50" r="45" stroke="var(--border-color)" stroke-width="4" fill="none"></circle>
-          <circle cx="50" cy="50" r="45" stroke="var(--brand-primary)" stroke-width="4" fill="none" stroke-dasharray="283" id="pomoRing" style="transition: stroke-dashoffset 1s linear; transform: rotate(-90deg); transform-origin: 50% 50%;"></circle>
-        </svg>
-        <div id="pomoTimer" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: 'JetBrains Mono', monospace; font-size: 1.75rem; font-weight: 700; color: var(--text-main);">25:00</div>
+      <div class="overall-bar-wrap">
+        <div class="count" id="overallCount">0 / 0</div>
+        <div class="bar"><div id="overallBar"></div></div>
       </div>
 
-      <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 12px;">
-        <button id="pomoStart" class="pro-btn pro-btn-primary" style="flex: 1;">Start</button>
-        <button id="pomoAdd" class="pro-btn" style="padding: 10px;">+10s</button>
+      <div class="controls">
+        <button id="expandAll">Expand all</button>
+        <button id="collapseAll">Collapse all</button>
+        <input class="search-input" id="chapterSearch" placeholder="Search chapters…">
+        <span class="status-msg" id="statusMsg"></span>
       </div>
-      <button id="pomoReset" class="pro-btn" style="width: 100%; border: none; background: var(--bg-hover);">Cancel</button>
-    </div>
-    
-    <div class="pro-card" style="padding: 20px; flex: 1; display: flex; flex-direction: column;">
-      <div style="font-weight: 600; font-size: 0.875rem; margin-bottom: 12px;">Quick Note</div>
-      <textarea id="m3StickyNote" class="pro-input" style="flex: 1; resize: none; border: none; background: var(--bg-base); box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);" placeholder="Jot down quick thoughts..."></textarea>
-    </div>
-  </aside>
+
+      <div id="chapters" class="chapter-grid"></div>
+    </section>
+
+    <!-- ==================== ALL YT VIDEOS (LATEST FETCH) ==================== -->
+    <section id="sectionAllVideos" class="content-section">
+      <div class="profile-page-header">
+        <h2 class="profile-heading">Latest YouTube Uploads</h2>
+        <p class="profile-sub">A clean grid of all the recent videos fetched from the channel.</p>
+      </div>
+      <div id="allVideosGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; margin-top: 24px;"></div>
+    </section>
+
+    <section id="sectionNotes" class="content-section">
+      <div class="card">
+        <div class="section-label" style="margin-top:0;">📝 Revision Notes & Timestamps</div>
+        <div class="controls" style="margin-bottom: 20px;">
+          <input class="search-input" id="notesSearch" placeholder="Search footnotes & videos..." style="width: 100%; max-width: 400px;">
+        </div>
+        <div id="notesContainer" class="chapter-grid"></div>
+      </div>
+    </section>
+
+    <section id="sectionQotd" class="content-section">
+      <div class="card">
+        <div class="section-label" style="margin-top:0;">💡 QOTD Library</div>
+        <div class="controls" style="margin-bottom: 20px;">
+          <input class="search-input" id="qotdSearch" placeholder="Search calculus, algebra, or video titles..." style="width: 100%; max-width: 400px;">
+        </div>
+        <div id="qotdContainer"></div>
+      </div>
+    </section>
+
+    <section id="sectionLeaderboard" class="content-section">
+      <div class="card">
+        <div class="section-label" style="margin-top:0;">🏆 Leaderboard</div>
+        <div id="leaderboardPage"></div>
+      </div>
+    </section>
+
+
+    <section id="sectionUpdates" class="content-section">
+      <div class="card">
+        <div class="section-label" style="margin-top:0;">📣 Updates</div>
+        <div id="updatesContent" class="loading">Loading updates...</div>
+      </div>
+    </section>
+
+    <!-- ==================== MY PROFILE ==================== -->
+    <section id="sectionProfile" class="content-section">
+      <div class="card" style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px;">
+        <div class="avatar" id="avatarLetter" style="width: 64px; height: 64px; font-size: 1.5rem;">S</div>
+        <div style="flex: 1;">
+          <h2 style="margin: 0; font-family: var(--font-display); color: var(--text);">Tracking as <strong id="whoamiName"></strong></h2>
+          <div style="margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap;">
+            <button id="editNameBtn" class="pomo-btn outline-pill" style="padding: 6px 12px; font-size: 0.85rem; width: auto;">Edit Name</button>
+            <button id="certBtn" class="pomo-btn outline-pill" style="padding: 6px 12px; font-size: 0.85rem; width: auto;">Get Certificate</button>
+            <button id="downloadStatsBtn" class="pomo-btn outline-pill" style="padding: 6px 12px; font-size: 0.85rem; width: auto; background: var(--accent-dim); color: var(--accent);">Download Stats</button>
+            <button id="logoutBtn" class="pomo-btn primary" style="padding: 6px 12px; font-size: 0.85rem; width: auto; background: var(--danger); color: #000;">Log Out</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="profile-page-header">
+        <h2 class="profile-heading">My Study Profile</h2>
+        <p class="profile-sub">Your daily study activity over the last 12 months. Each cell represents one day — green for Theory, blue for PYQ.</p>
+      </div>
+      <div class="card profile-heatmap-card">
+        <div class="section-label" style="margin-top:0;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Study Heatmap
+        </div>
+        <div id="heatmapContainer"></div>
+      </div>
+    </section>
+
+  </div>
 </div>
 
-<!-- MODALS & OVERLAYS -->
-<button id="showToolsPill" class="pro-btn pro-btn-primary" style="position: fixed; bottom: 24px; right: 24px; z-index: 100; display: none; box-shadow: var(--shadow-lg); border-radius: 50px;">
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Timer
-</button>
-
-<div id="modalOverlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.7); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+<div id="modalOverlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
   
-  <div id="settingsModal" class="pro-card" style="display: none; width: 90%; max-width: 440px; padding: 32px;">
+  <div id="settingsModal" style="display: none; background: var(--panel-2); border: 1px solid var(--border); border-radius: 24px; width: 90%; max-width: 420px; padding: 32px; box-shadow: 0 16px 40px rgba(0,0,0,0.5);">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-      <h3 style="margin: 0;">Profile Settings</h3>
-      <button class="close-modal" style="background:none; border:none; color:var(--text-muted); font-size:1.5rem; cursor:pointer;">&times;</button>
+      <h3 style="margin: 0; font-family: var(--font-display); font-size: 1.2rem; color: var(--text);">Profile Settings</h3>
+      <button class="close-modal" style="background:none; border:none; color:var(--muted); font-size:1.5rem; cursor:pointer; transition: 0.2s;">&times;</button>
     </div>
     <div style="display: flex; flex-direction: column; gap: 16px;">
+      
       <div>
-        <label style="font-size:0.75rem; font-weight: 600; text-transform: uppercase; color:var(--text-muted);">Display Name</label>
-        <input type="text" id="setDisplayName" class="pro-input" placeholder="e.g. Aarav" style="margin-top:6px;">
+        <label style="font-size:0.85rem; font-weight: 500; color:var(--muted);">Display Name</label>
+        <input type="text" id="setDisplayName" placeholder="e.g. Aarav" style="width:100%; box-sizing:border-box; padding: 12px 16px; border-radius: 12px; background: var(--panel); border: 1px solid transparent; color: var(--text); margin-top:6px; outline: none; font-family: var(--font-body); transition: 0.3s;">
       </div>
+      
       <div>
-        <label style="font-size:0.75rem; font-weight: 600; text-transform: uppercase; color:var(--text-muted);">Target Grade</label>
-        <select id="setGrade" class="pro-input" style="margin-top:6px;">
+        <label style="font-size:0.85rem; font-weight: 500; color:var(--muted);">Target Grade</label>
+        <select id="setGrade" style="width:100%; box-sizing:border-box; padding: 12px 16px; border-radius: 12px; background: var(--panel); border: 1px solid transparent; color: var(--text); margin-top:6px; outline: none; font-family: var(--font-body); transition: 0.3s;">
           <option value="">Select...</option>
           <option value="11th Grade">11th Grade</option>
           <option value="12th Grade">12th Grade</option>
           <option value="Dropper">Dropper</option>
         </select>
       </div>
+      
       <div>
-        <label style="font-size:0.75rem; font-weight: 600; text-transform: uppercase; color:var(--text-muted);">Telegram Handle</label>
-        <input type="text" id="setTelegram" class="pro-input" placeholder="@username" style="margin-top:6px;">
+        <label style="font-size:0.85rem; font-weight: 500; color:var(--muted);">Telegram Handle (Optional)</label>
+        <input type="text" id="setTelegram" placeholder="@username" style="width:100%; box-sizing:border-box; padding: 12px 16px; border-radius: 12px; background: var(--panel); border: 1px solid transparent; color: var(--text); margin-top:6px; outline: none; font-family: var(--font-body); transition: 0.3s;">
       </div>
+      
       <div>
-        <label style="font-size:0.75rem; font-weight: 600; text-transform: uppercase; color:var(--text-muted);">PC Navigation Style</label>
-        <select id="setNavStyle" class="pro-input" style="margin-top:6px;">
+        <label style="font-size:0.85rem; font-weight: 500; color:var(--muted);">PC Navigation Style</label>
+        <select id="setNavStyle" style="width:100%; box-sizing:border-box; padding: 12px 16px; border-radius: 12px; background: var(--panel); border: 1px solid transparent; color: var(--text); margin-top:6px; outline: none; font-family: var(--font-body); transition: 0.3s;">
           <option value="sidebar">Classic Sidebar</option>
           <option value="dock">Dock Mode</option>
         </select>
       </div>
-      <label style="display: flex; align-items: center; gap: 12px; font-size: 0.875rem; cursor: pointer; margin-top: 8px;">
-        <input type="checkbox" id="setIsPublic" style="width: 16px; height: 16px; accent-color: var(--brand-primary);"> Allow others to see my profile
+        
+      <label style="display: flex; align-items: center; gap: 12px; font-size: 0.9rem; font-weight: 500; color: var(--text); cursor: pointer; background: var(--panel); padding: 16px; border-radius: 12px; border: 1px solid transparent; margin-top: 4px;">
+        <input type="checkbox" id="setIsPublic" style="width: 18px; height: 18px; accent-color: var(--accent);"> Allow others to see my profile & Telegram
       </label>
-      <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 12px;">
-        <button id="saveSettingsBtn" class="pro-btn pro-btn-primary" style="width: 100%;">Save Changes</button>
-        <button id="retakeTourBtn" type="button" class="pro-btn" style="width: 100%; border: none;">Retake the welcome tour</button>
-      </div>
+      
+      <button id="saveSettingsBtn" style="background: var(--accent); color: var(--accent-on); border: none; padding: 14px; border-radius: 999px; cursor: pointer; font-weight: 700; margin-top: 12px; font-family: var(--font-body); font-size: 0.95rem; transition: transform 0.2s;">Save Profile</button>
+      <button id="retakeTourBtn" type="button" style="background:none; border:none; color:var(--muted); font-size:0.8rem; cursor:pointer; padding:4px; font-family: var(--font-body);">Retake the welcome tour</button>
     </div>
   </div>
 
-  <div id="studentCardModal" class="pro-card" style="display: none; width: 90%; max-width: 400px; padding: 24px;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-      <h3 id="scTitle" style="margin: 0;">Profile</h3>
-      <button class="close-modal" style="background:none; border:none; color:var(--text-muted); font-size:1.5rem; cursor:pointer;">&times;</button>
-    </div>
-    <div id="scBody" style="font-size: 0.875rem; color: var(--text-main); line-height: 1.5;"></div>
-  </div>
+    <div id="studentCardModal" style="display: none; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; width: 90%; max-width: 400px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+<h3 id="scTitle" style="margin: 0; font-family: var(--font-display);">Profile</h3>
+<button class="close-modal" style="background:none; border:none; color:var(--text); font-size:1.5rem; cursor:pointer;">&times;</button>
+</div>
+<div id="scBody" style="font-size: 0.95rem; color: var(--text);">
+</div>
+</div>
 
-  <div id="certModal" class="pro-card cert-modal" style="display:none; width: 90%; max-width: 600px; padding: 32px;">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
-      <h3 style="margin:0;">Your certificate</h3>
-      <button class="close-modal" id="certCloseBtn" style="background:none; border:none; color:var(--text-muted); font-size:1.5rem; cursor:pointer;">&times;</button>
+  <div id="certModal" class="cert-modal" style="display:none;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 4px;">
+      <h3 style="margin:0; font-family: var(--font-display); font-size: 1.15rem; color: var(--text);">Your certificate</h3>
+      <button class="close-modal" id="certCloseBtn" style="background:none; border:none; color:var(--muted); font-size:1.5rem; cursor:pointer;">&times;</button>
     </div>
-    <div style="margin-bottom: 24px;">
-      <label style="font-size:0.75rem; font-weight: 600; text-transform: uppercase; color:var(--text-muted);">Name on the certificate</label>
-      <input type="text" id="certName" class="pro-input" placeholder="Your name" style="margin-top:6px;">
+    <p style="font-size:0.85rem; color:var(--muted); margin: 6px 0 0;">Generated from your own progress on this account.</p>
+    <div style="margin-top:16px;">
+      <label style="font-size:0.85rem; font-weight:500; color:var(--muted);">Name on the certificate</label>
+      <input type="text" id="certName" placeholder="Your name" style="width:100%; box-sizing:border-box; padding: 12px 16px; border-radius: 12px; background: var(--panel); border: 1px solid var(--border); color: var(--text); margin-top:6px; outline: none; font-family: var(--font-body);">
     </div>
-    <div class="cert-canvas-wrap" style="background: var(--bg-hover); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-      <canvas id="certCanvas" width="1400" height="990" style="max-width: 100%; height: auto; border-radius: 4px; display: block;"></canvas>
-    </div>
-    <div class="cert-actions" style="margin-top: 24px; display: flex; gap: 12px; justify-content: flex-end;">
-      <button id="certPrintBtn" class="pro-btn">Save as PDF</button>
-      <button id="certPngBtn" class="pro-btn pro-btn-primary">Download PNG</button>
+    <div class="cert-canvas-wrap"><canvas id="certCanvas" width="1400" height="990"></canvas></div>
+    <div class="cert-actions">
+      <button id="certPrintBtn" class="pomo-btn outline-pill" style="width:auto; padding: 10px 20px;">Print / Save as PDF</button>
+      <button id="certPngBtn" class="pomo-btn primary" style="width:auto; padding: 10px 20px;">Download PNG</button>
     </div>
   </div>
 
 </div>
 
-<!-- TOUR OVERLAY -->
+<!-- M3 FLOATING PILL (Hidden until minimized) -->
+<button id="showToolsPill">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+  Timer
+</button>
+
+<!-- M3 NATIVE RIGHT SIDEBAR -->
+<div id="m3RightTools">
+  
+  <!-- Clean M3 Pomodoro -->
+  <div class="tool-card pomo-card">
+    <div class="focus-header">
+      <span class="focus-title">Timer</span>
+      <button id="minimizeToolsBtn" class="minimize-btn" title="Minimize to pill">✕</button>
+    </div>
+    
+    <!-- Smooth Standard Progress Ring -->
+    <div class="pomo-circle-wrap">
+      <svg viewBox="0 0 100 100" class="clean-ring">
+        <circle cx="50" cy="50" r="45" class="ring-bg"></circle>
+        <circle cx="50" cy="50" r="45" class="ring-progress" id="pomoRing"></circle>
+      </svg>
+      <div id="pomoTimer" class="pomo-time-text">25:00</div>
+    </div>
+
+    <!-- M3 Pill Buttons -->
+    <div class="pomo-btn-row">
+      <button id="pomoStart" class="pomo-btn blue-pill">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Start
+      </button>
+      <button id="pomoAdd" class="pomo-btn green-pill">+ 10s</button>
+    </div>
+    <button id="pomoReset" class="pomo-btn outline-pill">✕ Cancel</button>
+  </div>
+  
+  <!-- Sticky Note -->
+  <div class="tool-card sticky-card">
+    <div class="focus-header" style="margin-bottom: 12px;">
+      <span class="focus-title" style="color: var(--pyq);">Quick Note</span>
+    </div>
+    <textarea id="m3StickyNote" class="sticky-note" placeholder="Jot down quick thoughts..."></textarea>
+  </div>
+</div>
+
+
+  
+    <!-- ==================== ABOUT & LEGAL ==================== -->
+    <section id="sectionAbout" class="content-section" style="max-width: 800px; margin: 0 auto; padding: 40px 20px;">
+      
+      <!-- Header with real logo -->
+      <div style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 48px;">
+        <img src="logot.png" alt="Factorial Academy Logo" style="width: 80px; height: 80px; object-fit: contain; filter: var(--logo-filter, invert(0)); margin-bottom: 16px;">
+        <h2 style="font-family: var(--font-display); font-size: 2.5rem; font-weight: 800; color: var(--text); margin: 0; letter-spacing: -0.5px;">Factorial Academy</h2>
+        <div style="font-size: 1.1rem; color: var(--muted); margin-top: 8px;">Legal, Privacy, and Credits</div>
+
+        <!-- Social Links -->
+        <div style="display: flex; gap: 20px; margin-top: 24px; align-items: center;">
+          <!-- Website -->
+          <a href="https://www.factorialacademy.com" target="_blank" rel="noopener noreferrer" title="Website" style="color: var(--text); transition: color 0.2s; display: flex;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text)'">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          </a>
+          <!-- YouTube -->
+          <a href="https://www.youtube.com/@factorialacademy" target="_blank" rel="noopener noreferrer" title="YouTube — Factorial Academy" style="color: var(--text); transition: color 0.2s; display: flex;" onmouseover="this.style.color='#FF0000'" onmouseout="this.style.color='var(--text)'">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+          </a>
+          <!-- Telegram -->
+          <a href="https://t.me/factorialacademy" target="_blank" rel="noopener noreferrer" title="Telegram" style="color: var(--text); transition: color 0.2s; display: flex;" onmouseover="this.style.color='#0088cc'" onmouseout="this.style.color='var(--text)'">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+          </a>
+        </div>
+
+        <!-- Stats strip — real numbers, real product feel -->
+        <div class="about-stats">
+          <div class="about-stat"><div class="about-stat-num">700+</div><div class="about-stat-lbl">Lectures</div></div>
+          <div class="about-stat"><div class="about-stat-num">2</div><div class="about-stat-lbl">Core Developers</div></div>
+          <div class="about-stat"><div class="about-stat-num">14</div><div class="about-stat-lbl">Themes</div></div>
+          <div class="about-stat"><div class="about-stat-num">24/7</div><div class="about-stat-lbl">Auto-Synced</div></div>
+        </div>
+      </div>
+
+      <!-- Credits Section: Equal billing for both core contributors -->
+      <div class="about-card credits-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 24px; padding: 32px; margin-bottom: 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+        <h3 style="font-family: var(--font-display); font-size: 1rem; font-weight: 700; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; letter-spacing: 0.05em; display: flex; align-items: center; gap: 8px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Team &amp; Credits
+        </h3>
+        <p style="font-size: 0.9rem; color: var(--muted); margin: 0 0 28px;">The two people behind everything you're using right now.</p>
+
+        <!-- Story timeline -->
+        <div class="credits-timeline">
+          <div class="ct-node">
+            <div class="ct-dot ct-dot-start"></div>
+            <div class="ct-label">
+              <div class="ct-label-title">Platform launches</div>
+              <div class="ct-label-sub">Built from zero by Shree</div>
+            </div>
+          </div>
+          <div class="ct-line"></div>
+          <div class="ct-node">
+            <div class="ct-dot ct-dot-mid"></div>
+            <div class="ct-label">
+              <div class="ct-label-title">September 2026</div>
+              <div class="ct-label-sub">suryansh1807 joins the team</div>
+            </div>
+          </div>
+          <div class="ct-line"></div>
+          <div class="ct-node">
+            <div class="ct-dot ct-dot-end"></div>
+            <div class="ct-label">
+              <div class="ct-label-title">Today</div>
+              <div class="ct-label-sub">Built &amp; run by both, equally</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="credits-grid">
+          <!-- Shree -->
+          <div class="credit-person">
+            <div class="credit-avatar" style="background: linear-gradient(135deg, var(--pyq), var(--accent));">S</div>
+            <div class="credit-info">
+              <div class="credit-name">Shree</div>
+              <div class="credit-role">Founder &amp; Lead Developer</div>
+              <div class="credit-timeframe">🚀 Since day one</div>
+              <p class="credit-desc">Designed and built the platform from scratch — the core architecture, the database, the tracking system, and the Material&nbsp;3 interface — and has maintained it end to end ever since.</p>
+              <div class="credit-tags">
+                <span class="credit-tag">Architecture</span>
+                <span class="credit-tag">Database</span>
+                <span class="credit-tag">UI System</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- suryansh1807 -->
+          <div class="credit-person">
+            <div class="credit-avatar" style="background: linear-gradient(135deg, var(--accent), var(--pyq));">Su</div>
+            <div class="credit-info">
+              <div class="credit-name">suryansh1807</div>
+              <div class="credit-role">Core Developer</div>
+              <div class="credit-timeframe">🌱 Joined September 2026</div>
+              <p class="credit-desc">Joined the team in September 2026 and shipped the Video Portal, Playlistic, and automatic syncing — the features that keep the video library and progress data staying up to date on their own.</p>
+              <div class="credit-tags">
+                <span class="credit-tag">Video Portal</span>
+                <span class="credit-tag">Playlistic</span>
+                <span class="credit-tag">Auto-Sync</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p style="font-size: 0.85rem; color: var(--muted); margin: 24px 0 0; text-align: center; border-top: 1px solid var(--border); padding-top: 16px;">
+          Factorial Academy is built and maintained equally by both contributors above.
+        </p>
+      </div>
+
+      <!-- Roadmap Section -->
+      <div class="about-card" id="roadmapCard" style="background: var(--panel); border: 1px solid var(--border); border-radius: 24px; padding: 32px; margin-bottom: 32px;">
+        <h3 style="font-family: var(--font-display); font-size: 1rem; font-weight: 700; text-transform: uppercase; color: var(--text); margin-bottom: 6px; letter-spacing: 0.05em; border-bottom: 1px solid var(--border); padding-bottom: 12px;">Roadmap</h3>
+        <p style="font-size: 0.9rem; color: var(--muted); margin: 16px 0 20px;">Not promises, not a queue — just what's on the list. Nothing here has a date.</p>
+        <div id="roadmapList" style="display:flex; flex-direction:column; gap:10px;"></div>
+      </div>
+
+      <!-- Privacy Policy Section -->
+      <div class="about-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 24px; padding: 32px; margin-bottom: 32px;">
+        <h3 style="font-family: var(--font-display); font-size: 1rem; font-weight: 700; text-transform: uppercase; color: var(--text); margin-bottom: 16px; letter-spacing: 0.05em; border-bottom: 1px solid var(--border); padding-bottom: 12px;">Privacy Policy</h3>
+        <p style="font-size: 0.95rem; color: var(--muted); line-height: 1.6; margin-bottom: 16px;">
+          We take your privacy seriously. Factorial Academy strictly collects only the data necessary to provide you with your educational tracking experience.
+        </p>
+        <ul style="font-size: 0.95rem; color: var(--muted); line-height: 1.6; padding-left: 20px; margin: 0;">
+          <li style="margin-bottom: 8px;"><strong>Data Storage:</strong> All user tracking, heatmap data, and progress are securely stored in our cloud database.</li>
+          <li style="margin-bottom: 8px;"><strong>Third-Party Access:</strong> We do not sell or rent your personal information to third parties.</li>
+          <li><strong>Cookies:</strong> Local storage is utilized purely for session retention and dark mode preferences.</li>
+        </ul>
+      </div>
+
+      <!-- Terms of Service Section -->
+      <div class="about-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 24px; padding: 32px; margin-bottom: 32px;">
+        <h3 style="font-family: var(--font-display); font-size: 1rem; font-weight: 700; text-transform: uppercase; color: var(--text); margin-bottom: 16px; letter-spacing: 0.05em; border-bottom: 1px solid var(--border); padding-bottom: 12px;">Terms of Service</h3>
+        <p style="font-size: 0.95rem; color: var(--muted); line-height: 1.6; margin-bottom: 0;">
+          By accessing and using this application, you agree to utilize it solely for educational purposes. The videos provided are streamed from YouTube via standard embedding protocols, and are the intellectual property of their respective creators. Factorial Academy does not host any video content natively. 
+        </p>
+      </div>
+
+        
+      <!-- Contact Us Section -->
+      <div class="about-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 24px; padding: 32px; margin-bottom: 32px;">
+        <h3 style="font-family: var(--font-display); font-size: 1rem; font-weight: 700; text-transform: uppercase; color: var(--text); margin-bottom: 16px; letter-spacing: 0.05em; border-bottom: 1px solid var(--border); padding-bottom: 12px;">Contact Us</h3>
+        <p style="font-size: 0.95rem; color: var(--muted); line-height: 1.6; margin-bottom: 20px;">
+          Questions, feedback, partnership requests, or anything else — we'd love to hear from you. Reach the team directly by email and we'll get back to you as soon as we can.
+        </p>
+        <div class="contact-row">
+          <div class="contact-item">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <span id="contactEmailLabel">contact@factorialacademy.com</span>
+          </div>
+          <button class="pomo-btn primary" style="width: auto; padding: 10px 24px; font-weight: 600;" onclick="window.location.href='mailto:contact@factorialacademy.com?subject=' + encodeURIComponent('Factorial Academy — Inquiry')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            Email Us
+          </button>
+        </div>
+      </div>
+
+      <!-- Report a Bug Section -->
+      <div class="about-card" style="background: var(--panel-2); border: 1px dashed var(--border); border-radius: 24px; padding: 32px; margin-bottom: 32px; text-align: center;">
+        <h3 style="font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; color: var(--text); margin-bottom: 12px;">Found an issue?</h3>
+        <p style="font-size: 0.95rem; color: var(--muted); line-height: 1.6; margin-bottom: 20px;">
+          Help us keep the platform stable. If you experience crashes, broken videos, or UI glitches, please report them directly to the developer team — every report goes straight to Shree and suryansh1807.
+        </p>
+        <button class="pomo-btn outline-pill" id="reportBugBtn" style="margin: 0 auto; display: inline-flex; width: auto; padding: 10px 24px; font-weight: 600;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><path d="M9 9V6a3 3 0 0 1 6 0v3"/><path d="M8 9h8a2 2 0 0 1 2 2v6a5 5 0 0 1-10 0v-6a2 2 0 0 1 2-2z"/><path d="M3 12h4M17 12h4M6 6l2 2M18 6l-2 2M6 20l2-2M18 20l-2-2"/></svg>
+          Report a Bug
+        </button>
+      </div>
+
+      <!-- Exact Legal Text Block -->
+      <div style="font-size: 0.9rem; color: var(--muted); text-align: center; margin-top: 40px; line-height: 1.6;">
+        Independent tracker — not affiliated with Google or any exam body.<br>
+        Video data provided via YouTube API integrations.<br>
+        Typefaces: Sora, Inter, JetBrains Mono (SIL Open Font Licence 1.1).
+      </div>
+    </section>
+
+<!-- ==================== FOOTER ==================== -->
+  <footer class="app-footer" style="padding: 24px; text-align: center; border-top: 1px solid var(--border); margin-top: auto; font-family: var(--font-body);">
+    <div class="footer-links" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; margin-bottom: 12px; font-size: 0.85rem;">
+      <a href="#" style="color: var(--text); text-decoration: none;">Privacy</a>
+      <a href="#" style="color: var(--text); text-decoration: none;">Terms &amp; disclaimer</a>
+      <a href="#" style="color: var(--text); text-decoration: none;">What's new</a>
+      <a href="#" style="color: var(--text); text-decoration: none;">Roadmap</a>
+      <a href="#" style="color: var(--text); text-decoration: none;">Report a bug</a>
+      <a href="#" id="footerCreditsBtn" style="color: var(--accent); text-decoration: none; font-weight: 500;">Credits &amp; licences</a>
+    </div>
+    <div class="footer-copy" style="font-size: 0.75rem; color: var(--muted); line-height: 1.5;">Factorial Academy Tracker V7 &middot; Built &amp; maintained by Shree &amp; suryansh1807 &middot; Lessons &copy; Factorial Academy &middot; Lessons are streamed from YouTube, a trademark of Google LLC.</div>
+  </footer>
+
 <div class="tour-overlay" id="tourOverlay" style="display:none;" aria-live="polite">
-  <div class="tour-dim" id="tourDim" style="position: fixed; inset: 0; background: rgba(15,23,42,0.7); z-index: 9998;"></div>
+  <div class="tour-dim" id="tourDim"></div>
   <div class="tour-arrow" id="tourArrow" style="display:none;"></div>
-  <div class="pro-card tour-card" id="tourCard" role="dialog" style="position: relative; z-index: 9999; padding: 24px; max-width: 320px;">
-    <div class="tour-badge" id="tourBadge" style="font-size: 0.75rem; font-weight: 700; color: var(--brand-primary); margin-bottom: 8px;"></div>
-    <h4 id="tourTitle" style="margin: 0 0 8px 0;"></h4>
-    <p id="tourText" style="font-size: 0.875rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px;"></p>
-    <input type="text" id="tourNameInput" class="pro-input tour-name" placeholder="Your name" maxlength="40" style="display:none; margin-bottom: 16px;">
-    <div class="tour-foot" style="display: flex; justify-content: space-between; align-items: center;">
+  <div class="tour-card" id="tourCard" role="dialog" aria-label="Guided tour">
+    <div class="tour-badge" id="tourBadge"></div>
+    <b id="tourTitle"></b>
+    <p id="tourText"></p>
+    <input type="text" id="tourNameInput" class="tour-name" placeholder="Your name" maxlength="40" autocomplete="off" spellcheck="false" style="display:none;">
+    <div class="tour-foot">
       <div class="tour-dots" id="tourDots"></div>
-      <div class="tour-btns" style="display: flex; gap: 8px;">
-        <button class="pro-btn" type="button" id="tourSkip" style="padding: 6px 12px; border: none; background: transparent;">Skip</button>
-        <button class="pro-btn pro-btn-primary" type="button" id="tourNext" style="padding: 6px 16px;">Next</button>
+      <div class="tour-btns">
+        <button class="tour-skip" type="button" id="tourSkip">Skip</button>
+        <button class="pomo-btn primary" type="button" id="tourNext">Next</button>
       </div>
     </div>
   </div>
