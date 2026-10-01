@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Focus Portal · Factorial Academy</title>
+<link rel="icon" href="../logot.png">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#05060f;--p:rgba(14,16,36,.8);--a:#00f0ff;--b:#b026ff;--c:#ff2e97;--t:#eef1ff;--m:#8f98cc}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--t);font:15px Inter,sans-serif;height:100vh;overflow:hidden;display:flex;flex-direction:column}
+body::before{content:"";position:fixed;inset:-20%;z-index:-1;background:radial-gradient(40% 40% at 15% 20%,rgba(176,38,255,.3),transparent 70%),radial-gradient(35% 35% at 85% 70%,rgba(0,240,255,.22),transparent 70%);animation:au 20s ease-in-out infinite alternate}
+@keyframes au{to{transform:translate3d(5%,4%,0) scale(1.15)}}
+header{display:flex;align-items:center;gap:14px;padding:12px 20px;border-bottom:1px solid rgba(0,240,255,.2)}
+header a{color:var(--m);text-decoration:none;font-size:13px}header a:hover{color:var(--a)}
+h1{font:700 18px Sora;background:linear-gradient(90deg,var(--a),var(--b),var(--c),var(--a));background-size:300%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:fl 6s linear infinite;flex:1}
+@keyframes fl{to{background-position:300% 0}}
+#sync{font-size:12px;color:var(--m);display:flex;align-items:center;gap:8px}
+#sync i{width:8px;height:8px;border-radius:50%;background:var(--a);box-shadow:0 0 10px var(--a)}
+#sync.busy i{animation:pl .6s infinite alternate;background:var(--c);box-shadow:0 0 10px var(--c)}@keyframes pl{to{transform:scale(1.7)}}
+button{font:inherit;cursor:pointer;color:var(--t);background:rgba(0,240,255,.08);border:1px solid rgba(0,240,255,.4);border-radius:999px;padding:7px 14px;transition:.25s}
+button:hover{box-shadow:0 0 16px var(--a);background:rgba(0,240,255,.2)}
+main{flex:1;display:grid;grid-template-columns:300px 1fr 340px;gap:16px;padding:16px;min-height:0;transition:.5s}
+aside,section{background:var(--p);border:1px solid rgba(0,240,255,.2);border-radius:20px;backdrop-filter:blur(12px);overflow:auto;min-height:0}
+aside{padding:10px}
+.pl{display:block;width:100%;text-align:left;border-radius:14px;padding:12px 14px;margin-bottom:6px;border:1px solid transparent;background:none;animation:up .5s both}
+.pl small{display:block;color:var(--m);margin-top:2px}
+.pl.on{background:linear-gradient(90deg,rgba(0,240,255,.16),rgba(176,38,255,.12));border-color:var(--a);box-shadow:0 0 20px rgba(0,240,255,.25)}
+@keyframes up{from{opacity:0;transform:translateY(14px)}}
+#stage{display:flex;flex-direction:column;padding:14px;gap:12px}
+.vid{aspect-ratio:16/9;width:100%;border-radius:14px;overflow:hidden;background:#000;box-shadow:0 0 40px rgba(0,240,255,.25);position:relative}
+.vid iframe,.vid div{position:absolute;inset:0;width:100%;height:100%;border:0}
+#now{font:700 20px Sora}#meta{color:var(--m);font-size:13px}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.it{display:flex;gap:10px;padding:8px;border-radius:14px;cursor:pointer;border:1px solid transparent;transition:.25s;animation:up .4s both}
+.it:hover{transform:translateX(4px);border-color:rgba(176,38,255,.6);box-shadow:0 0 18px rgba(176,38,255,.3)}
+.it.on{border-color:var(--a);background:rgba(0,240,255,.08)}
+.it img{width:110px;aspect-ratio:16/9;object-fit:cover;border-radius:8px;flex:none}
+.it span{font-size:13px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.it.done{opacity:.45}.it.done::after{content:"✓";color:var(--a);margin-left:auto}
+body.focus main{grid-template-columns:0 1fr 0;gap:0;padding:16px 8vw}body.focus aside{opacity:0;padding:0;border:0}
+body.focus header{opacity:.15}body.focus header:hover{opacity:1}
+#msg{padding:30px;text-align:center;color:var(--m)}
+@media(max-width:1000px){body{overflow:auto;height:auto}main{grid-template-columns:1fr}aside,section{max-height:50vh}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head>
+<body>
+<header><a href="../">← Dashboard</a><h1>FOCUS PORTAL</h1>
+<span id="sync"><i></i><span id="st">Syncing…</span></span><button id="rs">⟳ Sync</button><button id="fm">Focus mode</button></header>
+<main>
+<aside id="pls"><div id="msg">Loading playlists from YouTube…</div></aside>
+<section id="stage"><div class="vid"><div id="pl"></div></div><div id="now">Pick a video</div><div id="meta"></div>
+<div class="row"><button id="pv">◀ Prev</button><button id="nx">Next ▶</button><button id="wd">Mark watched</button></div></section>
+<aside id="list"></aside>
+</main>
+<script type="module">
+import { YT_API_KEY as K, YT_CHANNEL_ID as CH } from '../config.js';
+const $=id=>document.getElementById(id),LS=localStorage;
+const API=async(p,q)=>{const u=new URL('https://www.googleapis.com/youtube/v3/'+p);Object.entries({...q,key:K}).forEach(([k,v])=>u.searchParams.set(k,v));
+  const r=await fetch(u);const j=await r.json();if(!r.ok)throw new Error(j.error?.message||r.status);return j};
+const paged=async(p,q)=>{let out=[],t='';do{const j=await API(p,{...q,maxResults:50,...(t&&{pageToken:t})});out.push(...j.items);t=j.nextPageToken}while(t&&out.length<1500);return out};
+let D=JSON.parse(LS.fa_portal||'null')||{pls:[]},cur=null,idx=0,player=null,W=new Set(JSON.parse(LS.fa_portal_w||'[]'));
+
+async function sync(){
+  $('sync').classList.add('busy');$('st').textContent='Syncing…';
+  try{
+    const ch=await API('channels',{part:'contentDetails',id:CH});
+    const up=ch.items[0].contentDetails.relatedPlaylists.uploads;
+    const raw=await paged('playlists',{part:'snippet,contentDetails',channelId:CH});
+    const list=[{id:up,title:'🔥 Latest Uploads',n:0},...raw.map(p=>({id:p.id,title:p.snippet.title,n:p.contentDetails.itemCount}))];
+    const pls=await Promise.all(list.map(async p=>{
+      const it=await paged('playlistItems',{part:'snippet,status',playlistId:p.id});
+      const v=it.filter(i=>i.status?.privacyStatus!=='private'&&!/^(private|deleted) video$/i.test(i.snippet.title)).map(i=>({id:i.snippet.resourceId.videoId,t:i.snippet.title,d:i.snippet.publishedAt}));
+      return{...p,v,n:v.length}}));
+    D={pls:pls.filter(p=>p.n),at:Date.now()};LS.fa_portal=JSON.stringify(D);
+    $('st').textContent='Synced '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+  }catch(e){$('st').textContent=D.pls.length?'Offline · showing cached':'Sync failed: '+e.message}
+  $('sync').classList.remove('busy');draw();
+}
+function draw(){
+  const pls=$('pls');pls.innerHTML='';
+  if(!D.pls.length){pls.innerHTML='<div id="msg">No playlists yet.</div>';return}
+  if(!cur||!D.pls.find(p=>p.id===cur.id))cur=D.pls[0];else cur=D.pls.find(p=>p.id===cur.id);
+  D.pls.forEach((p,i)=>{const b=document.createElement('button');b.className='pl'+(p.id===cur.id?' on':'');b.style.animationDelay=i*40+'ms';
+    b.innerHTML=`${esc(p.title)}<small>${p.n} videos</small>`;b.onclick=()=>{cur=p;idx=0;draw();play(0)};pls.append(b)});
+  const l=$('list');l.innerHTML='';
+  cur.v.forEach((v,i)=>{const d=document.createElement('div');d.className='it'+(i===idx?' on':'')+(W.has(v.id)?' done':'');d.style.animationDelay=Math.min(i,20)*25+'ms';
+    d.innerHTML=`<img loading="lazy" src="https://i.ytimg.com/vi/${v.id}/mqdefault.jpg" alt=""><span>${esc(v.t)}</span>`;d.onclick=()=>play(i);l.append(d)});
+  if(!player)play(idx,false);else label();
+}
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function label(){const v=cur.v[idx];$('now').textContent=v.t;$('meta').textContent=`${cur.title} · ${idx+1} of ${cur.n}`;
+  $('wd').textContent=W.has(v.id)?'✓ Watched':'Mark watched';
+  document.querySelectorAll('.it').forEach((e,i)=>e.classList.toggle('on',i===idx))}
+function play(i,auto=true){
+  idx=Math.max(0,Math.min(i,cur.v.length-1));const v=cur.v[idx];LS.fa_portal_last=JSON.stringify({p:cur.id,v:v.id});
+  if(player&&player.loadVideoById){auto?player.loadVideoById(v.id):player.cueVideoById(v.id)}
+  else if(window.YT?.Player){player=new YT.Player('pl',{videoId:v.id,playerVars:{rel:0,modestbranding:1,iv_load_policy:3,playsinline:1,autoplay:auto?1:0},host:'https://www.youtube-nocookie.com',
+    events:{onStateChange:e=>{if(e.data===0){W.add(cur.v[idx].id);LS.fa_portal_w=JSON.stringify([...W]);play(idx+1)}}}})}
+  label();
+}
+window.onYouTubeIframeAPIReady=()=>{if(cur)play(idx,false)};
+const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';document.head.append(s);
+$('nx').onclick=()=>play(idx+1);$('pv').onclick=()=>play(idx-1);$('rs').onclick=sync;
+$('wd').onclick=()=>{const id=cur.v[idx].id;W.has(id)?W.delete(id):W.add(id);LS.fa_portal_w=JSON.stringify([...W]);draw()};
+$('fm').onclick=()=>document.body.classList.toggle('focus');
+// restore last position, draw cached instantly, then auto-sync (on load, every 15 min, and when tab refocuses)
+try{const l=JSON.parse(LS.fa_portal_last||'null');if(l){const p=D.pls.find(x=>x.id===l.p);if(p){cur=p;idx=Math.max(0,p.v.findIndex(v=>v.id===l.v))}}}catch{}
+draw();sync();setInterval(sync,15*60e3);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&Date.now()-(D.at||0)>5*60e3)sync()});
+</script></body></html>
