@@ -15,6 +15,7 @@ import { mountClassAnalytics } from './classAnalytics.js';
 
 import { initYtFeed } from './ytFeed.js';
 import { initAllVideosGrid } from './allVideos.js';
+import { initFocusPortal } from './portal.js';
 import { initOnboarding, openRoadmap } from './onboarding.js';
 window.openRoadmap = openRoadmap;
 
@@ -180,6 +181,7 @@ window.showSection = showSection;
 // ---- Boot ----
 (async function boot() {
   initAuthForm();
+  initFocusPortal();
   wireStudentControls();
   await loadAndMergeCustomLectures();
 

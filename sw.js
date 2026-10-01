@@ -4,7 +4,7 @@
 // NOT cache Firebase/Firestore/YouTube requests — this app is live data,
 // and a stale cached response would be worse than a network error.
 
-const VERSION = 'fa-shell-v1-neon1';
+const VERSION = 'fa-shell-v1';
 const SHELL = [
   './', './index.html', './styles.css', './portalPromo.css',
   './main.js', './auth.js', './firebase.js', './config.js',
@@ -12,7 +12,7 @@ const SHELL = [
   './classAnalytics.js', './customLectures.js', './qotd.js', './qotdView.js',
   './qotdRecommend.js', './metrics.js', './data.js', './allVideos.js',
   './allVideosData.js', './ytApi.js', './ytFeed.js', './adminCheck.js',
-  './portalPromo.js', './neon.css', './neon.js', './manifest.webmanifest',
+  './portalPromo.js', './manifest.webmanifest',
   './logot.png', './offline.html', './404.html',
   './icons/icon-192.png', './icons/icon-512.png'
 ];
